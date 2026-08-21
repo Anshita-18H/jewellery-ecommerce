@@ -1,0 +1,21 @@
+{
+  "name": "jewellery-ecommerce-backend",
+  "version": "1.0.0",
+  "description": "Backend API for jewellery e-commerce site (Express + MySQL, session-based cart, no auth)",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mysql2": "^3.10.0",
+    "express-session": "^1.18.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

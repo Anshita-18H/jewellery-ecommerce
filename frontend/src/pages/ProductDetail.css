@@ -1,0 +1,120 @@
+.pd-page {
+  padding-top: 2.5rem;
+  padding-bottom: 5rem;
+  min-height: 60vh;
+}
+
+.pd-breadcrumb {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+.pd-breadcrumb a {
+  color: var(--text-body);
+}
+.pd-breadcrumb a:hover {
+  color: var(--gold-light);
+}
+
+.pd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+}
+
+.pd-image-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.pd-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pd-name {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  margin-top: 0.6rem;
+}
+
+.pd-price {
+  font-size: 1.1rem;
+  color: var(--gold-light);
+  margin-top: 0.8rem;
+}
+
+.pd-description {
+  margin-top: 1.5rem;
+  line-height: 1.7;
+  font-size: 0.92rem;
+  color: var(--text-body);
+}
+
+.pd-stock {
+  margin-top: 1.2rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.pd-actions {
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.pd-qty {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.pd-qty button {
+  background: none;
+  border: none;
+  color: var(--cream);
+  width: 38px;
+  height: 42px;
+  font-size: 1rem;
+}
+.pd-qty button:hover {
+  color: var(--gold-light);
+}
+.pd-qty span {
+  min-width: 32px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.pd-add-btn {
+  flex: 1;
+}
+
+.pd-added-msg {
+  margin-top: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--gold-light);
+}
+.pd-added-msg a {
+  text-decoration: underline;
+}
+
+.pd-status {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-muted);
+}
+.pd-error {
+  color: #c98a76;
+}
+
+@media (max-width: 760px) {
+  .pd-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}

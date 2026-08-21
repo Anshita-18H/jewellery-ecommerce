@@ -1,0 +1,135 @@
+.checkout-page {
+  padding-top: 2.5rem;
+  padding-bottom: 5rem;
+  min-height: 60vh;
+}
+
+.checkout-title {
+  margin-top: 0.6rem;
+  margin-bottom: 2.5rem;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+
+.checkout-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.checkout-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.checkout-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.checkout-form input {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--cream);
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+}
+.checkout-form input:focus {
+  outline: none;
+  border-color: var(--gold-dim);
+}
+
+.checkout-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.checkout-submit {
+  margin-top: 0.8rem;
+  padding: 1rem;
+}
+.checkout-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkout-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.checkout-error {
+  color: #c98a76;
+  font-size: 0.82rem;
+}
+
+.checkout-summary {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.8rem;
+  position: sticky;
+  top: 100px;
+}
+
+.checkout-summary h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1.2rem;
+}
+
+.checkout-summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--text-body);
+  margin-bottom: 0.7rem;
+}
+
+.checkout-summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  color: var(--cream);
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  margin-top: 0.7rem;
+}
+
+.checkout-success {
+  text-align: center;
+  padding-top: 5rem;
+}
+.checkout-success h1 {
+  margin: 0.6rem 0 1.2rem;
+}
+.checkout-success-text {
+  max-width: 480px;
+  margin: 0 auto 2.2rem;
+  line-height: 1.7;
+  color: var(--text-body);
+}
+
+.checkout-status {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-muted);
+}
+
+@media (max-width: 860px) {
+  .checkout-grid {
+    grid-template-columns: 1fr;
+  }
+  .checkout-form-row {
+    grid-template-columns: 1fr;
+  }
+}
