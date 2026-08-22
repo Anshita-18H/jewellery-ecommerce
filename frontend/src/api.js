@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 // `credentials: 'include'` is required so the session cookie
 // (used for the cart) is sent and stored by the browser.

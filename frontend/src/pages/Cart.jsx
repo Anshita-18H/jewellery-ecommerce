@@ -56,7 +56,7 @@ export default function Cart({ onCartChange }) {
               <img src={item.image_url} alt={item.name} className="cart-item-img" />
               <div className="cart-item-info">
                 <h3>{item.name}</h3>
-                <p className="cart-item-price">${Number(item.price).toLocaleString()} USD</p>
+                <p className="cart-item-price">Rs.{Number(item.price).toLocaleString()} </p>
               </div>
               <div className="pd-qty cart-item-qty">
                 <button onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}>−</button>
@@ -80,7 +80,7 @@ export default function Cart({ onCartChange }) {
           <h3>Order Summary</h3>
           <div className="cart-summary-row">
             <span>Subtotal</span>
-            <span>${cart.total.toLocaleString()} USD</span>
+            <span> Rs.{cart.total.toLocaleString()} </span>
           </div>
           <div className="cart-summary-row cart-summary-note">
             <span>Shipping</span>
@@ -88,7 +88,7 @@ export default function Cart({ onCartChange }) {
           </div>
           <div className="cart-summary-total">
             <span>Total</span>
-            <span>${cart.total.toLocaleString()} USD</span>
+            <span>Rs.{cart.total.toLocaleString()} </span>
           </div>
           <button className="btn btn-gold cart-checkout-btn" onClick={() => navigate('/checkout')}>
             Proceed to Checkout

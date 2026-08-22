@@ -2,6 +2,7 @@
 -- Run this once to create the database, tables, and sample data.
 -- Usage: mysql -u root -p < schema.sql
 
+
 CREATE DATABASE IF NOT EXISTS jewellery_db;
 USE jewellery_db;
 
@@ -69,11 +70,13 @@ INSERT INTO categories (name, slug) VALUES
   ('Bridal', 'bridal');
 
 INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured) VALUES
-  (1, 'Rose Gold Solitaire Ring', 'rose-gold-solitaire-ring', 'Elegant rose gold ring with a solitaire cut stone, perfect for everyday wear.', 4999.00, 12, 'https://placehold.co/500x500/f5e6e0/8b5e3c?text=Ring+1', TRUE),
-  (1, 'Classic Gold Band', 'classic-gold-band', 'Timeless plain gold band, hallmark certified.', 8999.00, 8, 'https://placehold.co/500x500/f5e6e0/8b5e3c?text=Ring+2', FALSE),
-  (2, 'Layered Pearl Necklace', 'layered-pearl-necklace', 'Multi-layer necklace with freshwater pearls.', 6499.00, 10, 'https://placehold.co/500x500/f0e9df/8b5e3c?text=Necklace+1', TRUE),
-  (2, 'Temple Design Necklace', 'temple-design-necklace', 'Traditional temple-style necklace, festive wear.', 15999.00, 5, 'https://placehold.co/500x500/f0e9df/8b5e3c?text=Necklace+2', FALSE),
-  (3, 'Kundan Drop Earrings', 'kundan-drop-earrings', 'Handcrafted kundan earrings with pearl drops.', 3499.00, 20, 'https://placehold.co/500x500/eee3d3/8b5e3c?text=Earring+1', TRUE),
-  (3, 'Minimalist Gold Studs', 'minimalist-gold-studs', 'Everyday studs in polished gold finish.', 1999.00, 25, 'https://placehold.co/500x500/eee3d3/8b5e3c?text=Earring+2', FALSE),
-  (4, 'Charm Bracelet', 'charm-bracelet', 'Delicate chain bracelet with hanging charms.', 2799.00, 15, 'https://placehold.co/500x500/f5eee0/8b5e3c?text=Bracelet+1', FALSE),
-  (5, 'Bridal Kundan Set', 'bridal-kundan-set', 'Complete bridal set: necklace, earrings, and maang tikka.', 24999.00, 3, 'https://placehold.co/500x500/f7e8e8/8b5e3c?text=Bridal+Set', TRUE);
+  (1, 'Rose Gold Solitaire Ring', 'rose-gold-solitaire-ring', 'Elegant rose gold ring with a solitaire cut stone, perfect for everyday wear.', 4999.00, 12, 'https://images.unsplash.com/photo-1551811040-f13e57351ef3?w=800&auto=format&fit=crop&q=80', TRUE),
+  (1, 'Classic Gold Band', 'classic-gold-band', 'Timeless plain gold band, hallmark certified.', 8999.00, 8, 'https://images.unsplash.com/photo-1551811040-f13e57351ef3?w=800&auto=format&fit=crop&q=80', FALSE),
+  (2, 'Layered Pearl Necklace', 'layered-pearl-necklace', 'Multi-layer necklace with freshwater pearls.', 6499.00, 10, 'https://images.unsplash.com/photo-1758995115682-1452a1a9e35b?w=800&auto=format&fit=crop&q=80', TRUE),
+  (2, 'Temple Design Necklace', 'temple-design-necklace', 'Traditional temple-style necklace, festive wear.', 15999.00, 5, 'https://images.unsplash.com/photo-1758995115682-1452a1a9e35b?w=800&auto=format&fit=crop&q=80', FALSE),
+  (3, 'Kundan Drop Earrings', 'kundan-drop-earrings', 'Handcrafted kundan earrings with pearl drops.', 3499.00, 20, 'https://images.unsplash.com/photo-1680968921717-4abbbe793bb3?w=800&auto=format&fit=crop&q=80', TRUE),
+  (3, 'Minimalist Gold Studs', 'minimalist-gold-studs', 'Everyday studs in polished gold finish.', 1999.00, 25, 'https://images.unsplash.com/photo-1680968921717-4abbbe793bb3?w=800&auto=format&fit=crop&q=80', FALSE),
+  (4, 'Charm Bracelet', 'charm-bracelet', 'Delicate chain bracelet with hanging charms.', 2799.00, 15, 'https://images.unsplash.com/photo-1602527418456-8b5cd2c7a4c2?w=800&auto=format&fit=crop&q=80', FALSE),
+  (5, 'Bridal Kundan Set', 'bridal-kundan-set', 'Complete bridal set: necklace, earrings, and maang tikka.', 24999.00, 3, 'https://images.unsplash.com/photo-1758995115682-1452a1a9e35b?w=800&auto=format&fit=crop&q=80', TRUE);
+
+  

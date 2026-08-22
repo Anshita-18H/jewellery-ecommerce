@@ -14,7 +14,7 @@ const app = express();
 // and to send/receive the session cookie.
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
   })
 );
@@ -31,7 +31,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       httpOnly: true,
-      secure: false, // set to true once deployed behind HTTPS
+      secure: process.env.NODE_ENV === 'production',
     },
   })
 );

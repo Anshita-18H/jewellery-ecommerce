@@ -52,7 +52,7 @@ export default function Checkout({ onCartChange }) {
         <h1>Thank you, {form.customer_name.split(' ')[0]}.</h1>
         <p className="checkout-success-text">
           Your order <strong>#{orderPlaced.order_id}</strong> has been placed for{' '}
-          <strong>${Number(orderPlaced.total).toLocaleString()} USD</strong>. We'll reach out on{' '}
+          <strong>Rs.{Number(orderPlaced.total).toLocaleString()} </strong>. We'll reach out on{' '}
           <strong>{form.phone}</strong> with delivery updates.
         </p>
         <Link to="/shop" className="btn btn-gold">Continue Shopping</Link>
@@ -112,12 +112,12 @@ export default function Checkout({ onCartChange }) {
           {cart.items.map((item) => (
             <div key={item.cart_item_id} className="checkout-summary-item">
               <span>{item.name} × {item.quantity}</span>
-              <span>${item.subtotal.toLocaleString()}</span>
+              <span>Rs.{item.subtotal.toLocaleString()}</span>
             </div>
           ))}
           <div className="checkout-summary-total">
             <span>Total</span>
-            <span>${cart.total.toLocaleString()} USD</span>
+            <span>Rs.{cart.total.toLocaleString()} </span>
           </div>
         </div>
       </div>

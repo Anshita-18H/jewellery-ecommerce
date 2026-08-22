@@ -144,7 +144,7 @@ function AdminProducts() {
 
         <div className="admin-form-row">
           <label>
-            Price (USD)
+            Price (Rs.)
             <input name="price" type="number" step="0.01" value={form.price} onChange={handleChange} required />
           </label>
           <label>

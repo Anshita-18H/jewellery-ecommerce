@@ -1,12 +1,11 @@
 import './Gallery.css';
-
 const galleryImages = [
-  { src: 'https://placehold.co/600x750/1b1712/c9a876?text=Look+01', caption: 'The Radiance Edit' },
-  { src: 'https://placehold.co/600x750/1b1712/c9a876?text=Look+02', caption: 'Bridal Story' },
-  { src: 'https://placehold.co/600x750/1b1712/c9a876?text=Look+03', caption: 'Everyday Gold' },
-  { src: 'https://placehold.co/600x750/1b1712/c9a876?text=Look+04', caption: 'Kundan Heritage' },
-  { src: 'https://placehold.co/600x750/1b1712/c9a876?text=Look+05', caption: 'Studio Portraits' },
-  { src: 'https://placehold.co/600x750/1b1712/c9a876?text=Look+06', caption: 'The Aura Campaign' },
+  { src: 'https://images.unsplash.com/photo-1551811040-f13e57351ef3?w=600&h=750&auto=format&fit=crop&q=80', caption: 'The Radiance Edit' },
+  { src: 'https://images.unsplash.com/photo-1742891603547-950f510710d7?w=600&h=750&auto=format&fit=crop&q=80', caption: 'Bridal Story' },
+  { src: 'https://images.unsplash.com/photo-1599481805056-1c61a8975797?w=600&h=750&auto=format&fit=crop&q=80', caption: 'Everyday Gold' },
+  { src: 'https://images.unsplash.com/photo-1680968921717-4abbbe793bb3?w=600&h=750&auto=format&fit=crop&q=80', caption: 'Kundan Heritage' },
+  { src: 'https://images.unsplash.com/photo-1654699991520-aaaf4dd2608b?w=600&h=750&auto=format&fit=crop&q=80', caption: 'Studio Portraits' },
+  { src: 'https://images.unsplash.com/photo-1758995115682-1452a1a9e35b?w=600&h=750&auto=format&fit=crop&q=80', caption: 'The Aura Campaign' },
 ];
 
 export default function Gallery() {
