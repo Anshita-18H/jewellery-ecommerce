@@ -61,15 +61,14 @@ CREATE TABLE IF NOT EXISTS order_items (
   FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
 );
-
-INSERT INTO categories (name, slug) VALUES
+INSERT IGNORE INTO categories (name, slug) VALUES
   ('Rings', 'rings'),
   ('Necklaces', 'necklaces'),
   ('Earrings', 'earrings'),
   ('Bracelets', 'bracelets'),
   ('Bridal', 'bridal');
 
-INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured) VALUES
+INSERT IGNORE INTO products (category_id, name, slug, description, price, stock, image_url, is_featured) VALUES
   (1, 'Rose Gold Solitaire Ring', 'rose-gold-solitaire-ring', 'Elegant rose gold ring with a solitaire cut stone, perfect for everyday wear.', 4999.00, 12, 'https://images.unsplash.com/photo-1551811040-f13e57351ef3?w=800&auto=format&fit=crop&q=80', TRUE),
   (1, 'Classic Gold Band', 'classic-gold-band', 'Timeless plain gold band, hallmark certified.', 8999.00, 8, 'https://images.unsplash.com/photo-1551811040-f13e57351ef3?w=800&auto=format&fit=crop&q=80', FALSE),
   (2, 'Layered Pearl Necklace', 'layered-pearl-necklace', 'Multi-layer necklace with freshwater pearls.', 6499.00, 10, 'https://images.unsplash.com/photo-1758995115682-1452a1a9e35b?w=800&auto=format&fit=crop&q=80', TRUE),
