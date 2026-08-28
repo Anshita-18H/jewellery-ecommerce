@@ -195,7 +195,7 @@ function AdminProducts() {
                   <td><img src={p.image_url} alt={p.name} className="admin-table-img" /></td>
                   <td>{p.name}</td>
                   <td>{p.category_name || '—'}</td>
-                  <td>Rs.{Number(p.price).toLocaleString()}</td>
+                  <td>{Number(p.price).toLocaleString()}</td>
                   <td>{p.stock}</td>
                   <td className="admin-table-actions">
                     <button onClick={() => startEdit(p)}>Edit</button>
