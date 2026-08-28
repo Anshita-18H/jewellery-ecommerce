@@ -48,7 +48,7 @@ export default function ProductDetail({ onCartChange }) {
         <div className="pd-info">
           {product.category_name && <p className="eyebrow">{product.category_name}</p>}
           <h1 className="pd-name">{product.name}</h1>
-          <p className="pd-price">${Number(product.price).toLocaleString()} USD</p>
+          <p className="pd-price">Rs {Number(product.price).toLocaleString()} </p>
           <p className="pd-description">{product.description}</p>
 
           <p className="pd-stock">

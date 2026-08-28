@@ -195,7 +195,7 @@ function AdminProducts() {
                   <td><img src={p.image_url} alt={p.name} className="admin-table-img" /></td>
                   <td>{p.name}</td>
                   <td>{p.category_name || '—'}</td>
-                  <td>${Number(p.price).toLocaleString()}</td>
+                  <td>Rs.{Number(p.price).toLocaleString()}</td>
                   <td>{p.stock}</td>
                   <td className="admin-table-actions">
                     <button onClick={() => startEdit(p)}>Edit</button>
@@ -250,7 +250,7 @@ function AdminOrders() {
               <td>#{o.id}</td>
               <td>{o.customer_name}</td>
               <td>{o.phone}</td>
-              <td>${Number(o.total_amount).toLocaleString()}</td>
+              <td>Rs.{Number(o.total_amount).toLocaleString()}</td>
               <td>
                 <select value={o.status} onChange={(e) => handleStatusChange(o.id, e.target.value)}>
                   <option value="pending">Pending</option>
