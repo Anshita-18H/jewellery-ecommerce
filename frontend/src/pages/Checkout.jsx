@@ -102,7 +102,7 @@ export default function Checkout({ onCartChange }) {
           {error && <p className="checkout-error">{error}</p>}
 
           <button type="submit" className="btn btn-gold checkout-submit" disabled={submitting}>
-            {submitting ? 'Placing Order…' : `Place Order — $${cart.total.toLocaleString()} USD`}
+            {submitting ? 'Placing Order…' : `Place Order — ${cart.total.toLocaleString()} `}
           </button>
           <p className="checkout-note">Guest checkout — no account needed. Payment collected on delivery for now.</p>
         </form>
