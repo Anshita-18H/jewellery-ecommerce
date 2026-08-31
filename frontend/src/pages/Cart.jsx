@@ -68,7 +68,7 @@ export default function Cart({ onCartChange }) {
                   +
                 </button>
               </div>
-              <p className="cart-item-subtotal">${item.subtotal.toLocaleString()}</p>
+              <p className="cart-item-subtotal">{item.subtotal.toLocaleString()}</p>
               <button className="cart-item-remove" onClick={() => handleRemove(item.product_id)} aria-label="Remove item">
                 ×
               </button>
