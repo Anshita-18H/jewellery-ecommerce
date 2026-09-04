@@ -12,10 +12,12 @@ function slugify(name) {
 }
 
 // GET /api/products
-// Supports optional query params: ?category=rings&search=gold&featured=true
+// Supports optional query params: ?category=rings&search=gold&featured=true&include_hidden=true
+// By default, only shows active (visible) products. Admin panel passes
+// include_hidden=true to see everything, including soft-deleted products.
 router.get('/', async (req, res) => {
   try {
-    const { category, search, featured } = req.query;
+    const { category, search, featured, include_hidden } = req.query;
 
     let sql = `
       SELECT p.*, c.name AS category_name, c.slug AS category_slug
@@ -25,6 +27,9 @@ router.get('/', async (req, res) => {
     `;
     const params = [];
 
+    if (!include_hidden) {
+      sql += ' AND p.is_active = TRUE';
+    }
     if (category) {
       sql += ' AND c.slug = ?';
       params.push(category);
@@ -140,17 +145,33 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/products/:id — admin: remove a product
+// DELETE /api/products/:id — admin: hide a product from the site (SOFT delete)
+// The row stays in the database — it's just marked inactive so it stops
+// showing up on the live site. Nothing is actually erased.
 router.delete('/:id', async (req, res) => {
   try {
-    const [result] = await pool.query('DELETE FROM products WHERE id = ?', [req.params.id]);
+    const [result] = await pool.query('UPDATE products SET is_active = FALSE WHERE id = ?', [req.params.id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    res.json({ message: 'Product deleted' });
+    res.json({ message: 'Product hidden from site' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to delete product' });
+    res.status(500).json({ error: 'Failed to hide product' });
+  }
+});
+
+// PUT /api/products/:id/restore — admin: bring a hidden product back
+router.put('/:id/restore', async (req, res) => {
+  try {
+    const [result] = await pool.query('UPDATE products SET is_active = TRUE WHERE id = ?', [req.params.id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ message: 'Product restored' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to restore product' });
   }
 });
 
