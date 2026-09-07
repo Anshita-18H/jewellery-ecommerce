@@ -26,6 +26,7 @@ export const getProduct = (slug) => request(`/products/${slug}`);
 export const createProduct = (data) => request('/products', { method: 'POST', body: JSON.stringify(data) });
 export const updateProduct = (id, data) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteProduct = (id) => request(`/products/${id}`, { method: 'DELETE' });
+export const restoreProduct = (id) => request(`/products/${id}/restore`, { method: 'PUT' });
 
 // ---- Categories ----
 export const getCategories = () => request('/categories');

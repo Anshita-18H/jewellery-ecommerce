@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
     const params = [];
 
     if (!include_hidden) {
-      sql += ' AND p.is_active = TRUE';
+      sql += ' AND (p.is_active = TRUE OR p.is_active IS NULL)';
     }
     if (category) {
       sql += ' AND c.slug = ?';
@@ -85,8 +85,8 @@ router.post('/', async (req, res) => {
     const slug = slugify(name);
 
     const [result] = await pool.query(
-      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, is_active)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE)`,
       [
         category_id || null,
         name,
