@@ -15,16 +15,16 @@ router.post('/', async (req, res) => {
     }
 
     const [cartRows] = await connection.query(
-      `SELECT ci.quantity, p.id AS product_id, p.name, p.price
+      `SELECT ci.quantity, p.id AS product_id, p.name, p.price, p.stock, p.is_active
        FROM cart_items ci
        JOIN products p ON ci.product_id = p.id
-       WHERE ci.session_id = ?`,
+       WHERE ci.session_id = ? AND (p.is_active = TRUE OR p.is_active IS NULL)`,
       [req.sessionID]
     );
 
     if (cartRows.length === 0) {
       connection.release();
-      return res.status(400).json({ error: 'Cart is empty' });
+      return res.status(400).json({ error: 'Cart is empty or items are no longer available' });
     }
 
     const total = cartRows.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
@@ -43,6 +43,12 @@ router.post('/', async (req, res) => {
         `INSERT INTO order_items (order_id, product_id, product_name, price, quantity)
          VALUES (?, ?, ?, ?, ?)`,
         [orderId, item.product_id, item.name, item.price, item.quantity]
+      );
+
+      // Decrement stock in database
+      await connection.query(
+        'UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?',
+        [item.quantity, item.product_id]
       );
     }
 

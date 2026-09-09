@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Search, ShoppingBag, Menu, X } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, X } from 'lucide-react';
 import './Navbar.css';
 
 export default function Navbar({ cartCount = 0 }) {
@@ -41,6 +41,9 @@ export default function Navbar({ cartCount = 0 }) {
         <div className="navbar-actions">
           <Link to="/shop" className="navbar-icon-btn" aria-label="Search products">
             <Search size={18} strokeWidth={1.5} />
+          </Link>
+          <Link to="/login" className="navbar-icon-btn" aria-label="Sign in to your account">
+            <User size={18} strokeWidth={1.5} />
           </Link>
           <Link to="/cart" className="navbar-icon-btn navbar-cart" aria-label="View cart">
             <ShoppingBag size={18} strokeWidth={1.5} />

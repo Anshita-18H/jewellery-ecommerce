@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, MapPin, ShoppingBag } from 'lucide-react';
+import { Search, MapPin, ShoppingBag, User } from 'lucide-react';
 import './Footer.css';
 
 export default function Footer() {
@@ -26,6 +26,7 @@ export default function Footer() {
           <ul className="footer-links">
             <li><Link to="/gallery">Gallery</Link></li>
             <li><Link to="/contact">Contact</Link></li>
+            <li><Link to="/login">Client Sign In</Link></li>
             <li><Link to="/cart">Cart</Link></li>
           </ul>
         </div>
@@ -45,6 +46,7 @@ export default function Footer() {
         <span>© {new Date().getFullYear()} AURA. All rights reserved.</span>
         <div className="footer-bottom-icons">
           <Link to="/shop" aria-label="Search"><Search size={15} strokeWidth={1.5} /></Link>
+          <Link to="/login" aria-label="Account"><User size={15} strokeWidth={1.5} /></Link>
           <Link to="/cart" aria-label="Cart"><ShoppingBag size={15} strokeWidth={1.5} /></Link>
         </div>
       </div>

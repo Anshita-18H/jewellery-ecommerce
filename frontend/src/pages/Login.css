@@ -1,0 +1,404 @@
+/* ==========================================================================
+   AURA — Fine Jewellery • Login Page Styles
+   ========================================================================== */
+
+.login-page {
+  position: relative;
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 0 5rem;
+  overflow: hidden;
+}
+
+/* Ambient luxury background glow */
+.login-glow {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(201, 168, 118, 0.08) 0%, rgba(10, 9, 8, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* The Luxury Card */
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 2.75rem 2.25rem 2.25rem;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 168, 118, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+/* Header & Emblem */
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-emblem {
+  color: var(--gold);
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
+  line-height: 1;
+  text-shadow: 0 0 15px rgba(201, 168, 118, 0.4);
+}
+
+.login-header .eyebrow {
+  margin-bottom: 0.5rem;
+}
+
+.login-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: 0.02em;
+  margin: 0.3rem 0;
+}
+
+.login-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Alerts (Error / Status) */
+.login-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-bottom: 1.4rem;
+}
+
+.login-alert-error {
+  background: rgba(201, 138, 118, 0.1);
+  border: 1px solid rgba(201, 138, 118, 0.3);
+  color: #e09e86;
+}
+
+.login-alert-success {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #81c784;
+}
+
+.login-alert-icon {
+  flex-shrink: 0;
+}
+
+/* Form Layout */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+
+.login-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.45rem;
+}
+
+.login-forgot-link {
+  font-size: 0.75rem;
+  color: var(--gold);
+  transition: color 0.2s ease;
+}
+
+.login-forgot-link:hover {
+  color: var(--gold-light);
+  text-decoration: underline;
+}
+
+/* Input Wrapping & Icons */
+.login-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.login-input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--gold-dim);
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.login-input {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--cream);
+  padding: 0.8rem 1rem 0.8rem 2.65rem;
+  font-size: 0.88rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+}
+
+.login-input-password {
+  padding-right: 2.85rem;
+}
+
+.login-input::placeholder {
+  color: rgba(143, 134, 118, 0.6);
+  font-weight: 300;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: rgba(27, 23, 18, 0.95);
+  box-shadow: 0 0 0 2px rgba(201, 168, 118, 0.15);
+}
+
+.login-input:focus + .login-password-toggle,
+.login-input-wrap:focus-within .login-input-icon {
+  color: var(--gold-light);
+}
+
+.login-input-wrap.has-error .login-input {
+  border-color: #c98a76;
+}
+
+.login-input-wrap.has-error .login-input:focus {
+  box-shadow: 0 0 0 2px rgba(201, 138, 118, 0.2);
+}
+
+.login-input-wrap.has-error .login-input-icon {
+  color: #c98a76;
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: color 0.2s ease;
+}
+
+.login-password-toggle:hover {
+  color: var(--gold-light);
+}
+
+.login-password-toggle:focus-visible {
+  outline: 1px solid var(--gold);
+  color: var(--cream);
+}
+
+/* Error Message */
+.login-error-msg {
+  color: #e09e86;
+  font-size: 0.74rem;
+  margin: 0.35rem 0 0;
+  line-height: 1.3;
+}
+
+/* Options (Remember Me) */
+.login-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -0.2rem;
+  margin-bottom: 0.2rem;
+}
+
+.login-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.8rem;
+  color: var(--text-body);
+  cursor: pointer;
+  user-select: none;
+}
+
+.login-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.login-checkbox-custom {
+  width: 16px;
+  height: 16px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.login-checkbox-label:hover .login-checkbox-custom {
+  border-color: var(--gold-dim);
+}
+
+.login-checkbox:checked ~ .login-checkbox-custom {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.login-checkbox:checked ~ .login-checkbox-custom::after {
+  content: '';
+  width: 4px;
+  height: 8px;
+  border: solid #1a1510;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
+}
+
+.login-checkbox:focus-visible ~ .login-checkbox-custom {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.login-checkbox-text {
+  font-size: 0.8rem;
+  color: var(--text-body);
+}
+
+/* Submit CTA */
+.login-submit-btn {
+  width: 100%;
+  padding: 0.95rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  margin-top: 0.4rem;
+  cursor: pointer;
+}
+
+.login-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.login-btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.login-spinner-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.login-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(26, 21, 16, 0.3);
+  border-top-color: #1a1510;
+  border-radius: 50%;
+  animation: login-spin 0.8s linear infinite;
+}
+
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Footer & Registration CTA */
+.login-footer {
+  margin-top: 1.8rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.login-register-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.login-register-link {
+  color: var(--gold-light);
+  font-weight: 400;
+  margin-left: 0.3rem;
+  transition: color 0.2s ease;
+}
+
+.login-register-link:hover {
+  color: var(--cream);
+  text-decoration: underline;
+}
+
+/* Brand Trust Assurance */
+.login-assurance {
+  margin-top: 1.2rem;
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .login-page {
+    padding: 2rem 0 3.5rem;
+  }
+
+  .login-card {
+    padding: 2rem 1.4rem 1.6rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .login-title {
+    font-size: 1.7rem;
+  }
+}
+

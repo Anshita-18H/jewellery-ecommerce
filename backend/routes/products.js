@@ -52,16 +52,39 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Helper: ensure slug is unique across products
+async function getUniqueSlug(baseSlug, excludeId = null) {
+  let slug = baseSlug;
+  let counter = 1;
+  while (true) {
+    let sql = 'SELECT id FROM products WHERE slug = ?';
+    const params = [slug];
+    if (excludeId) {
+      sql += ' AND id != ?';
+      params.push(excludeId);
+    }
+    const [existing] = await pool.query(sql, params);
+    if (existing.length === 0) return slug;
+    counter++;
+    slug = `${baseSlug}-${counter}`;
+  }
+}
+
 // GET /api/products/:slug — single product detail page
 router.get('/:slug', async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      `SELECT p.*, c.name AS category_name, c.slug AS category_slug
-       FROM products p
-       LEFT JOIN categories c ON p.category_id = c.id
-       WHERE p.slug = ?`,
-      [req.params.slug]
-    );
+    const { include_hidden } = req.query;
+    let sql = `
+      SELECT p.*, c.name AS category_name, c.slug AS category_slug
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.slug = ?
+    `;
+    if (!include_hidden) {
+      sql += ' AND (p.is_active = TRUE OR p.is_active IS NULL)';
+    }
+
+    const [rows] = await pool.query(sql, [req.params.slug]);
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Product not found' });
     }
@@ -82,7 +105,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'name and price are required' });
     }
 
-    const slug = slugify(name);
+    const slug = await getUniqueSlug(slugify(name));
 
     const [result] = await pool.query(
       `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, is_active)
@@ -119,7 +142,7 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    const slug = name ? slugify(name) : existing[0].slug;
+    const slug = name ? await getUniqueSlug(slugify(name), req.params.id) : existing[0].slug;
 
     await pool.query(
       `UPDATE products
@@ -172,6 +195,20 @@ router.put('/:id/restore', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to restore product' });
+  }
+});
+
+// DELETE /api/products/:id/permanent — admin: permanently remove a product from DB
+router.delete('/:id/permanent', async (req, res) => {
+  try {
+    const [result] = await pool.query('DELETE FROM products WHERE id = ?', [req.params.id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ message: 'Product permanently deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to permanently delete product' });
   }
 });
 

@@ -6,6 +6,7 @@ import {
   updateProduct,
   deleteProduct,
   restoreProduct,
+  hardDeleteProduct,
   getOrders,
   updateOrderStatus,
 } from '../api';
@@ -176,6 +177,17 @@ function AdminProducts({ onHiddenCountChange, editProduct, onClearEdit }) {
     }
   }
 
+  async function handleHardDelete(id) {
+    if (!confirm('Permanently delete this product from the database? This cannot be undone!')) return;
+    try {
+      await hardDeleteProduct(id);
+      setMessage('Product permanently deleted from database.');
+      loadData();
+    } catch (err) {
+      setMessage(err.message || 'Failed to delete product');
+    }
+  }
+
   const activeProducts = products.filter(isItemActive);
   const hiddenProducts = products.filter((p) => !isItemActive(p));
 
@@ -313,9 +325,14 @@ function AdminProducts({ onHiddenCountChange, editProduct, onClearEdit }) {
                           Delete
                         </button>
                       ) : (
-                        <button onClick={() => handleRestore(p.id)} className="admin-restore-btn" title="Restore to store">
-                          Restore
-                        </button>
+                        <>
+                          <button onClick={() => handleRestore(p.id)} className="admin-restore-btn" title="Restore to store">
+                            Restore
+                          </button>
+                          <button onClick={() => handleHardDelete(p.id)} className="admin-delete-btn" title="Permanently delete from database">
+                            Permanent Delete
+                          </button>
+                        </>
                       )}
                     </td>
                   </tr>
@@ -357,12 +374,23 @@ function AdminHiddenProducts({ onHiddenCountChange, onEditProduct }) {
     }
   }
 
+  async function handleHardDelete(id) {
+    if (!confirm('Permanently delete this product from the database? This CANNOT be undone!')) return;
+    try {
+      await hardDeleteProduct(id);
+      setMessage('Product permanently deleted from database.');
+      loadData();
+    } catch (err) {
+      setMessage(err.message || 'Failed to delete product permanently');
+    }
+  }
+
   return (
     <div className="admin-hidden-section">
       <div className="admin-info-banner">
         <strong>Hidden / Deleted Products</strong>
         <p>
-          Products listed here are soft-deleted and hidden from your live customer storefront. They are not permanently erased and remain safe in your database. Click <strong>Restore to Store</strong> to make any item visible and purchasable again.
+          Products listed here are soft-deleted and hidden from your live customer storefront. They are not permanently erased and remain safe in your database. Click <strong>Restore to Store</strong> to make any item visible and purchasable again, or <strong>Permanent Delete</strong> to remove it forever.
         </p>
       </div>
 
@@ -398,7 +426,7 @@ function AdminHiddenProducts({ onHiddenCountChange, onEditProduct }) {
                     <span className="admin-name-sub">Hidden from store</span>
                   </td>
                   <td>{p.category_name || '—'}</td>
-                  <td>{Number(p.price).toLocaleString()}</td>
+                  <td>Rs.{Number(p.price).toLocaleString()}</td>
                   <td>{p.stock}</td>
                   <td>
                     <span className="admin-status-badge badge-hidden">Hidden</span>
@@ -409,6 +437,9 @@ function AdminHiddenProducts({ onHiddenCountChange, onEditProduct }) {
                     </button>
                     <button onClick={() => onEditProduct(p)}>
                       Edit
+                    </button>
+                    <button className="admin-delete-btn" onClick={() => handleHardDelete(p.id)} title="Permanently delete from database">
+                      Permanent Delete
                     </button>
                   </td>
                 </tr>

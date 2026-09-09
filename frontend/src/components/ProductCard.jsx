@@ -12,7 +12,7 @@ export default function ProductCard({ product, onAddToCart }) {
         <Link to={`/product/${product.slug}`}>
           <h3 className="product-card-name">{product.name}</h3>
         </Link>
-        <p className="product-card-price">{Number(product.price).toLocaleString()} </p>
+        <p className="product-card-price">Rs. {Number(product.price).toLocaleString()}</p>
         <button
           className="btn btn-outline product-card-btn"
           onClick={() => onAddToCart?.(product)}

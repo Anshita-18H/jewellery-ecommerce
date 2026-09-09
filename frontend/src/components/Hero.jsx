@@ -18,7 +18,7 @@ export default function Hero({ product }) {
             <Link to="/shop?category=necklaces" className="btn btn-gold">
               Shop Diamond
             </Link>
-            {product && <span className="hero-price">{Number(product.price).toLocaleString()} </span>}
+            {product && <span className="hero-price">Rs. {Number(product.price).toLocaleString()}</span>}
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // `credentials: 'include'` is required so the session cookie
 // (used for the cart) is sent and stored by the browser.
@@ -27,6 +27,7 @@ export const createProduct = (data) => request('/products', { method: 'POST', bo
 export const updateProduct = (id, data) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteProduct = (id) => request(`/products/${id}`, { method: 'DELETE' });
 export const restoreProduct = (id) => request(`/products/${id}/restore`, { method: 'PUT' });
+export const hardDeleteProduct = (id) => request(`/products/${id}/permanent`, { method: 'DELETE' });
 
 // ---- Categories ----
 export const getCategories = () => request('/categories');

@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
       `SELECT ci.id AS cart_item_id, ci.quantity, p.id AS product_id, p.name, p.price, p.image_url, p.stock
        FROM cart_items ci
        JOIN products p ON ci.product_id = p.id
-       WHERE ci.session_id = ?`,
+       WHERE ci.session_id = ? AND (p.is_active = TRUE OR p.is_active IS NULL)`,
       [req.sessionID]
     );
 
@@ -38,11 +38,28 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'product_id is required' });
     }
 
+    const [products] = await pool.query(
+      'SELECT id, stock, is_active FROM products WHERE id = ?',
+      [product_id]
+    );
+
+    if (
+      products.length === 0 ||
+      products[0].is_active === 0 ||
+      products[0].is_active === false
+    ) {
+      return res.status(400).json({ error: 'Product is no longer available' });
+    }
+
+    if (products[0].stock <= 0) {
+      return res.status(400).json({ error: 'Product is out of stock' });
+    }
+
     await pool.query(
       `INSERT INTO cart_items (session_id, product_id, quantity)
        VALUES (?, ?, ?)
-       ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)`,
-      [req.sessionID, product_id, qty]
+       ON DUPLICATE KEY UPDATE quantity = LEAST(quantity + VALUES(quantity), ?)`,
+      [req.sessionID, product_id, qty, products[0].stock]
     );
 
     res.status(201).json({ message: 'Added to cart' });
