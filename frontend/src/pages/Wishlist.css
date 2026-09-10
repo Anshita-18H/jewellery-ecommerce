@@ -28,7 +28,8 @@
   font-size: clamp(2rem, 3.5vw, 2.75rem);
   font-weight: 500;
   color: var(--cream);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   margin: 0.2rem 0 0.4rem;
 }
 

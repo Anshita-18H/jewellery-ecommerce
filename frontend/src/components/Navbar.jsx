@@ -44,12 +44,12 @@ export default function Navbar({ cartCount = 0 }) {
           <Link to="/shop" className="navbar-icon-btn" aria-label="Search products">
             <Search size={18} strokeWidth={1.5} />
           </Link>
+          <Link to="/login" className="navbar-icon-btn" aria-label="Sign in to your account">
+            <User size={18} strokeWidth={1.5} />
+          </Link>
           <Link to="/wishlist" className="navbar-icon-btn navbar-wishlist" aria-label="View wishlist">
             <Heart size={18} strokeWidth={1.5} />
             {wishlistCount > 0 && <span className="navbar-badge">{wishlistCount}</span>}
-          </Link>
-          <Link to="/login" className="navbar-icon-btn" aria-label="Sign in to your account">
-            <User size={18} strokeWidth={1.5} />
           </Link>
           <Link to="/cart" className="navbar-icon-btn navbar-cart" aria-label="View cart">
             <ShoppingBag size={18} strokeWidth={1.5} />

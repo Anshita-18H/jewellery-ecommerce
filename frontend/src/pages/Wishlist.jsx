@@ -38,7 +38,7 @@ export default function Wishlist({ onCartChange }) {
           <p className="eyebrow">Your Collection</p>
           <h1 className="wishlist-empty-title">Your Wishlist is Waiting</h1>
           <p className="wishlist-empty-desc">
-            Save the pieces you love and they&apos;ll appear here.
+            Save the pieces you love and return to them whenever you wish.
           </p>
           <div className="wishlist-empty-actions">
             <Link to="/shop" className="btn btn-gold wishlist-empty-btn">
