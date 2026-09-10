@@ -85,7 +85,7 @@ export default function Register() {
 
   function validateAgreeTerms(val) {
     if (!val) {
-      return 'Please accept the Terms & Conditions.';
+      return 'You must agree to the Terms & Conditions and Privacy Policy.';
     }
     return null;
   }
@@ -176,8 +176,8 @@ export default function Register() {
           <div className="register-header">
             <div className="register-emblem">♦</div>
             <p className="eyebrow">AURA Privilege</p>
-            <h1 className="register-title">Create Account</h1>
-            <p className="register-subtitle">Join the world of AURA fine jewellery</p>
+            <h1 className="register-title">Create Your Account</h1>
+            <p className="register-subtitle">Join AURA and make every moment timeless.</p>
           </div>
 
           {/* Status & Error Alerts */}
