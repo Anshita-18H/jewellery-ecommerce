@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import { User, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, Check, ArrowRight } from 'lucide-react';
 import './Register.css';
 
 export default function Register() {
@@ -16,7 +16,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Validation & UI states
+  // Validation & UI flow states
   const [touched, setTouched] = useState({
     fullName: false,
     email: false,
@@ -27,7 +27,7 @@ export default function Register() {
   });
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
-  const [apiSuccess, setApiSuccess] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // Validation helpers
   function validateFullName(val) {
@@ -55,7 +55,7 @@ export default function Register() {
     if (!val || !val.trim()) {
       return 'Please enter your phone number.';
     }
-    // Clean string to digits only
+    // Extract numeric digits
     const digitsOnly = val.replace(/\D/g, '');
     if (digitsOnly.length < 10) {
       return 'Please enter a valid phone number (at least 10 digits).';
@@ -90,7 +90,7 @@ export default function Register() {
     return null;
   }
 
-  // Active validation errors (only shown if field has been interacted with)
+  // Active validation errors (only shown once field is interacted with)
   const fullNameError = touched.fullName ? validateFullName(fullName) : null;
   const emailError = touched.email ? validateEmail(email) : null;
   const phoneError = touched.phone ? validatePhone(phone) : null;
@@ -105,7 +105,6 @@ export default function Register() {
   async function handleRegister(e) {
     e.preventDefault();
     setApiError(null);
-    setApiSuccess(null);
 
     // Mark all fields as touched on submit attempt
     setTouched({
@@ -134,33 +133,34 @@ export default function Register() {
       /* ==========================================================================
          FUTURE BACKEND REGISTRATION INTEGRATION POINT
          --------------------------------------------------------------------------
-         When the backend registration API is ready, connect here:
+         When the backend authentication API is implemented, connect here:
 
          const response = await fetch('/api/auth/register', {
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            credentials: 'include',
            body: JSON.stringify({
-             fullName: fullName.trim(),
+             name: fullName.trim(),
              email: email.trim(),
              phone: phone.trim(),
-             password,
+             password: password,
            }),
          });
 
          const data = await response.json();
 
          if (!response.ok) {
-           throw new Error(data.error || 'Failed to create account. Please try again.');
+           // Provide user-friendly messaging without technical system leaks
+           throw new Error(data.message || "We couldn't create your account right now. Please try again.");
          }
          ========================================================================== */
 
-      // Simulated brief delay for UX demonstration
+      // Simulated brief delay for UX transition (frontend demonstration)
       await new Promise((resolve) => setTimeout(resolve, 800));
 
-      setApiSuccess('Account details validated! Ready to connect to POST /api/auth/register.');
+      setIsSuccess(true);
     } catch (err) {
-      setApiError(err.message || 'Unable to complete registration. Please try again.');
+      setApiError("We couldn't create your account right now. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -171,283 +171,324 @@ export default function Register() {
       <div className="register-glow" />
 
       <div className="register-container container">
-        <div className="register-card">
-          {/* Brand Header */}
-          <div className="register-header">
-            <div className="register-emblem">♦</div>
-            <p className="eyebrow">AURA Privilege</p>
-            <h1 className="register-title">Create Your Account</h1>
-            <p className="register-subtitle">Join AURA and make every moment timeless.</p>
-          </div>
-
-          {/* Status & Error Alerts */}
-          {apiError && (
-            <div className="register-alert register-alert-error" role="alert">
-              <AlertCircle size={16} className="register-alert-icon" />
-              <span>{apiError}</span>
-            </div>
-          )}
-
-          {apiSuccess && (
-            <div className="register-alert register-alert-success" role="status">
-              <CheckCircle2 size={16} className="register-alert-icon" />
-              <span>{apiSuccess}</span>
-            </div>
-          )}
-
-          {/* Registration Form */}
-          <form className="register-form" onSubmit={handleRegister} noValidate>
-            {/* Full Name Field */}
-            <div className="register-field">
-              <label htmlFor="fullName" className="register-label">
-                Full Name
-              </label>
-              <div className={`register-input-wrap ${fullNameError ? 'has-error' : ''}`}>
-                <User size={16} className="register-input-icon" />
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  autoComplete="name"
-                  className="register-input"
-                  placeholder="Enter your full name"
-                  value={fullName}
-                  onChange={(e) => {
-                    setFullName(e.target.value);
-                    if (apiError) setApiError(null);
-                  }}
-                  onBlur={() => handleBlur('fullName')}
-                  disabled={loading}
-                  aria-invalid={!!fullNameError}
-                  aria-describedby={fullNameError ? 'fullName-error' : undefined}
-                  required
-                />
-              </div>
-              {fullNameError && (
-                <p id="fullName-error" className="register-error-msg" role="alert">
-                  {fullNameError}
-                </p>
-              )}
+        {isSuccess ? (
+          /* ====================================================================
+             AURA Registration Success State
+             ==================================================================== */
+          <div className="register-card register-success-card">
+            {/* Elegant Luxury Check Icon */}
+            <div className="register-success-icon-wrap">
+              <Check size={28} className="register-success-icon" aria-hidden="true" focusable="false" />
             </div>
 
-            {/* Email Address Field */}
-            <div className="register-field">
-              <label htmlFor="email" className="register-label">
-                Email Address
-              </label>
-              <div className={`register-input-wrap ${emailError ? 'has-error' : ''}`}>
-                <Mail size={16} className="register-input-icon" />
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  className="register-input"
-                  placeholder="Enter your email address"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (apiError) setApiError(null);
-                  }}
-                  onBlur={() => handleBlur('email')}
-                  disabled={loading}
-                  aria-invalid={!!emailError}
-                  aria-describedby={emailError ? 'email-error' : undefined}
-                  required
-                />
-              </div>
-              {emailError && (
-                <p id="email-error" className="register-error-msg" role="alert">
-                  {emailError}
-                </p>
-              )}
-            </div>
-
-            {/* Phone Number Field */}
-            <div className="register-field">
-              <label htmlFor="phone" className="register-label">
-                Phone Number
-              </label>
-              <div className={`register-input-wrap ${phoneError ? 'has-error' : ''}`}>
-                <Phone size={16} className="register-input-icon" />
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  autoComplete="tel"
-                  className="register-input"
-                  placeholder="Enter your phone number"
-                  value={phone}
-                  onChange={(e) => {
-                    setPhone(e.target.value);
-                    if (apiError) setApiError(null);
-                  }}
-                  onBlur={() => handleBlur('phone')}
-                  disabled={loading}
-                  aria-invalid={!!phoneError}
-                  aria-describedby={phoneError ? 'phone-error' : undefined}
-                  required
-                />
-              </div>
-              {phoneError && (
-                <p id="phone-error" className="register-error-msg" role="alert">
-                  {phoneError}
-                </p>
-              )}
-            </div>
-
-            {/* Password Field */}
-            <div className="register-field">
-              <label htmlFor="password" className="register-label">
-                Password
-              </label>
-              <div className={`register-input-wrap ${passwordError ? 'has-error' : ''}`}>
-                <Lock size={16} className="register-input-icon" />
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  className="register-input register-input-password"
-                  placeholder="Create a password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (apiError) setApiError(null);
-                  }}
-                  onBlur={() => handleBlur('password')}
-                  disabled={loading}
-                  aria-invalid={!!passwordError}
-                  aria-describedby={passwordError ? 'password-error' : 'password-hint'}
-                  required
-                />
-                <button
-                  type="button"
-                  className="register-password-toggle"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  tabIndex={0}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              <p id="password-hint" className="register-requirement-hint">
-                Password must contain at least 8 characters.
-              </p>
-              {passwordError && (
-                <p id="password-error" className="register-error-msg" role="alert">
-                  {passwordError}
-                </p>
-              )}
-            </div>
-
-            {/* Confirm Password Field */}
-            <div className="register-field">
-              <label htmlFor="confirmPassword" className="register-label">
-                Confirm Password
-              </label>
-              <div className={`register-input-wrap ${confirmPasswordError ? 'has-error' : ''}`}>
-                <Lock size={16} className="register-input-icon" />
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  className="register-input register-input-password"
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    if (apiError) setApiError(null);
-                  }}
-                  onBlur={() => handleBlur('confirmPassword')}
-                  disabled={loading}
-                  aria-invalid={!!confirmPasswordError}
-                  aria-describedby={confirmPasswordError ? 'confirmPassword-error' : undefined}
-                  required
-                />
-                <button
-                  type="button"
-                  className="register-password-toggle"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                  tabIndex={0}
-                >
-                  {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              {confirmPasswordError && (
-                <p id="confirmPassword-error" className="register-error-msg" role="alert">
-                  {confirmPasswordError}
-                </p>
-              )}
-            </div>
-
-            {/* Terms & Conditions Checkbox */}
-            <div className="register-field register-terms-field">
-              <label className="register-checkbox-label">
-                <input
-                  type="checkbox"
-                  name="agreeTerms"
-                  checked={agreeTerms}
-                  onChange={(e) => {
-                    setAgreeTerms(e.target.checked);
-                    if (touched.agreeTerms) handleBlur('agreeTerms');
-                  }}
-                  disabled={loading}
-                  className="register-checkbox"
-                />
-                <span className="register-checkbox-custom" />
-                <span className="register-checkbox-text">
-                  I agree to the{' '}
-                  <span className="register-terms-link">Terms &amp; Conditions</span>
-                  {' '}and{' '}
-                  <span className="register-terms-link">Privacy Policy</span>.
-                </span>
-              </label>
-              {termsError && (
-                <p className="register-error-msg" role="alert" style={{ marginTop: '0.4rem' }}>
-                  {termsError}
-                </p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="btn btn-gold register-submit-btn"
-              disabled={loading}
-              aria-busy={loading}
-            >
-              {loading ? (
-                <span className="register-spinner-text">
-                  <span className="register-spinner" />
-                  Creating Account…
-                </span>
-              ) : (
-                <span className="register-btn-content">
-                  Create Account
-                  <ArrowRight size={15} />
-                </span>
-              )}
-            </button>
-          </form>
-
-          {/* Login CTA Footer */}
-          <div className="register-footer">
-            <p className="register-login-text">
-              Already have an account?{' '}
-              <Link to="/login" className="register-login-link">
-                Sign In
-              </Link>
+            {/* Luxury Success Typography */}
+            <h1 className="register-title register-success-title">Account Created Successfully</h1>
+            <p className="register-success-desc">
+              Welcome to AURA. Your journey with timeless jewellery begins here.
             </p>
-          </div>
+            <p className="register-success-subtext">
+              You can now sign in to your AURA account.
+            </p>
 
-          {/* Security & Brand Assurance */}
-          <div className="register-assurance">
-            <span>Encrypted &amp; Secure • AURA Concierge</span>
+            {/* Continue to Sign In CTA Button */}
+            <Link to="/login" className="btn btn-gold register-success-btn">
+              <span className="register-btn-content">
+                <span>Continue to Sign In</span>
+                <ArrowRight size={15} aria-hidden="true" focusable="false" />
+              </span>
+            </Link>
+
+            {/* Security & Brand Assurance */}
+            <div className="register-assurance register-success-assurance">
+              <span>Encrypted &amp; Secure • AURA Concierge</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* ====================================================================
+             AURA Registration Form
+             ==================================================================== */
+          <div className="register-card">
+            {/* Brand Header */}
+            <div className="register-header">
+              <div className="register-emblem">♦</div>
+              <p className="eyebrow">AURA Privilege</p>
+              <h1 className="register-title">Create Your Account</h1>
+              <p className="register-subtitle">Join AURA and make every moment timeless.</p>
+            </div>
+
+            {/* Status & Error Alerts */}
+            {apiError && (
+              <div className="register-alert register-alert-error" role="alert">
+                <AlertCircle size={16} className="register-alert-icon" aria-hidden="true" focusable="false" />
+                <div className="register-alert-text">
+                  <strong className="register-alert-title">Registration Failed</strong>
+                  <span className="register-alert-desc">{apiError}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Registration Form */}
+            <form className="register-form" onSubmit={handleRegister} noValidate>
+              {/* Full Name Field */}
+              <div className="register-field">
+                <label htmlFor="fullName" className="register-label">
+                  Full Name
+                </label>
+                <div className={`register-input-wrap ${fullNameError ? 'has-error' : ''}`}>
+                  <User size={16} className="register-input-icon" aria-hidden="true" focusable="false" />
+                  <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    autoComplete="name"
+                    className="register-input"
+                    placeholder="Enter your full name"
+                    value={fullName}
+                    onChange={(e) => {
+                      setFullName(e.target.value);
+                      if (apiError) setApiError(null);
+                    }}
+                    onBlur={() => handleBlur('fullName')}
+                    disabled={loading}
+                    aria-invalid={!!fullNameError}
+                    aria-describedby={fullNameError ? 'fullName-error' : undefined}
+                    required
+                  />
+                </div>
+                {fullNameError && (
+                  <p id="fullName-error" className="register-error-msg" role="alert">
+                    {fullNameError}
+                  </p>
+                )}
+              </div>
+
+              {/* Email Address Field */}
+              <div className="register-field">
+                <label htmlFor="email" className="register-label">
+                  Email Address
+                </label>
+                <div className={`register-input-wrap ${emailError ? 'has-error' : ''}`}>
+                  <Mail size={16} className="register-input-icon" aria-hidden="true" focusable="false" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    className="register-input"
+                    placeholder="Enter your email address"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (apiError) setApiError(null);
+                    }}
+                    onBlur={() => handleBlur('email')}
+                    disabled={loading}
+                    aria-invalid={!!emailError}
+                    aria-describedby={emailError ? 'email-error' : undefined}
+                    required
+                  />
+                </div>
+                {emailError && (
+                  <p id="email-error" className="register-error-msg" role="alert">
+                    {emailError}
+                  </p>
+                )}
+              </div>
+
+              {/* Phone Number Field */}
+              <div className="register-field">
+                <label htmlFor="phone" className="register-label">
+                  Phone Number
+                </label>
+                <div className={`register-input-wrap ${phoneError ? 'has-error' : ''}`}>
+                  <Phone size={16} className="register-input-icon" aria-hidden="true" focusable="false" />
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    autoComplete="tel"
+                    className="register-input"
+                    placeholder="Enter your phone number"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value);
+                      if (apiError) setApiError(null);
+                    }}
+                    onBlur={() => handleBlur('phone')}
+                    disabled={loading}
+                    aria-invalid={!!phoneError}
+                    aria-describedby={phoneError ? 'phone-error' : undefined}
+                    required
+                  />
+                </div>
+                {phoneError && (
+                  <p id="phone-error" className="register-error-msg" role="alert">
+                    {phoneError}
+                  </p>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div className="register-field">
+                <label htmlFor="password" className="register-label">
+                  Password
+                </label>
+                <div className={`register-input-wrap ${passwordError ? 'has-error' : ''}`}>
+                  <Lock size={16} className="register-input-icon" aria-hidden="true" focusable="false" />
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    className="register-input register-input-password"
+                    placeholder="Create a password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (apiError) setApiError(null);
+                    }}
+                    onBlur={() => handleBlur('password')}
+                    disabled={loading}
+                    aria-invalid={!!passwordError}
+                    aria-describedby={passwordError ? 'password-error' : 'password-hint'}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="register-password-toggle"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    tabIndex={0}
+                  >
+                    {showPassword ? (
+                      <EyeOff size={16} aria-hidden="true" focusable="false" />
+                    ) : (
+                      <Eye size={16} aria-hidden="true" focusable="false" />
+                    )}
+                  </button>
+                </div>
+                <p id="password-hint" className="register-requirement-hint">
+                  Password must contain at least 8 characters.
+                </p>
+                {passwordError && (
+                  <p id="password-error" className="register-error-msg" role="alert">
+                    {passwordError}
+                  </p>
+                )}
+              </div>
+
+              {/* Confirm Password Field */}
+              <div className="register-field">
+                <label htmlFor="confirmPassword" className="register-label">
+                  Confirm Password
+                </label>
+                <div className={`register-input-wrap ${confirmPasswordError ? 'has-error' : ''}`}>
+                  <Lock size={16} className="register-input-icon" aria-hidden="true" focusable="false" />
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    className="register-input register-input-password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      if (apiError) setApiError(null);
+                    }}
+                    onBlur={() => handleBlur('confirmPassword')}
+                    disabled={loading}
+                    aria-invalid={!!confirmPasswordError}
+                    aria-describedby={confirmPasswordError ? 'confirmPassword-error' : undefined}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="register-password-toggle"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                    tabIndex={0}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff size={16} aria-hidden="true" focusable="false" />
+                    ) : (
+                      <Eye size={16} aria-hidden="true" focusable="false" />
+                    )}
+                  </button>
+                </div>
+                {confirmPasswordError && (
+                  <p id="confirmPassword-error" className="register-error-msg" role="alert">
+                    {confirmPasswordError}
+                  </p>
+                )}
+              </div>
+
+              {/* Terms & Conditions Checkbox */}
+              <div className="register-field register-terms-field">
+                <label className="register-checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="agreeTerms"
+                    checked={agreeTerms}
+                    onChange={(e) => {
+                      setAgreeTerms(e.target.checked);
+                      if (touched.agreeTerms) handleBlur('agreeTerms');
+                    }}
+                    disabled={loading}
+                    className="register-checkbox"
+                  />
+                  <span className="register-checkbox-custom" />
+                  <span className="register-checkbox-text">
+                    I agree to the{' '}
+                    <span className="register-terms-link">Terms &amp; Conditions</span>
+                    {' '}and{' '}
+                    <span className="register-terms-link">Privacy Policy</span>.
+                  </span>
+                </label>
+                {termsError && (
+                  <p className="register-error-msg" role="alert" style={{ marginTop: '0.4rem' }}>
+                    {termsError}
+                  </p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className="btn btn-gold register-submit-btn"
+                disabled={loading}
+                aria-busy={loading}
+              >
+                {loading ? (
+                  <span className="register-spinner-text">
+                    <span className="register-spinner" aria-hidden="true" />
+                    <span>Creating your account...</span>
+                  </span>
+                ) : (
+                  <span className="register-btn-content">
+                    <span>Create Account</span>
+                    <ArrowRight size={15} aria-hidden="true" focusable="false" />
+                  </span>
+                )}
+              </button>
+            </form>
+
+            {/* Login CTA Footer */}
+            <div className="register-footer">
+              <p className="register-login-text">
+                Already have an account?{' '}
+                <Link to="/login" className="register-login-link">
+                  Sign In
+                </Link>
+              </p>
+            </div>
+
+            {/* Security & Brand Assurance */}
+            <div className="register-assurance">
+              <span>Encrypted &amp; Secure • AURA Concierge</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
