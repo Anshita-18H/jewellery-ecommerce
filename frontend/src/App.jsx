@@ -13,6 +13,8 @@ import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
+import Wishlist from './pages/Wishlist';
+import { WishlistProvider } from './context/WishlistContext';
 import { getCart } from './api';
 
 export default function App() {
@@ -29,13 +31,14 @@ export default function App() {
   }, [refreshCartCount]);
 
   return (
-    <>
+    <WishlistProvider>
       <Navbar cartCount={cartCount} />
       <main>
         <Routes>
           <Route path="/" element={<Home onCartChange={refreshCartCount} />} />
           <Route path="/shop" element={<Shop onCartChange={refreshCartCount} />} />
           <Route path="/product/:slug" element={<ProductDetail onCartChange={refreshCartCount} />} />
+          <Route path="/wishlist" element={<Wishlist onCartChange={refreshCartCount} />} />
           <Route path="/cart" element={<Cart onCartChange={refreshCartCount} />} />
           <Route path="/checkout" element={<Checkout onCartChange={refreshCartCount} />} />
           <Route path="/gallery" element={<Gallery />} />
@@ -47,6 +50,6 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
-    </>
+    </WishlistProvider>
   );
 }

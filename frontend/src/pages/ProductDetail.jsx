@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Heart } from 'lucide-react';
 import { getProduct, addToCart } from '../api';
+import { useWishlist } from '../context/WishlistContext';
 import './ProductDetail.css';
 
 export default function ProductDetail({ onCartChange }) {
@@ -10,6 +12,9 @@ export default function ProductDetail({ onCartChange }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [added, setAdded] = useState(false);
+
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const wishlisted = product ? isInWishlist(product.id) : false;
 
   useEffect(() => {
     setLoading(true);
@@ -55,18 +60,53 @@ export default function ProductDetail({ onCartChange }) {
             {product.stock > 0 ? `${product.stock} in stock` : 'Currently out of stock'}
           </p>
 
-          {product.stock > 0 && (
-            <div className="pd-actions">
-              <div className="pd-qty">
-                <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>−</button>
-                <span>{quantity}</span>
-                <button onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}>+</button>
+          <div className="pd-actions-wrap">
+            {product.stock > 0 ? (
+              <div className="pd-actions">
+                <div className="pd-qty">
+                  <button onClick={() => setQuantity((q) => Math.max(1, q - 1))}>−</button>
+                  <span>{quantity}</span>
+                  <button onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}>+</button>
+                </div>
+                <button className="btn btn-gold pd-add-btn" onClick={handleAddToCart}>
+                  Add to Cart
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-outline pd-wishlist-btn ${wishlisted ? 'active' : ''}`}
+                  onClick={() => toggleWishlist(product)}
+                  aria-label={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                >
+                  <Heart
+                    size={17}
+                    fill={wishlisted ? 'var(--gold)' : 'none'}
+                    stroke={wishlisted ? 'var(--gold)' : 'currentColor'}
+                    aria-hidden="true"
+                    focusable="false"
+                  />
+                  <span>{wishlisted ? 'Added to Wishlist' : 'Add to Wishlist'}</span>
+                </button>
               </div>
-              <button className="btn btn-gold pd-add-btn" onClick={handleAddToCart}>
-                Add to Cart
-              </button>
-            </div>
-          )}
+            ) : (
+              <div className="pd-actions">
+                <button
+                  type="button"
+                  className={`btn btn-outline pd-wishlist-btn ${wishlisted ? 'active' : ''}`}
+                  onClick={() => toggleWishlist(product)}
+                  aria-label={wishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                >
+                  <Heart
+                    size={17}
+                    fill={wishlisted ? 'var(--gold)' : 'none'}
+                    stroke={wishlisted ? 'var(--gold)' : 'currentColor'}
+                    aria-hidden="true"
+                    focusable="false"
+                  />
+                  <span>{wishlisted ? 'Added to Wishlist' : 'Add to Wishlist'}</span>
+                </button>
+              </div>
+            )}
+          </div>
 
           {added && (
             <p className="pd-added-msg">

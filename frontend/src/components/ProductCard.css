@@ -4,6 +4,9 @@
   border-radius: var(--radius-md);
   overflow: hidden;
   transition: border-color 0.25s var(--ease), transform 0.25s var(--ease);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .product-card:hover {
@@ -11,11 +14,18 @@
   transform: translateY(-3px);
 }
 
+.product-card-media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: #0d0b09;
+}
+
 .product-card-image-link {
   display: block;
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  background: #0d0b09;
 }
 
 .product-card-image {
@@ -29,8 +39,59 @@
   transform: scale(1.05);
 }
 
+/* Luxury Floating Wishlist Button */
+.product-card-wishlist-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(20, 17, 13, 0.78);
+  border: 1px solid rgba(201, 168, 118, 0.3);
+  color: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: background 0.25s var(--ease), border-color 0.25s var(--ease), transform 0.2s var(--ease), color 0.25s var(--ease);
+}
+
+.product-card-wishlist-btn:hover {
+  background: rgba(27, 23, 18, 0.95);
+  border-color: var(--gold);
+  color: var(--gold-light);
+  transform: scale(1.1);
+}
+
+.product-card-wishlist-btn.active {
+  background: rgba(27, 23, 18, 0.95);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.product-card-wishlist-btn.active:hover {
+  transform: scale(1.12);
+}
+
+.product-card-heart-icon {
+  display: block;
+  flex-shrink: 0;
+  transition: fill 0.25s ease, stroke 0.25s ease, transform 0.2s ease;
+}
+
+.product-card-wishlist-btn:active .product-card-heart-icon {
+  transform: scale(0.85);
+}
+
 .product-card-body {
   padding: 1.1rem 1.1rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .product-card-eyebrow {
@@ -59,6 +120,7 @@
   width: 100%;
   padding: 0.7rem;
   font-size: 0.72rem;
+  margin-top: auto;
 }
 
 .product-card-btn:disabled {

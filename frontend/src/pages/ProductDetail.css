@@ -64,7 +64,8 @@
   margin-top: 2rem;
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .pd-qty {
@@ -92,6 +93,33 @@
 
 .pd-add-btn {
   flex: 1;
+  min-width: 140px;
+}
+
+.pd-wishlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.4rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  transition: all 0.25s var(--ease);
+}
+
+.pd-wishlist-btn.active {
+  border-color: var(--gold);
+  color: var(--gold-light);
+  background: rgba(201, 168, 118, 0.08);
+}
+
+.pd-wishlist-btn svg {
+  flex-shrink: 0;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.pd-wishlist-btn:hover svg {
+  transform: scale(1.1);
 }
 
 .pd-added-msg {
@@ -116,5 +144,15 @@
   .pd-grid {
     grid-template-columns: 1fr;
     gap: 2rem;
+  }
+
+  .pd-actions {
+    gap: 0.8rem;
+  }
+
+  .pd-add-btn,
+  .pd-wishlist-btn {
+    width: 100%;
+    flex: none;
   }
 }

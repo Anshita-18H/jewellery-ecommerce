@@ -1,0 +1,240 @@
+/* ==========================================================================
+   AURA — Fine Jewellery • Wishlist Page Styles
+   ========================================================================== */
+
+.wishlist-page {
+  padding-top: 2.5rem;
+  padding-bottom: 5rem;
+  min-height: 65vh;
+}
+
+/* Header Section */
+.wishlist-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.wishlist-header-text .eyebrow {
+  margin-bottom: 0.4rem;
+}
+
+.wishlist-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: 0.02em;
+  margin: 0.2rem 0 0.4rem;
+}
+
+.wishlist-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.wishlist-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.wishlist-continue-btn {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+}
+
+.wishlist-clear-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.6rem;
+  transition: color 0.2s var(--ease);
+}
+
+.wishlist-clear-btn:hover {
+  color: #e09e86;
+  text-decoration: underline;
+}
+
+/* Count & Filter Bar */
+.wishlist-count-bar {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  margin-bottom: 1.5rem;
+}
+
+/* Product Grid */
+.wishlist-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.wishlist-card {
+  transition: transform 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.wishlist-add-cart-btn {
+  margin-top: 0.8rem;
+  font-size: 0.74rem;
+  padding: 0.75rem;
+  letter-spacing: 0.08em;
+  transition: all 0.25s var(--ease);
+}
+
+/* ==========================================================================
+   Empty Wishlist State
+   ========================================================================== */
+
+.wishlist-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 4rem;
+  padding-bottom: 6rem;
+}
+
+.wishlist-empty-card {
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+  padding: 3.5rem 2rem 3rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(201, 168, 118, 0.05);
+}
+
+.wishlist-empty-icon-wrap {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201, 168, 118, 0.16) 0%, rgba(201, 168, 118, 0.03) 70%);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 0 25px rgba(201, 168, 118, 0.2);
+}
+
+.wishlist-empty-icon {
+  stroke: var(--gold);
+  stroke-width: 1.8;
+}
+
+.wishlist-empty-card .eyebrow {
+  margin-bottom: 0.5rem;
+}
+
+.wishlist-empty-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--cream);
+  margin: 0.3rem 0 0.8rem;
+  letter-spacing: 0.02em;
+}
+
+.wishlist-empty-desc {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 auto 2rem;
+  max-width: 360px;
+}
+
+.wishlist-empty-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.wishlist-empty-btn {
+  padding: 0.85rem 1.8rem;
+  font-size: 0.8rem;
+}
+
+.wishlist-empty-secondary-btn {
+  padding: 0.85rem 1.5rem;
+  font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   Desktop (1440px, 1280px, 1024px) → Tablet (768px) → Mobile (480px, 375px)
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .wishlist-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 860px) {
+  .wishlist-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .wishlist-header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .wishlist-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .wishlist-page {
+    padding-top: 1.8rem;
+  }
+
+  .wishlist-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .wishlist-title {
+    font-size: 1.85rem;
+  }
+
+  .wishlist-empty-card {
+    padding: 2.5rem 1.25rem 2rem;
+  }
+
+  .wishlist-empty-title {
+    font-size: 1.65rem;
+  }
+
+  .wishlist-empty-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .wishlist-empty-btn,
+  .wishlist-empty-secondary-btn {
+    width: 100%;
+  }
+}

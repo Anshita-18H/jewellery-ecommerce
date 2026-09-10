@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, X } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, X, Heart } from 'lucide-react';
+import { useWishlist } from '../context/WishlistContext';
 import './Navbar.css';
 
 export default function Navbar({ cartCount = 0 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { wishlistCount } = useWishlist();
 
   const links = [
     { label: 'Shop', to: '/shop' },
@@ -41,6 +43,10 @@ export default function Navbar({ cartCount = 0 }) {
         <div className="navbar-actions">
           <Link to="/shop" className="navbar-icon-btn" aria-label="Search products">
             <Search size={18} strokeWidth={1.5} />
+          </Link>
+          <Link to="/wishlist" className="navbar-icon-btn navbar-wishlist" aria-label="View wishlist">
+            <Heart size={18} strokeWidth={1.5} />
+            {wishlistCount > 0 && <span className="navbar-badge">{wishlistCount}</span>}
           </Link>
           <Link to="/login" className="navbar-icon-btn" aria-label="Sign in to your account">
             <User size={18} strokeWidth={1.5} />
