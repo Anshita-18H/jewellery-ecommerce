@@ -33,7 +33,11 @@ export default function Home({ onCartChange }) {
       <Hero product={heroProduct} />
 
       <section className="home-collections container">
-        <h2 className="section-title">Featured Collections</h2>
+        <div className="home-section-header text-center">
+          <p className="eyebrow">Curated Selection</p>
+          <h2 className="section-title">Featured Collections</h2>
+          <p className="section-subtitle">Handcrafted fine jewellery sculpted for timeless distinction</p>
+        </div>
 
         {loading && <p className="home-status">Loading collections…</p>}
         {error && <p className="home-status home-error">Couldn't load products: {error}</p>}

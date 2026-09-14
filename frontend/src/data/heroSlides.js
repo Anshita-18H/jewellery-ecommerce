@@ -1,0 +1,43 @@
+export const heroSlides = [
+  {
+    id: 1,
+    eyebrow: 'New Arrival',
+    title: 'Eternal Radiance',
+    subtitle: 'Discover the Timeless Brilliance of Hand-Selected Jewels',
+    ctaText: 'Shop Diamond',
+    ctaLink: '/shop?category=necklaces',
+    image: 'https://images.unsplash.com/photo-1758995115682-1452a1a9e35b?w=1000&auto=format&fit=crop&q=85',
+    accent: 'Necklaces & Pendants',
+  },
+  {
+    id: 2,
+    eyebrow: 'Signature Collection',
+    title: 'Solitaire Elegance',
+    subtitle: 'Masterfully Crafted 18K Gold & Certified Solitaire Cuts',
+    ctaText: 'Explore Rings',
+    ctaLink: '/shop?category=rings',
+    image: 'https://images.unsplash.com/photo-1551811040-f13e57351ef3?w=1000&auto=format&fit=crop&q=85',
+    accent: 'Rings & Bands',
+  },
+  {
+    id: 3,
+    eyebrow: 'High Jewellery',
+    title: 'The Royal Heritage',
+    subtitle: 'Artisanal Kundan Sets Designed for Unforgettable Moments',
+    ctaText: 'Discover Bridal',
+    ctaLink: '/shop?category=bridal',
+    image: 'https://images.unsplash.com/photo-1680968921717-4abbbe793bb3?w=1000&auto=format&fit=crop&q=85',
+    accent: 'Bridal Couture',
+  },
+  {
+    id: 4,
+    eyebrow: 'Artisan Fine Craft',
+    title: 'Modern Grace',
+    subtitle: 'Luminous Pearls and Sculptural Gold Earrings',
+    ctaText: 'View Earrings',
+    ctaLink: '/shop?category=earrings',
+    image: 'https://images.unsplash.com/photo-1602527418456-8b5cd2c7a4c2?w=1000&auto=format&fit=crop&q=85',
+    accent: 'Earrings & Drops',
+  },
+];
+

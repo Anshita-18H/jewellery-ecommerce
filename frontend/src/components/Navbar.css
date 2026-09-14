@@ -1,117 +1,194 @@
+/* ========================================================
+   AURA — FINE JEWELLERY NAVBAR
+   Luxury Dark Glassmorphism with High-Contrast Typography & Icons
+   ======================================================== */
+
 .navbar {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(10, 9, 8, 0.85);
-  backdrop-filter: blur(10px);
+  background: rgba(11, 10, 9, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .navbar-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 1.1rem;
-  padding-bottom: 1.1rem;
+  padding-top: 1.15rem;
+  padding-bottom: 1.15rem;
+  position: relative;
+}
+
+/* Left Brand Section */
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
 }
 
 .navbar-logo {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   letter-spacing: 0.28em;
-  color: var(--cream);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(201, 164, 92, 0.18);
+  transition: color 0.25s ease, text-shadow 0.25s ease;
 }
 
+.navbar-logo:hover {
+  color: var(--gold-bright);
+  text-shadow: 0 0 25px rgba(226, 194, 122, 0.35);
+}
+
+/* Center Navigation Links */
 .navbar-links {
   display: flex;
-  gap: 1.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: 2.2rem;
+  margin: 0 auto;
 }
 
 .navbar-link {
-  font-size: 0.74rem;
-  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--text-body);
+  color: var(--text-primary);
+  font-weight: 400;
   transition: color 0.2s var(--ease);
-  padding-bottom: 2px;
-  border-bottom: 1px solid transparent;
+  padding-bottom: 5px;
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
+  position: relative;
 }
 
-.navbar-link:hover,
+.navbar-link:hover {
+  color: var(--gold-bright);
+}
+
 .navbar-link.active {
-  color: var(--gold-light);
-  border-color: var(--gold-dim);
+  color: var(--gold-bright);
+  border-color: var(--gold);
+  text-shadow: 0 0 10px rgba(226, 194, 122, 0.25);
 }
 
+/* Right Actions */
 .navbar-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.4rem;
 }
 
 .navbar-icon-btn {
   position: relative;
   display: inline-flex;
-  color: var(--text-body);
-  transition: color 0.2s var(--ease);
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-primary);
+  transition: all 0.2s var(--ease);
+  text-decoration: none;
 }
+
 .navbar-icon-btn:hover {
-  color: var(--gold-light);
+  color: var(--gold-bright);
+  background: rgba(201, 164, 92, 0.1);
+  transform: translateY(-1px);
+}
+
+.navbar-auth-dot {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  background: #81c784;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #81c784;
 }
 
 .navbar-badge {
   position: absolute;
-  top: -8px;
-  right: -10px;
-  background: var(--gold);
-  color: #1a1510;
-  font-size: 0.62rem;
-  font-weight: 600;
-  width: 16px;
-  height: 16px;
+  top: -4px;
+  right: -5px;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+  color: #0E0C0A;
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .navbar-menu-btn {
   display: none;
   background: none;
-  border: none;
-  color: var(--cream);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s ease, color 0.2s ease;
 }
 
-@media (max-width: 860px) {
+.navbar-menu-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+}
+
+/* Responsive Mobile Drawer */
+@media (max-width: 890px) {
   .navbar-menu-btn {
     display: inline-flex;
-    order: -1;
   }
-  .navbar-logo {
-    margin: 0 auto;
-    font-size: 1.25rem;
-  }
+
   .navbar-links {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--bg-elevated);
+    background: var(--bg-card);
     flex-direction: column;
     align-items: center;
     gap: 0;
     max-height: 0;
     overflow: hidden;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-strong);
     transition: max-height 0.3s var(--ease);
+    box-shadow: var(--shadow-lg);
   }
+
   .navbar-links.open {
-    max-height: 400px;
+    max-height: 440px;
   }
+
   .navbar-link {
     width: 100%;
     text-align: center;
     padding: 1rem 0;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border-subtle);
+    font-size: 0.85rem;
+  }
+
+  .navbar-link:last-child {
+    border-bottom: none;
   }
 }

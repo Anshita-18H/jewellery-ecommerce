@@ -1,102 +1,282 @@
+/* ========================================================
+   AURA — FINE JEWELLERY HERO SHOWCASE
+   High-Contrast Editorial Typography & Atmospheric Depth
+   ======================================================== */
+
 .hero {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(ellipse 60% 50% at 70% 20%, rgba(201, 168, 118, 0.12), transparent 60%),
-    linear-gradient(180deg, #0d0b09 0%, #0a0908 100%);
+    radial-gradient(ellipse 65% 55% at 70% 25%, rgba(201, 164, 92, 0.15), transparent 60%),
+    linear-gradient(180deg, #12100E 0%, #0B0A09 100%);
   border-bottom: 1px solid var(--border);
+  min-height: 600px;
+  user-select: none;
 }
 
 .hero-glow {
   position: absolute;
   top: -20%;
   right: -10%;
-  width: 60%;
+  width: 65%;
   height: 140%;
-  background: radial-gradient(circle, rgba(201, 168, 118, 0.15) 0%, transparent 65%);
-  filter: blur(40px);
+  background: radial-gradient(circle, rgba(201, 164, 92, 0.18) 0%, transparent 65%);
+  filter: blur(50px);
   pointer-events: none;
+  z-index: 0;
+}
+
+/* Slider Track */
+.hero-slider-track {
+  display: flex;
+  transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+  width: 100%;
+  height: 100%;
+}
+
+.hero-slide {
+  min-width: 100%;
+  box-sizing: border-box;
+  opacity: 0.35;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.hero-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .hero-inner {
   position: relative;
+  z-index: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.15fr 1fr;
   align-items: center;
-  gap: 2rem;
-  padding-top: 4.5rem;
-  padding-bottom: 4.5rem;
-  min-height: 560px;
+  gap: 3rem;
+  padding-top: 5rem;
+  padding-bottom: 6rem;
+  min-height: 580px;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.hero-copy .eyebrow {
+  display: inline-block;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: var(--gold);
+  font-weight: 500;
+  margin-bottom: 0.9rem;
 }
 
 .hero-title {
-  font-size: clamp(2.6rem, 5.5vw, 4.2rem);
-  line-height: 1.05;
-  letter-spacing: 0.02em;
-  margin-top: 0.75rem;
+  font-size: clamp(2.5rem, 5.2vw, 4.2rem);
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+  color: var(--text-primary);
+  margin-bottom: 1.2rem;
+  text-shadow: 0 4px 25px rgba(0, 0, 0, 0.7);
 }
 
 .hero-subtitle {
-  margin-top: 1rem;
-  font-size: 1rem;
-  color: var(--text-muted);
+  font-size: 1.05rem;
+  color: var(--text-secondary);
   font-weight: 300;
+  line-height: 1.7;
   letter-spacing: 0.02em;
+  max-width: 500px;
 }
 
 .hero-cta-row {
-  margin-top: 2.2rem;
+  margin-top: 2.4rem;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.8rem;
 }
 
 .hero-price {
-  font-size: 0.9rem;
-  color: var(--text-body);
+  font-size: 1.2rem;
+  color: var(--gold-bright);
   letter-spacing: 0.04em;
+  font-weight: 600;
+  text-shadow: 0 0 15px rgba(226, 194, 122, 0.2);
 }
 
+/* Stage & Pedestal */
 .hero-stage {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  min-height: 420px;
+  min-height: 440px;
 }
 
 .hero-pedestal {
   position: absolute;
   bottom: 6%;
-  width: 78%;
-  height: 60px;
+  width: 85%;
+  height: 65px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, #3a352c 0%, #201c16 60%, transparent 75%);
-  box-shadow: 0 0 60px 10px rgba(201, 168, 118, 0.08);
+  background: radial-gradient(ellipse at center, rgba(201, 164, 92, 0.22) 0%, rgba(29, 25, 21, 0.8) 50%, transparent 75%);
+  box-shadow: 0 0 70px 20px rgba(201, 164, 92, 0.12);
+  z-index: 1;
+}
+
+.hero-img-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 430px;
+  height: 430px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--border-strong);
+  background: var(--bg-card);
 }
 
 .hero-product-img {
-  position: relative;
-  z-index: 1;
-  max-height: 420px;
-  width: auto;
-  margin: 0 auto;
-  object-fit: contain;
-  filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.6));
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s ease;
 }
 
-@media (max-width: 860px) {
+.hero-slide.is-active .hero-product-img {
+  transform: scale(1.02);
+}
+
+/* Navigation Buttons */
+.hero-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(29, 25, 21, 0.85);
+  border: 1px solid var(--border-strong);
+  color: var(--gold-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  transition: all 0.25s ease;
+}
+
+.hero-nav-btn:hover {
+  background: var(--gold);
+  border-color: var(--gold-bright);
+  color: #0E0C0A;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 6px 20px rgba(201, 164, 92, 0.4);
+}
+
+.hero-nav-prev {
+  left: 24px;
+}
+
+.hero-nav-next {
+  right: 24px;
+}
+
+/* Slide Indicator Dots */
+.hero-indicators {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-indicator-dot {
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  border: none;
+  background: rgba(245, 240, 232, 0.25);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.3s ease;
+}
+
+.hero-indicator-dot:hover {
+  background: rgba(245, 240, 232, 0.5);
+}
+
+.hero-indicator-dot.active {
+  background: var(--gold-bright);
+  width: 46px;
+  box-shadow: 0 0 10px rgba(226, 194, 122, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 890px) {
+  .hero {
+    min-height: auto;
+  }
+
   .hero-inner {
     grid-template-columns: 1fr;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+    padding-top: 3.5rem;
+    padding-bottom: 4.5rem;
     min-height: unset;
+    gap: 2.2rem;
+    text-align: center;
   }
+
+  .hero-copy {
+    align-items: center;
+  }
+
+  .hero-subtitle {
+    margin: 0 auto;
+  }
+
+  .hero-cta-row {
+    justify-content: center;
+  }
+
   .hero-stage {
     order: -1;
-    min-height: 280px;
+    min-height: 300px;
   }
+
+  .hero-img-wrapper {
+    max-width: 320px;
+    height: 320px;
+  }
+
   .hero-title {
     font-size: 2.4rem;
+  }
+
+  .hero-nav-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .hero-nav-prev {
+    left: 10px;
+  }
+
+  .hero-nav-next {
+    right: 10px;
   }
 }

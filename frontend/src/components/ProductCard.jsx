@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
+import StarRating from './StarRating';
 import './ProductCard.css';
 
 export default function ProductCard({ product, onAddToCart }) {
@@ -12,6 +13,9 @@ export default function ProductCard({ product, onAddToCart }) {
     e.stopPropagation();
     toggleWishlist(product);
   }
+
+  const avgRating = Number(product.avg_rating) || 0;
+  const ratingCount = Number(product.rating_count) || 0;
 
   return (
     <div className="product-card">
@@ -41,6 +45,18 @@ export default function ProductCard({ product, onAddToCart }) {
         <Link to={`/product/${product.slug}`}>
           <h3 className="product-card-name">{product.name}</h3>
         </Link>
+
+        {avgRating > 0 && (
+          <div className="product-card-rating">
+            <StarRating
+              rating={avgRating}
+              count={ratingCount}
+              size={12}
+              compact
+            />
+          </div>
+        )}
+
         <p className="product-card-price">Rs. {Number(product.price).toLocaleString()}</p>
         <button
           type="button"

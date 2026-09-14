@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { User, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, Check, ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './Register.css';
 
 export default function Register() {
@@ -28,6 +29,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const { register } = useAuth();
 
   // Validation helpers
   function validateFullName(val) {
@@ -130,37 +132,16 @@ export default function Register() {
     setLoading(true);
 
     try {
-      /* ==========================================================================
-         FUTURE BACKEND REGISTRATION INTEGRATION POINT
-         --------------------------------------------------------------------------
-         When the backend authentication API is implemented, connect here:
-
-         const response = await fetch('/api/auth/register', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           credentials: 'include',
-           body: JSON.stringify({
-             name: fullName.trim(),
-             email: email.trim(),
-             phone: phone.trim(),
-             password: password,
-           }),
-         });
-
-         const data = await response.json();
-
-         if (!response.ok) {
-           // Provide user-friendly messaging without technical system leaks
-           throw new Error(data.message || "We couldn't create your account right now. Please try again.");
-         }
-         ========================================================================== */
-
-      // Simulated brief delay for UX transition (frontend demonstration)
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await register({
+        name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        password: password,
+      });
 
       setIsSuccess(true);
     } catch (err) {
-      setApiError("We couldn't create your account right now. Please try again.");
+      setApiError(err.message || "We couldn't create your account right now. Please try again.");
     } finally {
       setLoading(false);
     }

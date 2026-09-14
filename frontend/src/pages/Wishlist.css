@@ -64,16 +64,17 @@
 }
 
 .wishlist-clear-btn:hover {
-  color: #e09e86;
+  color: #f28b82;
   text-decoration: underline;
 }
 
 /* Count & Filter Bar */
 .wishlist-count-bar {
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--gold-dim);
+  color: var(--gold-bright);
+  font-weight: 500;
   margin-bottom: 1.5rem;
 }
 

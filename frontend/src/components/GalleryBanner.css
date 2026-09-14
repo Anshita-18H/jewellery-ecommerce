@@ -1,22 +1,31 @@
 .gallery-banner-section {
-  padding: 4rem 2rem 5rem;
+  padding: 5rem 2rem 6rem;
   text-align: center;
 }
 
 .gallery-banner-eyebrow {
   display: block;
-  margin-bottom: 2rem;
+  margin-bottom: 2.2rem;
+  color: var(--gold);
+  letter-spacing: 0.26em;
 }
 
 .gallery-banner {
   display: block;
   position: relative;
-  height: 340px;
+  height: 380px;
   border-radius: var(--radius-md);
   background-size: cover;
   background-position: center;
   overflow: hidden;
   border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.gallery-banner:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
 }
 
 .gallery-banner-overlay {
@@ -26,32 +35,41 @@
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: 0 3rem;
+  padding: 0 4rem;
   text-align: left;
-  background: linear-gradient(90deg, rgba(10, 9, 8, 0.85) 0%, rgba(10, 9, 8, 0.25) 55%, transparent 100%);
+  background: linear-gradient(90deg, rgba(11, 10, 9, 0.92) 0%, rgba(11, 10, 9, 0.4) 60%, transparent 100%);
 }
 
 .gallery-banner-title {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  color: var(--cream);
-  max-width: 340px;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  color: var(--text-primary);
+  max-width: 420px;
+  line-height: 1.2;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
 }
 
 .gallery-banner-link {
-  margin-top: 1rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  margin-top: 1.2rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--gold-light);
-  border-bottom: 1px solid var(--gold-dim);
-  padding-bottom: 2px;
+  color: var(--gold-bright);
+  border-bottom: 1.5px solid var(--gold);
+  padding-bottom: 3px;
+  transition: all 0.2s ease;
+}
+
+.gallery-banner:hover .gallery-banner-link {
+  color: #fff;
+  border-color: #fff;
 }
 
 @media (max-width: 640px) {
   .gallery-banner {
-    height: 260px;
+    height: 280px;
   }
   .gallery-banner-overlay {
-    padding: 0 1.5rem;
+    padding: 0 1.75rem;
   }
 }

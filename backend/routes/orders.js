@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
+const { requireAdmin } = require('../middleware/auth');
 
 // POST /api/orders — checkout: turns the current session's cart into an order
 // Body: { customer_name, phone, address, city, pincode }
@@ -15,10 +16,10 @@ router.post('/', async (req, res) => {
     }
 
     const [cartRows] = await connection.query(
-      `SELECT ci.quantity, p.id AS product_id, p.name, p.price, p.stock, p.is_active
+      `SELECT ci.quantity, p.id AS product_id, p.name, p.price, p.stock
        FROM cart_items ci
        JOIN products p ON ci.product_id = p.id
-       WHERE ci.session_id = ? AND (p.is_active = TRUE OR p.is_active IS NULL)`,
+       WHERE ci.session_id = ?`,
       [req.sessionID]
     );
 
@@ -67,7 +68,7 @@ router.post('/', async (req, res) => {
 });
 
 // GET /api/orders — admin: list all orders (most recent first)
-router.get('/', async (req, res) => {
+router.get('/', requireAdmin, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
     res.json(rows);
@@ -78,7 +79,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/orders/:id — admin: single order with line items
-router.get('/:id', async (req, res) => {
+router.get('/:id', requireAdmin, async (req, res) => {
   try {
     const [orderRows] = await pool.query('SELECT * FROM orders WHERE id = ?', [req.params.id]);
     if (orderRows.length === 0) {
@@ -94,7 +95,7 @@ router.get('/:id', async (req, res) => {
 
 // PUT /api/orders/:id/status — admin: update order status
 // Body: { status: 'pending' | 'shipped' | 'delivered' | 'cancelled' }
-router.put('/:id/status', async (req, res) => {
+router.put('/:id/status', requireAdmin, async (req, res) => {
   try {
     const { status } = req.body;
     const validStatuses = ['pending', 'shipped', 'delivered', 'cancelled'];

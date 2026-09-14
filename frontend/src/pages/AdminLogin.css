@@ -1,0 +1,262 @@
+/* ========================================================
+   AURA — Fine Jewellery Admin Login Stylesheet
+   Luxury Black & Gold Theme with Encrypted Security Accents
+   ======================================================== */
+
+.admin-login-page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: 2rem 1.5rem;
+  overflow: hidden;
+  font-family: var(--font-sans);
+}
+
+.admin-login-glow {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(201, 168, 118, 0.08) 0%, rgba(10, 9, 8, 0) 70%);
+  pointer-events: none;
+}
+
+.admin-login-container {
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  z-index: 10;
+}
+
+.admin-login-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 2.8rem 2.4rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.admin-login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.admin-login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-login-emblem {
+  font-size: 1.4rem;
+  color: var(--gold);
+  line-height: 1;
+  margin-bottom: 0.6rem;
+  filter: drop-shadow(0 0 8px rgba(201, 168, 118, 0.4));
+}
+
+.admin-login-title {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  margin: 0.35rem 0 0.6rem;
+}
+
+.admin-login-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Alerts */
+.admin-login-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.4;
+}
+
+.admin-login-alert.alert-error {
+  background: rgba(201, 138, 118, 0.12);
+  border: 1px solid rgba(201, 138, 118, 0.35);
+  color: #f28b82;
+}
+
+.admin-login-alert.alert-success {
+  background: rgba(76, 175, 80, 0.12);
+  border: 1px solid rgba(76, 175, 80, 0.35);
+  color: #81c784;
+}
+
+.admin-login-alert .alert-icon {
+  flex-shrink: 0;
+}
+
+/* Form */
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.admin-login-label {
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+  font-weight: 500;
+}
+
+.admin-login-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.admin-login-input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--gold-primary);
+  pointer-events: none;
+}
+
+.admin-login-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.6rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  transition: all 0.2s ease;
+}
+
+.admin-login-input.password-input {
+  padding-right: 2.6rem;
+}
+
+.admin-login-input:focus {
+  outline: none;
+  border-color: var(--gold-bright);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 2px rgba(201, 164, 92, 0.22);
+}
+
+.admin-login-eye-btn {
+  position: absolute;
+  right: 0.85rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.admin-login-eye-btn:hover {
+  color: var(--cream);
+}
+
+.admin-login-submit {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.95rem;
+  letter-spacing: 0.1em;
+}
+
+.admin-login-btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.admin-login-btn-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+.admin-login-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(10, 9, 8, 0.3);
+  border-top-color: #0a0908;
+  border-radius: 50%;
+  animation: adminLoginSpin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes adminLoginSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.admin-login-footer {
+  text-align: center;
+  margin-top: 1.6rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+}
+
+.admin-return-link {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+  letter-spacing: 0.04em;
+}
+
+.admin-return-link:hover {
+  color: var(--gold-light);
+}
+
+.admin-login-security {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin-top: 1.5rem;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.admin-login-security .security-icon {
+  color: var(--gold);
+}
+
+@media (max-width: 480px) {
+  .admin-login-card {
+    padding: 2.2rem 1.6rem;
+  }
+}
+

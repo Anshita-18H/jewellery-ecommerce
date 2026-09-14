@@ -1,0 +1,63 @@
+.star-rating-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  vertical-align: middle;
+}
+
+.star-rating-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  color: inherit;
+}
+
+.star-rating-wrap.is-interactive .star-btn {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.star-rating-wrap.is-interactive .star-btn:hover {
+  transform: scale(1.25);
+}
+
+.star-rating-wrap.is-disabled .star-btn {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.star-rating-score {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gold-bright);
+  letter-spacing: 0.02em;
+}
+
+.star-rating-count {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.star-rating-wrap.is-compact {
+  gap: 0.35rem;
+}
+
+.star-rating-wrap.is-compact .star-rating-score {
+  font-size: 0.78rem;
+}
+
+.star-rating-wrap.is-compact .star-rating-count {
+  font-size: 0.72rem;
+}

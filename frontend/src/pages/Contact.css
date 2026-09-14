@@ -10,42 +10,54 @@
 }
 
 .contact-title {
+  font-family: var(--font-display);
+  color: var(--text-primary);
   margin-top: 0.6rem;
   font-size: clamp(1.8rem, 4vw, 2.6rem);
+  letter-spacing: 0.02em;
 }
 
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1.3fr;
-  gap: 3.5rem;
-  max-width: 900px;
+  gap: 3rem;
+  max-width: 960px;
   margin: 0 auto;
 }
 
 .contact-info {
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
+  gap: 1.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 2.2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  height: fit-content;
 }
 
 .contact-info-row {
   display: flex;
-  gap: 0.9rem;
-  color: var(--gold);
+  gap: 1rem;
+  color: var(--gold-bright);
 }
 
 .contact-info-row p {
   margin: 0;
-  color: var(--text-body);
-  font-size: 0.88rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.65;
 }
 
 .contact-info-label {
-  color: var(--cream) !important;
-  font-size: 0.75rem !important;
-  letter-spacing: 0.05em;
+  color: var(--text-primary) !important;
+  font-family: var(--font-display);
+  font-size: 0.85rem !important;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 0.25rem !important;
+  margin-bottom: 0.35rem !important;
+  font-weight: 500;
 }
 
 .contact-whatsapp-btn {
@@ -56,44 +68,61 @@
 .contact-form {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 2.2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .contact-form label {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  font-size: 0.78rem;
-  letter-spacing: 0.05em;
+  gap: 0.55rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--gold-bright);
+  font-weight: 500;
 }
 
 .contact-form input,
 .contact-form textarea {
-  background: var(--bg-card);
+  background: var(--bg-elevated);
   border: 1px solid var(--border);
-  color: var(--cream);
-  padding: 0.8rem 1rem;
-  font-size: 0.9rem;
+  color: var(--text-primary);
+  padding: 0.85rem 1.1rem;
+  font-size: 0.92rem;
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   resize: vertical;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: var(--text-muted);
 }
 .contact-form input:focus,
 .contact-form textarea:focus {
   outline: none;
-  border-color: var(--gold-dim);
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 0 2px rgba(201, 164, 92, 0.22);
 }
 
 .contact-success {
-  color: var(--gold-light);
-  font-size: 0.92rem;
+  color: #81c784;
+  background: rgba(76, 175, 80, 0.12);
+  border: 1px solid rgba(76, 175, 80, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 1.2rem 1.5rem;
+  font-size: 0.95rem;
   line-height: 1.6;
 }
 
 @media (max-width: 760px) {
   .contact-grid {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 }

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Search, MapPin, ShoppingBag, User } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import './Footer.css';
 
 export default function Footer() {
@@ -12,7 +12,7 @@ export default function Footer() {
         </div>
 
         <div className="footer-col">
-          <p className="footer-heading">Shop</p>
+          <p className="footer-heading">Collections</p>
           <ul className="footer-links">
             <li><Link to="/shop?category=rings">Rings</Link></li>
             <li><Link to="/shop?category=necklaces">Necklaces</Link></li>
@@ -22,33 +22,35 @@ export default function Footer() {
         </div>
 
         <div className="footer-col">
-          <p className="footer-heading">Explore</p>
+          <p className="footer-heading">Brand</p>
           <ul className="footer-links">
             <li><Link to="/gallery">Gallery</Link></li>
             <li><Link to="/contact">Contact</Link></li>
             <li><Link to="/login">Client Sign In</Link></li>
-            <li><Link to="/cart">Cart</Link></li>
+            <li><Link to="/wishlist">Wishlist</Link></li>
           </ul>
         </div>
 
         <div className="footer-col">
-          <p className="footer-heading">Contact</p>
+          <p className="footer-heading">Service</p>
           <p className="footer-contact-line">
             <MapPin size={14} strokeWidth={1.5} /> Indore, Madhya Pradesh
           </p>
-          <a href="https://wa.me/910000000000" className="footer-contact-line" target="_blank" rel="noreferrer">
-            WhatsApp Us
+          <a
+            href="https://wa.me/910000000000"
+            className="footer-contact-line footer-wa-link"
+            target="_blank"
+            rel="noreferrer"
+          >
+            WhatsApp Concierge
           </a>
         </div>
       </div>
 
       <div className="footer-bottom container">
-        <span>© {new Date().getFullYear()} AURA. All rights reserved.</span>
-        <div className="footer-bottom-icons">
-          <Link to="/shop" aria-label="Search"><Search size={15} strokeWidth={1.5} /></Link>
-          <Link to="/login" aria-label="Account"><User size={15} strokeWidth={1.5} /></Link>
-          <Link to="/cart" aria-label="Cart"><ShoppingBag size={15} strokeWidth={1.5} /></Link>
-        </div>
+        <span className="footer-copyright">
+          © 2026 AURA Fine Jewellery. All rights reserved.
+        </span>
       </div>
     </footer>
   );

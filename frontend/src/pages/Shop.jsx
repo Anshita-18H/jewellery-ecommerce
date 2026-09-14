@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { getProducts, getCategories, addToCart } from '../api';
 import './Shop.css';
@@ -78,12 +79,15 @@ export default function Shop({ onCartChange }) {
         </div>
 
         <form className="shop-search" onSubmit={handleSearchSubmit}>
-          <input
-            type="text"
-            placeholder="Search jewellery…"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
+          <div className="shop-search-wrap">
+            <Search size={16} className="shop-search-icon" />
+            <input
+              type="text"
+              placeholder="Search jewellery…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+          </div>
           <button type="submit" className="btn btn-outline">Search</button>
         </form>
       </div>

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
+const { requireAdmin } = require('../middleware/auth');
 
 // GET /api/categories — used for nav links, shop filters, and admin dropdown
 router.get('/', async (req, res) => {
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/categories — admin: add a new category
-router.post('/', async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
   try {
     const { name } = req.body;
     if (!name) {

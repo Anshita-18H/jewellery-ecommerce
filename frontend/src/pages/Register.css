@@ -92,15 +92,15 @@
 }
 
 .register-alert-error {
-  background: rgba(201, 138, 118, 0.1);
-  border: 1px solid rgba(201, 138, 118, 0.35);
-  color: #e09e86;
+  background: rgba(229, 115, 115, 0.12);
+  border: 1px solid rgba(229, 115, 115, 0.35);
+  color: #f28b82;
 }
 
 .register-alert-icon {
   flex-shrink: 0;
   margin-top: 2px;
-  color: #e09e86;
+  color: #f28b82;
 }
 
 .register-alert-text {
@@ -112,13 +112,13 @@
 .register-alert-title {
   font-weight: 500;
   font-size: 0.84rem;
-  color: #f1b39e;
+  color: #f28b82;
   letter-spacing: 0.02em;
 }
 
 .register-alert-desc {
   font-size: 0.78rem;
-  color: #d89680;
+  color: #fca5a5;
   line-height: 1.35;
 }
 
@@ -135,10 +135,11 @@
 }
 
 .register-label {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--gold-bright);
+  font-weight: 500;
   margin-bottom: 0.45rem;
 }
 
@@ -152,7 +153,7 @@
 .register-input-icon {
   position: absolute;
   left: 1rem;
-  color: var(--gold-dim);
+  color: var(--gold-primary);
   pointer-events: none;
   transition: color 0.2s ease;
   display: flex;
@@ -170,7 +171,7 @@ svg.register-input-icon {
   width: 100%;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  color: var(--cream);
+  color: var(--text-primary);
   padding: 0.8rem 1rem 0.8rem 2.65rem;
   font-size: 0.88rem;
   border-radius: var(--radius-sm);
@@ -183,32 +184,33 @@ svg.register-input-icon {
 }
 
 .register-input::placeholder {
-  color: rgba(143, 134, 118, 0.6);
+  color: var(--text-muted);
+  opacity: 0.85;
   font-weight: 300;
 }
 
 .register-input:focus {
   outline: none;
-  border-color: var(--gold);
-  background: rgba(27, 23, 18, 0.95);
-  box-shadow: 0 0 0 2px rgba(201, 168, 118, 0.15);
+  border-color: var(--gold-bright);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 2px rgba(201, 164, 92, 0.22);
 }
 
 .register-input:focus + .register-password-toggle,
 .register-input-wrap:focus-within .register-input-icon {
-  color: var(--gold-light);
+  color: var(--gold-bright);
 }
 
 .register-input-wrap.has-error .register-input {
-  border-color: #c98a76;
+  border-color: #f28b82;
 }
 
 .register-input-wrap.has-error .register-input:focus {
-  box-shadow: 0 0 0 2px rgba(201, 138, 118, 0.2);
+  box-shadow: 0 0 0 2px rgba(229, 115, 115, 0.25);
 }
 
 .register-input-wrap.has-error .register-input-icon {
-  color: #c98a76;
+  color: #f28b82;
 }
 
 /* Password Visibility Toggle */

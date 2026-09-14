@@ -126,21 +126,22 @@
 }
 
 .login-label {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--gold-bright);
+  font-weight: 500;
   margin-bottom: 0.45rem;
 }
 
 .login-forgot-link {
   font-size: 0.75rem;
-  color: var(--gold);
+  color: var(--gold-bright);
   transition: color 0.2s ease;
 }
 
 .login-forgot-link:hover {
-  color: var(--gold-light);
+  color: var(--text-primary);
   text-decoration: underline;
 }
 
@@ -154,7 +155,7 @@
 .login-input-icon {
   position: absolute;
   left: 1rem;
-  color: var(--gold-dim);
+  color: var(--gold-primary);
   pointer-events: none;
   transition: color 0.2s ease;
 }
@@ -163,7 +164,7 @@
   width: 100%;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  color: var(--cream);
+  color: var(--text-primary);
   padding: 0.8rem 1rem 0.8rem 2.65rem;
   font-size: 0.88rem;
   border-radius: var(--radius-sm);
@@ -176,32 +177,33 @@
 }
 
 .login-input::placeholder {
-  color: rgba(143, 134, 118, 0.6);
+  color: var(--text-muted);
+  opacity: 0.85;
   font-weight: 300;
 }
 
 .login-input:focus {
   outline: none;
-  border-color: var(--gold);
-  background: rgba(27, 23, 18, 0.95);
-  box-shadow: 0 0 0 2px rgba(201, 168, 118, 0.15);
+  border-color: var(--gold-bright);
+  background: var(--bg-elevated);
+  box-shadow: 0 0 0 2px rgba(201, 164, 92, 0.22);
 }
 
 .login-input:focus + .login-password-toggle,
 .login-input-wrap:focus-within .login-input-icon {
-  color: var(--gold-light);
+  color: var(--gold-bright);
 }
 
 .login-input-wrap.has-error .login-input {
-  border-color: #c98a76;
+  border-color: #f28b82;
 }
 
 .login-input-wrap.has-error .login-input:focus {
-  box-shadow: 0 0 0 2px rgba(201, 138, 118, 0.2);
+  box-shadow: 0 0 0 2px rgba(229, 115, 115, 0.25);
 }
 
 .login-input-wrap.has-error .login-input-icon {
-  color: #c98a76;
+  color: #f28b82;
 }
 
 .login-password-toggle {

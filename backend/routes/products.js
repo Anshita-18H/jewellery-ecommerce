@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
+const { requireAdmin } = require('../middleware/auth');
 
 // Helper: turn a product name into a URL-friendly slug
 function slugify(name) {
@@ -17,32 +18,38 @@ function slugify(name) {
 // include_hidden=true to see everything, including soft-deleted products.
 router.get('/', async (req, res) => {
   try {
-    const { category, search, featured, include_hidden } = req.query;
+    const { category, search, featured } = req.query;
 
     let sql = `
-      SELECT p.*, c.name AS category_name, c.slug AS category_slug
+      SELECT p.*, c.name AS category_name, c.slug AS category_slug,
+             COALESCE(ROUND(AVG(pr.rating), 1), 0) AS avg_rating,
+             COUNT(pr.id) AS rating_count
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN product_ratings pr ON p.id = pr.product_id
       WHERE 1 = 1
     `;
     const params = [];
 
-    if (!include_hidden) {
-      sql += ' AND (p.is_active = TRUE OR p.is_active IS NULL)';
-    }
     if (category) {
       sql += ' AND c.slug = ?';
       params.push(category);
     }
     if (search) {
-      sql += ' AND (p.name LIKE ? OR p.description LIKE ?)';
-      params.push(`%${search}%`, `%${search}%`);
+      const searchNum = Number(search);
+      if (Number.isInteger(searchNum) && searchNum > 0) {
+        sql += ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ? OR p.id = ?)';
+        params.push(`%${search}%`, `%${search}%`, `%${search}%`, searchNum);
+      } else {
+        sql += ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?)';
+        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      }
     }
     if (featured === 'true') {
       sql += ' AND p.is_featured = TRUE';
     }
 
-    sql += ' ORDER BY p.created_at DESC';
+    sql += ' GROUP BY p.id ORDER BY p.created_at DESC';
 
     const [rows] = await pool.query(sql, params);
     res.json(rows);
@@ -73,16 +80,16 @@ async function getUniqueSlug(baseSlug, excludeId = null) {
 // GET /api/products/:slug — single product detail page
 router.get('/:slug', async (req, res) => {
   try {
-    const { include_hidden } = req.query;
     let sql = `
-      SELECT p.*, c.name AS category_name, c.slug AS category_slug
+      SELECT p.*, c.name AS category_name, c.slug AS category_slug,
+             COALESCE(ROUND(AVG(pr.rating), 1), 0) AS avg_rating,
+             COUNT(pr.id) AS rating_count
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN product_ratings pr ON p.id = pr.product_id
       WHERE p.slug = ?
+      GROUP BY p.id
     `;
-    if (!include_hidden) {
-      sql += ' AND (p.is_active = TRUE OR p.is_active IS NULL)';
-    }
 
     const [rows] = await pool.query(sql, [req.params.slug]);
     if (rows.length === 0) {
@@ -97,7 +104,7 @@ router.get('/:slug', async (req, res) => {
 
 // POST /api/products — admin: add a new product
 // Body: { name, category_id, description, price, stock, image_url, is_featured }
-router.post('/', async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
   try {
     const { name, category_id, description, price, stock, image_url, is_featured } = req.body;
 
@@ -108,8 +115,8 @@ router.post('/', async (req, res) => {
     const slug = await getUniqueSlug(slugify(name));
 
     const [result] = await pool.query(
-      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, is_active)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE)`,
+      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         category_id || null,
         name,
@@ -133,7 +140,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT /api/products/:id — admin: edit an existing product
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAdmin, async (req, res) => {
   try {
     const { name, category_id, description, price, stock, image_url, is_featured } = req.body;
 
@@ -168,38 +175,22 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/products/:id — admin: hide a product from the site (SOFT delete)
-// The row stays in the database — it's just marked inactive so it stops
-// showing up on the live site. Nothing is actually erased.
-router.delete('/:id', async (req, res) => {
+// DELETE /api/products/:id — admin: remove a product
+router.delete('/:id', requireAdmin, async (req, res) => {
   try {
-    const [result] = await pool.query('UPDATE products SET is_active = FALSE WHERE id = ?', [req.params.id]);
+    const [result] = await pool.query('DELETE FROM products WHERE id = ?', [req.params.id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    res.json({ message: 'Product hidden from site' });
+    res.json({ message: 'Product deleted' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to hide product' });
-  }
-});
-
-// PUT /api/products/:id/restore — admin: bring a hidden product back
-router.put('/:id/restore', async (req, res) => {
-  try {
-    const [result] = await pool.query('UPDATE products SET is_active = TRUE WHERE id = ?', [req.params.id]);
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-    res.json({ message: 'Product restored' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to restore product' });
+    res.status(500).json({ error: 'Failed to delete product' });
   }
 });
 
 // DELETE /api/products/:id/permanent — admin: permanently remove a product from DB
-router.delete('/:id/permanent', async (req, res) => {
+router.delete('/:id/permanent', requireAdmin, async (req, res) => {
   try {
     const [result] = await pool.query('DELETE FROM products WHERE id = ?', [req.params.id]);
     if (result.affectedRows === 0) {

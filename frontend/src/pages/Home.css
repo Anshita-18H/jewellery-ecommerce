@@ -1,34 +1,64 @@
 .home-collections {
-  padding-top: 4.5rem;
-  padding-bottom: 1rem;
+  padding-top: 5rem;
+  padding-bottom: 2rem;
+}
+
+.home-section-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+}
+
+.home-section-header .eyebrow {
+  margin-bottom: 0.6rem;
+}
+
+.home-section-header .section-title {
+  margin-bottom: 0.6rem;
+}
+
+.section-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
 }
 
 .home-collections-grid {
-  margin-top: 2.5rem;
+  margin-top: 3rem;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
+  gap: 1.75rem;
 }
 
 .home-status {
   text-align: center;
-  margin-top: 2rem;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  margin-top: 3rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
 }
 
 .home-error {
-  color: #c98a76;
+  color: #f28b82;
+  background: rgba(201, 138, 118, 0.12);
+  border: 1px solid rgba(201, 138, 118, 0.35);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-sm);
+  max-width: 500px;
+  margin: 2rem auto;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
   .home-collections-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 540px) {
   .home-collections-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }

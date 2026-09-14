@@ -1,9 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Eye, EyeOff, Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Eye, EyeOff, Lock, Mail, AlertCircle, ArrowRight, CheckCircle2, LogOut, Shield } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 export default function Login() {
+  const { user, login, logout } = useAuth();
+  const navigate = useNavigate();
+
   // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -64,37 +68,20 @@ export default function Login() {
     setLoading(true);
 
     try {
-      /* ==========================================================================
-         FUTURE BACKEND AUTHENTICATION INTEGRATION POINT
-         --------------------------------------------------------------------------
-         When the backend authentication API is ready, connect here:
+      const res = await login({
+        email: email.trim(),
+        password,
+        rememberMe,
+      });
 
-         const response = await fetch('/api/auth/login', {
-           method: 'POST',
-           headers: { 'Content-Type': 'application/json' },
-           credentials: 'include', // for session/cookie auth
-           body: JSON.stringify({
-             email: email.trim(),
-             password,
-             rememberMe,
-           }),
-         });
-
-         const data = await response.json();
-
-         if (!response.ok) {
-           throw new Error(data.error || 'Invalid email or password');
-         }
-
-         // Successful authentication:
-         // 1. Update user session/auth context
-         // 2. Redirect to account or previous page: navigate('/account');
-         ========================================================================== */
-
-      // Simulated brief delay to provide responsive feedback
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      setApiSuccess('Form validated. Ready to connect to POST /api/auth/login.');
+      setApiSuccess(res.message || 'Signed in successfully.');
+      setTimeout(() => {
+        if (res.user?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate(-1);
+        }
+      }, 700);
     } catch (err) {
       setApiError(err.message || 'Unable to sign in. Please verify your credentials.');
     } finally {
@@ -107,14 +94,58 @@ export default function Login() {
       <div className="login-glow" />
 
       <div className="login-container container">
-        <div className="login-card">
-          {/* Brand Header */}
-          <div className="login-header">
-            <div className="login-emblem">♦</div>
-            <p className="eyebrow">AURA Privilege</p>
-            <h1 className="login-title">Welcome Back</h1>
-            <p className="login-subtitle">Sign in to your AURA account</p>
+        {user ? (
+          <div className="login-card">
+            <div className="login-header">
+              <div className="login-emblem">♦</div>
+              <p className="eyebrow">AURA Client Privileged</p>
+              <h1 className="login-title">Client Account</h1>
+              <p className="login-subtitle">
+                You are currently signed in as <strong>{user.name}</strong>
+              </p>
+            </div>
+
+            <div className="login-account-details" style={{ margin: '1.5rem 0', textAlign: 'center' }}>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-body)', marginBottom: '0.4rem' }}>
+                Email: <span style={{ color: 'var(--cream)' }}>{user.email}</span>
+              </p>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                Account Tier: <span style={{ textTransform: 'capitalize', color: 'var(--gold-light)' }}>{user.role}</span>
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <Link to="/shop" className="btn btn-gold" style={{ textAlign: 'center' }}>
+                Explore Jewellery Collections
+              </Link>
+              {user.role === 'admin' && (
+                <Link to="/admin" className="btn btn-outline" style={{ textAlign: 'center' }}>
+                  Open Admin Management
+                </Link>
+              )}
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={logout}
+                style={{ borderColor: 'rgba(190, 70, 70, 0.4)', color: '#ff9b9b' }}
+              >
+                Sign Out of AURA
+              </button>
+            </div>
+
+            <div className="login-assurance" style={{ marginTop: '2rem' }}>
+              <span>Encrypted &amp; Secure • AURA Concierge</span>
+            </div>
           </div>
+        ) : (
+          <div className="login-card">
+            {/* Brand Header */}
+            <div className="login-header">
+              <div className="login-emblem">♦</div>
+              <p className="eyebrow">AURA Privilege</p>
+              <h1 className="login-title">Welcome Back</h1>
+              <p className="login-subtitle">Sign in to your AURA account</p>
+            </div>
 
           {/* Status & Error Alerts */}
           {apiError && (
@@ -263,6 +294,7 @@ export default function Login() {
             <span>Encrypted &amp; Secure • AURA Concierge</span>
           </div>
         </div>
+      )}
       </div>
     </div>
   );
