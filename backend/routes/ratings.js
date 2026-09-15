@@ -73,7 +73,15 @@ router.get('/', async (req, res) => {
       reviews: reviewsRows,
     });
   } catch (err) {
-    console.error('Fetch ratings error:', err);
+    console.error('Fetch ratings error:', err.message);
+    if (err.code === 'ER_NO_SUCH_TABLE') {
+      return res.json({
+        averageRating: 0,
+        totalRatings: 0,
+        distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+        reviews: [],
+      });
+    }
     res.status(500).json({ error: 'Failed to load product ratings' });
   }
 });
@@ -103,7 +111,10 @@ router.get('/my-rating', async (req, res) => {
       updatedAt: row.updated_at,
     });
   } catch (err) {
-    console.error('Fetch my-rating error:', err);
+    console.error('Fetch my-rating error:', err.message);
+    if (err.code === 'ER_NO_SUCH_TABLE') {
+      return res.json({ rating: null, reviewText: '' });
+    }
     res.status(500).json({ error: 'Failed to load your rating' });
   }
 });

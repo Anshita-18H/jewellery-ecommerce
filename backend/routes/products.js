@@ -54,7 +54,43 @@ router.get('/', async (req, res) => {
     const [rows] = await pool.query(sql, params);
     res.json(rows);
   } catch (err) {
-    console.error(err);
+    console.error('Products fetch error, attempting fallback query:', err.message);
+    try {
+      let fallbackSql = `
+        SELECT p.*, c.name AS category_name, c.slug AS category_slug,
+               0 AS avg_rating,
+               0 AS rating_count
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE 1 = 1
+      `;
+      const fallbackParams = [];
+
+      if (category) {
+        fallbackSql += ' AND c.slug = ?';
+        fallbackParams.push(category);
+      }
+      if (search) {
+        const searchNum = Number(search);
+        if (Number.isInteger(searchNum) && searchNum > 0) {
+          fallbackSql += ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ? OR p.id = ?)';
+          fallbackParams.push(`%${search}%`, `%${search}%`, `%${search}%`, searchNum);
+        } else {
+          fallbackSql += ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?)';
+          fallbackParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
+        }
+      }
+      if (featured === 'true') {
+        fallbackSql += ' AND p.is_featured = TRUE';
+      }
+
+      fallbackSql += ' ORDER BY p.created_at DESC';
+
+      const [fallbackRows] = await pool.query(fallbackSql, fallbackParams);
+      return res.json(fallbackRows);
+    } catch (fallbackErr) {
+      console.error('Fallback query error:', fallbackErr.message);
+    }
     res.status(500).json({ error: 'Failed to fetch products' });
   }
 });
@@ -97,7 +133,24 @@ router.get('/:slug', async (req, res) => {
     }
     res.json(rows[0]);
   } catch (err) {
-    console.error(err);
+    console.error('Product detail fetch error, attempting fallback query:', err.message);
+    try {
+      let fallbackSql = `
+        SELECT p.*, c.name AS category_name, c.slug AS category_slug,
+               0 AS avg_rating,
+               0 AS rating_count
+        FROM products p
+        LEFT JOIN categories c ON p.category_id = c.id
+        WHERE p.slug = ?
+      `;
+      const [fallbackRows] = await pool.query(fallbackSql, [req.params.slug]);
+      if (fallbackRows.length === 0) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      return res.json(fallbackRows[0]);
+    } catch (fallbackErr) {
+      console.error('Fallback query error:', fallbackErr.message);
+    }
     res.status(500).json({ error: 'Failed to fetch product' });
   }
 });

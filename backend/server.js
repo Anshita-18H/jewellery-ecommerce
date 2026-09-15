@@ -77,7 +77,45 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Jewellery e-commerce API is running' });
 });
 
+const pool = require('./config/db');
+
+async function initDatabase() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(150) NOT NULL,
+        email VARCHAR(150) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        phone VARCHAR(30) DEFAULT NULL,
+        role VARCHAR(20) NOT NULL DEFAULT 'customer',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS product_ratings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        product_id INT NOT NULL,
+        user_id INT NOT NULL,
+        rating INT NOT NULL,
+        review_text TEXT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE KEY unique_product_user_rating (product_id, user_id)
+      )
+    `);
+    console.log('Database tables verified successfully');
+  } catch (err) {
+    console.warn('Database table verification notice:', err.message);
+  }
+}
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  await initDatabase();
 });
