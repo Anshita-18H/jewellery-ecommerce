@@ -280,3 +280,32 @@
     right: 10px;
   }
 }
+
+@media (max-width: 480px) {
+  .hero-inner {
+    padding-top: 2.5rem;
+    padding-bottom: 3.5rem;
+    gap: 1.5rem;
+  }
+
+  .hero-stage {
+    min-height: 240px;
+  }
+
+  .hero-img-wrapper {
+    max-width: 250px;
+    height: 250px;
+  }
+
+  .hero-title {
+    font-size: 1.85rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.92rem;
+  }
+
+  .hero-cta-row {
+    margin-top: 1.6rem;
+  }
+}
