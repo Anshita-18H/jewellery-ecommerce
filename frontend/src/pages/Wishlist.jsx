@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { addToCart } from '../api';
+import { formatCurrency } from '../utils/format';
 import './Wishlist.css';
 
 export default function Wishlist({ onCartChange }) {
@@ -112,7 +113,7 @@ export default function Wishlist({ onCartChange }) {
               <Link to={`/product/${product.slug}`}>
                 <h3 className="product-card-name">{product.name}</h3>
               </Link>
-              <p className="product-card-price">Rs. {Number(product.price).toLocaleString()}</p>
+              <p className="product-card-price">{formatCurrency(product.price)}</p>
 
               <button
                 type="button"

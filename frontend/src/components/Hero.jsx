@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { heroSlides } from '../data/heroSlides';
+import { formatCurrency } from '../utils/format';
 import './Hero.css';
 
 export default function Hero({ product }) {
@@ -100,7 +101,7 @@ export default function Hero({ product }) {
                   </Link>
                   {slide.price && (
                     <span className="hero-price">
-                      Rs. {Number(slide.price).toLocaleString()}
+                      {formatCurrency(slide.price)}
                     </span>
                   )}
                 </div>

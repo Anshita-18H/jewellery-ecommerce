@@ -39,6 +39,7 @@ import { useAdminAuth } from '../context/AdminAuthContext';
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute';
 import AdminLogin from './AdminLogin';
 import StarRating from '../components/StarRating';
+import { formatCurrency } from '../utils/format';
 import './Admin.css';
 
 const emptyForm = {
@@ -423,7 +424,7 @@ function AdminDashboard({ onNavigate, onEditProduct }) {
           <div className="admin-metric-content">
             <span className="admin-metric-label">Total Revenue</span>
             <span className="admin-metric-value">
-              Rs. {Number(metrics.totalRevenue || 0).toLocaleString()}
+              {formatCurrency(metrics.totalRevenue || 0)}
             </span>
             <span className="admin-metric-hint">Gross order volume</span>
           </div>
@@ -491,7 +492,7 @@ function AdminDashboard({ onNavigate, onEditProduct }) {
                   <img src={item.image_url} alt={item.name} className="admin-thumb" />
                   <div className="admin-compact-info">
                     <span className="admin-compact-name">{item.name}</span>
-                    <span className="admin-compact-price">Rs. {Number(item.price).toLocaleString()}</span>
+                    <span className="admin-compact-price">{formatCurrency(item.price)}</span>
                   </div>
                   <div className="admin-compact-action">
                     <span className="admin-stock-badge low-stock">{item.stock} left</span>
@@ -509,22 +510,22 @@ function AdminDashboard({ onNavigate, onEditProduct }) {
           )}
         </div>
 
-        {/* Top Rated Pieces */}
+        {/* Top Rated Showcase */}
         <div className="admin-card">
           <div className="admin-card-header">
             <div className="admin-card-title-group">
-              <Sparkles size={18} className="icon-gold" />
-              <h3>Top Rated Jewellery</h3>
+              <Star size={18} className="icon-gold" />
+              <h3>Client Favourites</h3>
             </div>
             <button type="button" className="admin-link-btn" onClick={() => onNavigate('reviews')}>
-              Reviews
+              All Reviews
             </button>
           </div>
 
           {topRated.length === 0 ? (
             <div className="admin-empty-compact">
-              <Star size={24} className="icon-muted" />
-              <p>No customer ratings recorded yet.</p>
+              <Sparkles size={24} className="icon-muted" />
+              <p>No ratings submitted yet.</p>
             </div>
           ) : (
             <div className="admin-compact-list">
@@ -539,7 +540,7 @@ function AdminDashboard({ onNavigate, onEditProduct }) {
                       <span className="admin-rating-count">({item.rating_count})</span>
                     </div>
                   </div>
-                  <span className="admin-compact-price">Rs. {Number(item.price).toLocaleString()}</span>
+                  <span className="admin-compact-price">{formatCurrency(item.price)}</span>
                 </div>
               ))}
             </div>
@@ -578,7 +579,7 @@ function AdminDashboard({ onNavigate, onEditProduct }) {
                   </div>
                   <div className="admin-compact-action">
                     <span className={`admin-order-badge status-${ord.status}`}>{ord.status}</span>
-                    <span className="admin-compact-price">Rs. {Number(ord.total_amount).toLocaleString()}</span>
+                    <span className="admin-compact-price">{formatCurrency(ord.total_amount)}</span>
                   </div>
                 </div>
               ))}
@@ -809,7 +810,7 @@ function AdminProducts({
 
           <div className="admin-form-row">
             <label>
-              Price (Rs.) *
+              Price (₹) *
               <input
                 name="price"
                 type="number"
@@ -942,7 +943,7 @@ function AdminProducts({
                         <span className="admin-name-sub">/{p.slug}</span>
                       </td>
                       <td>{p.category_name || '—'}</td>
-                      <td>Rs. {Number(p.price).toLocaleString()}</td>
+                      <td>{formatCurrency(p.price)}</td>
                       <td>
                         <span className={`admin-stock-badge ${p.stock <= 5 ? 'low-stock' : 'in-stock'}`}>
                           {p.stock}
@@ -1098,7 +1099,7 @@ function AdminOrders() {
                     <td>{o.customer_name}</td>
                     <td>{o.phone}</td>
                     <td>{o.city || '—'}</td>
-                    <td>Rs. {Number(o.total_amount).toLocaleString()}</td>
+                    <td>{formatCurrency(o.total_amount)}</td>
                     <td>
                       <select
                         value={o.status}
@@ -1320,7 +1321,7 @@ function AdminSettings({ user }) {
           </div>
           <div className="admin-settings-row">
             <span>Currency</span>
-            <strong>INR (₹ / Rs.)</strong>
+            <strong>INR (₹)</strong>
           </div>
           <div className="admin-settings-row">
             <span>Atelier Location</span>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getCart, updateCartItem, removeCartItem } from '../api';
+import { formatCurrency } from '../utils/format';
 import './Cart.css';
 
 export default function Cart({ onCartChange }) {
@@ -56,7 +57,7 @@ export default function Cart({ onCartChange }) {
               <img src={item.image_url} alt={item.name} className="cart-item-img" />
               <div className="cart-item-info">
                 <h3>{item.name}</h3>
-                <p className="cart-item-price">Rs.{Number(item.price).toLocaleString()} </p>
+                <p className="cart-item-price">{formatCurrency(item.price)}</p>
               </div>
               <div className="pd-qty cart-item-qty">
                 <button onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}>−</button>
@@ -68,7 +69,7 @@ export default function Cart({ onCartChange }) {
                   +
                 </button>
               </div>
-              <p className="cart-item-subtotal">{item.subtotal.toLocaleString()}</p>
+              <p className="cart-item-subtotal">{formatCurrency(item.subtotal)}</p>
               <button className="cart-item-remove" onClick={() => handleRemove(item.product_id)} aria-label="Remove item">
                 ×
               </button>
@@ -80,15 +81,15 @@ export default function Cart({ onCartChange }) {
           <h3>Order Summary</h3>
           <div className="cart-summary-row">
             <span>Subtotal</span>
-            <span> Rs.{cart.total.toLocaleString()} </span>
+            <span>{formatCurrency(cart.total)}</span>
           </div>
           <div className="cart-summary-row cart-summary-note">
-            <span>Shipping</span>
-            <span>Calculated at checkout</span>
+            <span>Insured Shipping</span>
+            <span>Free</span>
           </div>
           <div className="cart-summary-total">
             <span>Total</span>
-            <span>Rs.{cart.total.toLocaleString()} </span>
+            <span>{formatCurrency(cart.total)}</span>
           </div>
           <button className="btn btn-gold cart-checkout-btn" onClick={() => navigate('/checkout')}>
             Proceed to Checkout

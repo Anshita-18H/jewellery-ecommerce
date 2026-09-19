@@ -12,6 +12,7 @@ import {
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import StarRating from '../components/StarRating';
+import { formatCurrency } from '../utils/format';
 import './ProductDetail.css';
 
 export default function ProductDetail({ onCartChange }) {
@@ -185,7 +186,7 @@ export default function ProductDetail({ onCartChange }) {
             )}
           </div>
 
-          <p className="pd-price">Rs. {Number(product.price).toLocaleString()}</p>
+          <p className="pd-price">{formatCurrency(product.price)}</p>
           <p className="pd-description">{product.description}</p>
 
           <p className="pd-stock">

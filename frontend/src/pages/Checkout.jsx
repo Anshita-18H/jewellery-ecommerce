@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getCart, placeOrder } from '../api';
+import { formatCurrency } from '../utils/format';
 import './Checkout.css';
 
 export default function Checkout({ onCartChange }) {
@@ -52,7 +53,7 @@ export default function Checkout({ onCartChange }) {
         <h1>Thank you, {form.customer_name.split(' ')[0]}.</h1>
         <p className="checkout-success-text">
           Your order <strong>#{orderPlaced.order_id}</strong> has been placed for{' '}
-          <strong>Rs.{Number(orderPlaced.total).toLocaleString()} </strong>. We'll reach out on{' '}
+          <strong>{formatCurrency(orderPlaced.total)}</strong>. We'll reach out on{' '}
           <strong>{form.phone}</strong> with delivery updates.
         </p>
         <Link to="/shop" className="btn btn-gold">Continue Shopping</Link>
@@ -102,7 +103,7 @@ export default function Checkout({ onCartChange }) {
           {error && <p className="checkout-error">{error}</p>}
 
           <button type="submit" className="btn btn-gold checkout-submit" disabled={submitting}>
-            {submitting ? 'Placing Order…' : `Place Order — ${cart.total.toLocaleString()} `}
+            {submitting ? 'Placing Order…' : `Place Order — ${formatCurrency(cart.total)}`}
           </button>
           <p className="checkout-note">Guest checkout — no account needed. Payment collected on delivery for now.</p>
         </form>
@@ -112,12 +113,16 @@ export default function Checkout({ onCartChange }) {
           {cart.items.map((item) => (
             <div key={item.cart_item_id} className="checkout-summary-item">
               <span>{item.name} × {item.quantity}</span>
-              <span>Rs.{item.subtotal.toLocaleString()}</span>
+              <span>{formatCurrency(item.subtotal)}</span>
             </div>
           ))}
+          <div className="checkout-summary-item" style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', marginBottom: '0.75rem' }}>
+            <span>Insured Shipping</span>
+            <span>Free</span>
+          </div>
           <div className="checkout-summary-total">
             <span>Total</span>
-            <span>Rs.{cart.total.toLocaleString()} </span>
+            <span>{formatCurrency(cart.total)}</span>
           </div>
         </div>
       </div>

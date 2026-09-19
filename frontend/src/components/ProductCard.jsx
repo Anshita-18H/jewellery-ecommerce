@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import StarRating from './StarRating';
+import { formatCurrency } from '../utils/format';
 import './ProductCard.css';
 
 export default function ProductCard({ product, onAddToCart }) {
@@ -57,7 +58,7 @@ export default function ProductCard({ product, onAddToCart }) {
           </div>
         )}
 
-        <p className="product-card-price">Rs. {Number(product.price).toLocaleString()}</p>
+        <p className="product-card-price">{formatCurrency(product.price)}</p>
         <button
           type="button"
           className="btn btn-outline product-card-btn"
