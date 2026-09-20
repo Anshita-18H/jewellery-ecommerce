@@ -15,6 +15,12 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'customer_name, phone, address, city, and pincode are required' });
     }
 
+    const phoneRegex = /^(\+91)?[0-9]{10}$/;
+    if (!phoneRegex.test(String(phone).trim())) {
+      connection.release();
+      return res.status(400).json({ error: 'Enter a valid 10-digit phone number, with or without +91' });
+    }
+
     const [cartRows] = await connection.query(
       `SELECT ci.quantity, p.id AS product_id, p.name, p.price, p.stock
        FROM cart_items ci

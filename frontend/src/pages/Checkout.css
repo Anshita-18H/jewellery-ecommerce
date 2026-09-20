@@ -88,6 +88,21 @@
   padding: 0.85rem 1.1rem;
 }
 
+.checkout-form input.input-error {
+  border-color: rgba(242, 139, 130, 0.6);
+  box-shadow: 0 0 0 2px rgba(242, 139, 130, 0.18);
+}
+
+.checkout-field-error {
+  color: #f28b82;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-weight: 400;
+  margin-top: 0.2rem;
+  line-height: 1.4;
+}
+
 .checkout-summary {
   background: var(--bg-card);
   border: 1px solid var(--border);

@@ -10,6 +10,7 @@ export default function Checkout({ onCartChange }) {
   const [submitting, setSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(null);
   const [error, setError] = useState(null);
+  const [phoneError, setPhoneError] = useState(null);
   const [form, setForm] = useState({
     customer_name: '',
     phone: '',
@@ -19,20 +20,53 @@ export default function Checkout({ onCartChange }) {
   });
   const navigate = useNavigate();
 
+  const PHONE_REGEX = /^(\+91)?[0-9]{10}$/;
+
   useEffect(() => {
     getCart()
       .then(setCart)
       .finally(() => setLoading(false));
   }, []);
 
+  function formatPhoneInput(val) {
+    if (!val) return '';
+    // If starts with +, allow a single leading +91 followed by digits
+    if (val.startsWith('+')) {
+      const rest = val.slice(1).replace(/\D/g, '');
+      if (rest.length === 0) return '+';
+      if (rest[0] !== '9') return '+';
+      if (rest.length === 1) return '+9';
+      if (rest[1] !== '1') return '+9';
+      // Starts with +91, allow up to 10 digits after +91
+      return '+91' + rest.slice(2, 12);
+    }
+    // Does not start with +, only allow digits up to 10 characters
+    return val.replace(/\D/g, '').slice(0, 10);
+  }
+
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
+  function handlePhoneChange(e) {
+    const formatted = formatPhoneInput(e.target.value);
+    setForm((prev) => ({ ...prev, phone: formatted }));
+    if (phoneError) {
+      setPhoneError(null);
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
-    setSubmitting(true);
+    setPhoneError(null);
     setError(null);
+
+    if (!PHONE_REGEX.test(form.phone.trim())) {
+      setPhoneError('Enter a valid 10-digit phone number, with or without +91');
+      return;
+    }
+
+    setSubmitting(true);
     try {
       const result = await placeOrder(form);
       setOrderPlaced(result);
@@ -83,7 +117,17 @@ export default function Checkout({ onCartChange }) {
           </label>
           <label>
             Phone Number
-            <input name="phone" value={form.phone} onChange={handleChange} required type="tel" />
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={handlePhoneChange}
+              required
+              type="tel"
+              placeholder="e.g. 9876543210 or +919876543210"
+              className={phoneError ? 'input-error' : ''}
+              autoComplete="tel"
+            />
+            {phoneError && <span className="checkout-field-error">{phoneError}</span>}
           </label>
           <label>
             Address
