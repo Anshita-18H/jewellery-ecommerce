@@ -46,6 +46,18 @@ export const updateCartItem = (productId, quantity) =>
   request(`/cart/${productId}`, { method: 'PUT', body: JSON.stringify({ quantity }) });
 export const removeCartItem = (productId) => request(`/cart/${productId}`, { method: 'DELETE' });
 
+// ---- Wishlist ----
+export const getWishlist = async () => {
+  const data = await request('/wishlist');
+  return Array.isArray(data) ? data : [];
+};
+export const addToWishlistApi = (productId) =>
+  request('/wishlist', { method: 'POST', body: JSON.stringify({ product_id: productId }) });
+export const removeFromWishlistApi = (productId) =>
+  request(`/wishlist/${productId}`, { method: 'DELETE' });
+export const clearWishlistApi = () =>
+  request('/wishlist', { method: 'DELETE' });
+
 // ---- Orders ----
 export const placeOrder = (data) => request('/orders', { method: 'POST', body: JSON.stringify(data) });
 export const getOrders = () => request('/orders');

@@ -42,7 +42,7 @@ export default function Hero({ product }) {
 
     const interval = setInterval(() => {
       goToNext();
-    }, 5500);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [isPaused, totalSlides]);

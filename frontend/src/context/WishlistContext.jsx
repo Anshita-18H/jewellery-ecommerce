@@ -1,37 +1,47 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import {
+  getWishlist,
+  addToWishlistApi,
+  removeFromWishlistApi,
+  clearWishlistApi,
+} from '../api';
 
 const WishlistContext = createContext(null);
 
-const STORAGE_KEY = 'aura_wishlist';
-
-function getStoredWishlist() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) {
-      // Validate each item has at least an id and name
-      return parsed.filter((item) => item && typeof item === 'object' && item.id !== undefined);
-    }
-    return [];
-  } catch (err) {
-    console.warn('Failed to parse wishlist from localStorage. Resetting to empty array.', err);
-    return [];
-  }
-}
-
 export function WishlistProvider({ children }) {
-  const [wishlistItems, setWishlistItems] = useState(getStoredWishlist);
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Sync to localStorage safely
+  // Load wishlist from backend session on mount
   useEffect(() => {
+    // Purge legacy client-side localStorage so old data does not interfere
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlistItems));
-    } catch (err) {
-      console.warn('Unable to persist wishlist to localStorage:', err);
+      localStorage.removeItem('aura_wishlist');
+    } catch {
+      // Ignore
     }
-  }, [wishlistItems]);
+
+    let isMounted = true;
+    getWishlist()
+      .then((items) => {
+        if (isMounted) {
+          setWishlistItems(Array.isArray(items) ? items : []);
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not load session wishlist:', err);
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Toast timer cleanup
   useEffect(() => {
@@ -55,38 +65,56 @@ export function WishlistProvider({ children }) {
   );
 
   const addToWishlist = useCallback(
-    (product) => {
+    async (product) => {
       if (!product || !product.id) return;
+
+      const cleanProduct = {
+        id: product.id,
+        name: product.name || 'Fine Jewellery Piece',
+        slug: product.slug || String(product.id),
+        price: product.price || 0,
+        image_url: product.image_url || '',
+        category_name: product.category_name || '',
+        stock: typeof product.stock === 'number' ? product.stock : 1,
+        description: product.description || '',
+      };
+
+      // Optimistic update
       setWishlistItems((prev) => {
-        const exists = prev.some((item) => String(item.id) === String(product.id));
-        if (exists) return prev; // Deduplicate
-
-        // Sanitize product object to only store required display attributes
-        const cleanProduct = {
-          id: product.id,
-          name: product.name || 'Fine Jewellery Piece',
-          slug: product.slug || String(product.id),
-          price: product.price || 0,
-          image_url: product.image_url || '',
-          category_name: product.category_name || '',
-          stock: typeof product.stock === 'number' ? product.stock : 1,
-          description: product.description || '',
-        };
-
-        return [...prev, cleanProduct];
+        if (prev.some((item) => String(item.id) === String(product.id))) return prev;
+        return [cleanProduct, ...prev];
       });
       showToast('Added to your wishlist');
+
+      try {
+        await addToWishlistApi(product.id);
+      } catch (err) {
+        // Rollback on failure
+        setWishlistItems((prev) => prev.filter((item) => String(item.id) !== String(product.id)));
+        showToast(err.message || 'Could not update wishlist');
+      }
     },
     [showToast]
   );
 
   const removeFromWishlist = useCallback(
-    (productId) => {
+    async (productId) => {
       if (!productId) return;
+
+      const previousItems = wishlistItems;
+      // Optimistic update
       setWishlistItems((prev) => prev.filter((item) => String(item.id) !== String(productId)));
       showToast('Removed from your wishlist');
+
+      try {
+        await removeFromWishlistApi(productId);
+      } catch (err) {
+        // Rollback on failure
+        setWishlistItems(previousItems);
+        showToast(err.message || 'Could not remove from wishlist');
+      }
     },
-    [showToast]
+    [wishlistItems, showToast]
   );
 
   const toggleWishlist = useCallback(
@@ -101,14 +129,17 @@ export function WishlistProvider({ children }) {
     [isInWishlist, addToWishlist, removeFromWishlist]
   );
 
-  const clearWishlist = useCallback(() => {
+  const clearWishlist = useCallback(async () => {
+    const previousItems = wishlistItems;
     setWishlistItems([]);
+
     try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // Ignore
+      await clearWishlistApi();
+    } catch (err) {
+      setWishlistItems(previousItems);
+      showToast(err.message || 'Could not clear wishlist');
     }
-  }, []);
+  }, [wishlistItems, showToast]);
 
   const wishlistCount = wishlistItems.length;
 
@@ -124,6 +155,7 @@ export function WishlistProvider({ children }) {
         clearWishlist,
         toastMessage,
         showToast,
+        loading,
       }}
     >
       {children}
@@ -144,4 +176,3 @@ export function useWishlist() {
   }
   return context;
 }
-
