@@ -2,11 +2,18 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 
-// Every route here uses req.sessionID — a unique ID express-session
-// generates per browser (stored in a cookie). No login required;
-// this scopes the wishlist to the specific visitor's session.
+// Wishlist requires authenticated customer session (req.session.userId).
+// If visitor is not logged in, return 401 Unauthorized.
+function requireAuth(req, res, next) {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: 'Please sign in to access your wishlist' });
+  }
+  next();
+}
 
-// GET /api/wishlist — get all products wishlisted by the current visitor
+router.use(requireAuth);
+
+// GET /api/wishlist — get all products wishlisted by the logged-in customer
 router.get('/', async (req, res) => {
   try {
     const [rows] = await pool.query(
@@ -16,9 +23,9 @@ router.get('/', async (req, res) => {
        FROM wishlist_items wi
        JOIN products p ON wi.product_id = p.id
        LEFT JOIN categories c ON p.category_id = c.id
-       WHERE wi.session_id = ?
+       WHERE wi.user_id = ?
        ORDER BY wi.created_at DESC`,
-      [req.sessionID]
+      [req.session.userId]
     );
 
     res.json(rows);
@@ -28,7 +35,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/wishlist — add a product to the visitor's wishlist
+// POST /api/wishlist — add a product to the user's wishlist
 // Body: { product_id }
 router.post('/', async (req, res) => {
   try {
@@ -47,10 +54,10 @@ router.post('/', async (req, res) => {
     }
 
     await pool.query(
-      `INSERT INTO wishlist_items (session_id, product_id)
+      `INSERT INTO wishlist_items (user_id, product_id)
        VALUES (?, ?)
        ON DUPLICATE KEY UPDATE created_at = CURRENT_TIMESTAMP`,
-      [req.sessionID, product_id]
+      [req.session.userId, product_id]
     );
 
     res.status(201).json({ message: 'Added to wishlist' });
@@ -60,12 +67,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-// DELETE /api/wishlist/:productId — remove a single product from wishlist
+// DELETE /api/wishlist/:productId — remove a single product from user's wishlist
 router.delete('/:productId', async (req, res) => {
   try {
     await pool.query(
-      'DELETE FROM wishlist_items WHERE session_id = ? AND product_id = ?',
-      [req.sessionID, req.params.productId]
+      'DELETE FROM wishlist_items WHERE user_id = ? AND product_id = ?',
+      [req.session.userId, req.params.productId]
     );
     res.json({ message: 'Removed from wishlist' });
   } catch (err) {
@@ -74,10 +81,10 @@ router.delete('/:productId', async (req, res) => {
   }
 });
 
-// DELETE /api/wishlist — clear all items from visitor's wishlist
+// DELETE /api/wishlist — clear all items from user's wishlist
 router.delete('/', async (req, res) => {
   try {
-    await pool.query('DELETE FROM wishlist_items WHERE session_id = ?', [req.sessionID]);
+    await pool.query('DELETE FROM wishlist_items WHERE user_id = ?', [req.session.userId]);
     res.json({ message: 'Wishlist cleared' });
   } catch (err) {
     console.error('Clear wishlist error:', err);
@@ -86,4 +93,3 @@ router.delete('/', async (req, res) => {
 });
 
 module.exports = router;
-

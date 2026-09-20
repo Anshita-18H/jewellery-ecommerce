@@ -19,6 +19,7 @@ import Wishlist from './pages/Wishlist';
 import { WishlistProvider } from './context/WishlistContext';
 import { AuthProvider } from './context/AuthContext';
 import { AdminAuthProvider } from './context/AdminAuthContext';
+import AuthModal from './components/AuthModal';
 import { getCart } from './api';
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
         <WishlistProvider>
 
         {!isAdminPage && <Navbar cartCount={cartCount} />}
+        <AuthModal />
 
         <main>
           <Routes>

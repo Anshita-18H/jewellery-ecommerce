@@ -66,6 +66,8 @@ export const updateOrderStatus = (id, status) =>
   request(`/orders/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) });
 
 // ---- Authentication (Session Cookie) ----
+export const signupUser = (data) =>
+  request('/auth/signup', { method: 'POST', body: JSON.stringify(data) });
 export const registerUser = (data) =>
   request('/auth/register', { method: 'POST', body: JSON.stringify(data) });
 export const loginUser = (data) =>

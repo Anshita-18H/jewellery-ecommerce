@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
 import { addToCart } from '../api';
 import { formatCurrency } from '../utils/format';
 import './Wishlist.css';
 
 export default function Wishlist({ onCartChange }) {
   const { wishlistItems, removeFromWishlist, clearWishlist, showToast } = useWishlist();
+  const { user, openAuthModal } = useAuth();
   const [addingId, setAddingId] = useState(null);
   const [addedMap, setAddedMap] = useState({});
 
@@ -27,6 +29,41 @@ export default function Wishlist({ onCartChange }) {
     } finally {
       setAddingId(null);
     }
+  }
+
+  // If visitor is not logged in, prompt to sign in
+  if (!user) {
+    return (
+      <div className="wishlist-page container wishlist-empty">
+        <div className="wishlist-empty-card">
+          <div className="wishlist-empty-icon-wrap">
+            <Heart size={32} className="wishlist-empty-icon" aria-hidden="true" focusable="false" />
+          </div>
+          <p className="eyebrow">AURA Privilege</p>
+          <h1 className="wishlist-empty-title">Sign In for Your Wishlist</h1>
+          <p className="wishlist-empty-desc">
+            Sign in or create an account to access your saved jewellery pieces and private keepsakes.
+          </p>
+          <div className="wishlist-empty-actions">
+            <button
+              type="button"
+              className="btn btn-gold wishlist-empty-btn"
+              onClick={() =>
+                openAuthModal({
+                  mode: 'login',
+                  prompt: 'Sign in to access your private wishlist collection.',
+                })
+              }
+            >
+              Sign In / Register
+            </button>
+            <Link to="/shop" className="btn btn-outline wishlist-empty-secondary-btn">
+              Explore Jewellery
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (wishlistItems.length === 0) {

@@ -41,11 +41,12 @@ CREATE TABLE IF NOT EXISTS cart_items (
 
 CREATE TABLE IF NOT EXISTS wishlist_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  session_id VARCHAR(255) NOT NULL,
+  user_id INT NOT NULL,
   product_id INT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-  UNIQUE KEY unique_wishlist_item (session_id, product_id)
+  UNIQUE KEY unique_user_wishlist_item (user_id, product_id)
 );
 
 CREATE TABLE IF NOT EXISTS orders (

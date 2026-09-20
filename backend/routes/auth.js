@@ -32,8 +32,8 @@ function verifyPassword(password, stored) {
   }
 }
 
-// POST /api/auth/register — create customer account (strictly customer role)
-router.post('/register', async (req, res) => {
+// POST /api/auth/signup & /api/auth/register — create customer account (strictly customer role)
+async function handleSignup(req, res) {
   try {
     const { name, email, phone, password } = req.body;
 
@@ -89,10 +89,13 @@ router.post('/register', async (req, res) => {
       });
     });
   } catch (err) {
-    console.error('Registration error:', err);
+    console.error('Registration/Signup error:', err);
     res.status(500).json({ error: "We couldn't create your account right now. Please try again." });
   }
-});
+}
+
+router.post('/signup', handleSignup);
+router.post('/register', handleSignup);
 
 // POST /api/auth/login — authenticate customer
 router.post('/login', async (req, res) => {
