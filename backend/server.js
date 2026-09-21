@@ -144,6 +144,27 @@ async function initDatabase() {
         UNIQUE KEY unique_user_wishlist_item (user_id, product_id)
       )
     `);
+
+    try {
+      const [productCols] = await pool.query(`SHOW COLUMNS FROM products LIKE 'occasion_tags'`);
+      if (productCols.length === 0) {
+        await pool.query(`ALTER TABLE products ADD COLUMN occasion_tags VARCHAR(255) DEFAULT NULL`);
+        console.log('Added occasion_tags column to products table');
+      }
+    } catch (err) {
+      console.warn('Could not verify occasion_tags column on products:', err.message);
+    }
+
+    try {
+      const [genderCols] = await pool.query(`SHOW COLUMNS FROM products LIKE 'gender_tag'`);
+      if (genderCols.length === 0) {
+        await pool.query(`ALTER TABLE products ADD COLUMN gender_tag VARCHAR(20) DEFAULT NULL`);
+        console.log('Added gender_tag column to products table');
+      }
+    } catch (err) {
+      console.warn('Could not verify gender_tag column on products:', err.message);
+    }
+
     console.log('Database tables verified successfully');
   } catch (err) {
     console.warn('Database table verification notice:', err.message);

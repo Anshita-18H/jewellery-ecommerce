@@ -50,6 +50,8 @@ const emptyForm = {
   stock: '',
   image_url: '',
   is_featured: false,
+  occasion_tags: '',
+  gender_tag: '',
 };
 
 export default function Admin() {
@@ -708,6 +710,8 @@ function AdminProducts({
       stock: product.stock,
       image_url: product.image_url || '',
       is_featured: !!product.is_featured,
+      occasion_tags: product.occasion_tags || '',
+      gender_tag: product.gender_tag || '',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -844,6 +848,27 @@ function AdminProducts({
             />
           </label>
 
+          <div className="admin-form-row">
+            <label>
+              Occasion Tags (comma-separated, e.g. bridal, gifting, everyday)
+              <input
+                name="occasion_tags"
+                value={form.occasion_tags}
+                onChange={handleChange}
+                placeholder="e.g. bridal, gifting, everyday"
+              />
+            </label>
+            <label>
+              Gender Tag
+              <select name="gender_tag" value={form.gender_tag} onChange={handleChange}>
+                <option value="">None (Unisex / General)</option>
+                <option value="women">Women</option>
+                <option value="men">Men</option>
+                <option value="kids">Kids</option>
+              </select>
+            </label>
+          </div>
+
           <label className="admin-checkbox-label">
             <input
               type="checkbox"
@@ -942,7 +967,19 @@ function AdminProducts({
                         <div style={{ fontWeight: 500, color: 'var(--cream)' }}>{p.name}</div>
                         <span className="admin-name-sub">/{p.slug}</span>
                       </td>
-                      <td>{p.category_name || '—'}</td>
+                      <td>
+                        <div>{p.category_name || '—'}</div>
+                        {p.occasion_tags && (
+                          <span className="admin-name-sub" style={{ color: 'var(--gold)' }}>
+                            Tags: {p.occasion_tags}
+                          </span>
+                        )}
+                        {p.gender_tag && (
+                          <span className="admin-name-sub" style={{ color: 'var(--cream)', textTransform: 'capitalize' }}>
+                            Gender: {p.gender_tag}
+                          </span>
+                        )}
+                      </td>
                       <td>{formatCurrency(p.price)}</td>
                       <td>
                         <span className={`admin-stock-badge ${p.stock <= 5 ? 'low-stock' : 'in-stock'}`}>

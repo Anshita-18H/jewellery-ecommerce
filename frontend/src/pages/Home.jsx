@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
+import AssuranceSection from '../components/AssuranceSection';
+import OccasionGrid from '../components/OccasionGrid';
+import GenderGrid from '../components/GenderGrid';
 import GalleryBanner from '../components/GalleryBanner';
 import { getProducts, addToCart } from '../api';
 import './Home.css';
@@ -32,6 +35,8 @@ export default function Home({ onCartChange }) {
     <div>
       <Hero product={heroProduct} />
 
+      <AssuranceSection />
+
       <section className="home-collections container">
         <div className="home-section-header text-center">
           <p className="eyebrow">Curated Selection</p>
@@ -50,6 +55,10 @@ export default function Home({ onCartChange }) {
           </div>
         )}
       </section>
+
+      <OccasionGrid />
+
+      <GenderGrid />
 
       <GalleryBanner />
     </div>

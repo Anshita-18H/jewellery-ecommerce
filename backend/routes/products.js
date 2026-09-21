@@ -18,7 +18,7 @@ function slugify(name) {
 // include_hidden=true to see everything, including soft-deleted products.
 router.get('/', async (req, res) => {
   try {
-    const { category, search, featured } = req.query;
+    const { category, search, featured, occasion, gender, min_price, max_price } = req.query;
 
     let sql = `
       SELECT p.*, c.name AS category_name, c.slug AS category_slug,
@@ -34,6 +34,28 @@ router.get('/', async (req, res) => {
     if (category) {
       sql += ' AND c.slug = ?';
       params.push(category);
+    }
+    if (occasion) {
+      sql += " AND (CONCAT(',', REPLACE(COALESCE(p.occasion_tags, ''), ' ', ''), ',') LIKE ?)";
+      params.push(`%,${occasion.trim()},%`);
+    }
+    if (gender) {
+      sql += ' AND p.gender_tag = ?';
+      params.push(gender.toLowerCase().trim());
+    }
+    if (min_price !== undefined && min_price !== '') {
+      const minNum = Number(min_price);
+      if (!isNaN(minNum)) {
+        sql += ' AND p.price >= ?';
+        params.push(minNum);
+      }
+    }
+    if (max_price !== undefined && max_price !== '') {
+      const maxNum = Number(max_price);
+      if (!isNaN(maxNum)) {
+        sql += ' AND p.price <= ?';
+        params.push(maxNum);
+      }
     }
     if (search) {
       const searchNum = Number(search);
@@ -69,6 +91,28 @@ router.get('/', async (req, res) => {
       if (category) {
         fallbackSql += ' AND c.slug = ?';
         fallbackParams.push(category);
+      }
+      if (occasion) {
+        fallbackSql += " AND (CONCAT(',', REPLACE(COALESCE(p.occasion_tags, ''), ' ', ''), ',') LIKE ?)";
+        fallbackParams.push(`%,${occasion.trim()},%`);
+      }
+      if (gender) {
+        fallbackSql += ' AND p.gender_tag = ?';
+        fallbackParams.push(gender.toLowerCase().trim());
+      }
+      if (min_price !== undefined && min_price !== '') {
+        const minNum = Number(min_price);
+        if (!isNaN(minNum)) {
+          fallbackSql += ' AND p.price >= ?';
+          fallbackParams.push(minNum);
+        }
+      }
+      if (max_price !== undefined && max_price !== '') {
+        const maxNum = Number(max_price);
+        if (!isNaN(maxNum)) {
+          fallbackSql += ' AND p.price <= ?';
+          fallbackParams.push(maxNum);
+        }
       }
       if (search) {
         const searchNum = Number(search);
@@ -156,10 +200,10 @@ router.get('/:slug', async (req, res) => {
 });
 
 // POST /api/products — admin: add a new product
-// Body: { name, category_id, description, price, stock, image_url, is_featured }
+// Body: { name, category_id, description, price, stock, image_url, is_featured, occasion_tags, gender_tag }
 router.post('/', requireAdmin, async (req, res) => {
   try {
-    const { name, category_id, description, price, stock, image_url, is_featured } = req.body;
+    const { name, category_id, description, price, stock, image_url, is_featured, occasion_tags, gender_tag } = req.body;
 
     if (!name || !price) {
       return res.status(400).json({ error: 'name and price are required' });
@@ -168,8 +212,8 @@ router.post('/', requireAdmin, async (req, res) => {
     const slug = await getUniqueSlug(slugify(name));
 
     const [result] = await pool.query(
-      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, occasion_tags, gender_tag)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         category_id || null,
         name,
@@ -179,6 +223,8 @@ router.post('/', requireAdmin, async (req, res) => {
         stock || 0,
         image_url || 'https://placehold.co/500x500/f5e6e0/8b5e3c?text=Product',
         !!is_featured,
+        occasion_tags || null,
+        gender_tag || null,
       ]
     );
 
@@ -195,7 +241,7 @@ router.post('/', requireAdmin, async (req, res) => {
 // PUT /api/products/:id — admin: edit an existing product
 router.put('/:id', requireAdmin, async (req, res) => {
   try {
-    const { name, category_id, description, price, stock, image_url, is_featured } = req.body;
+    const { name, category_id, description, price, stock, image_url, is_featured, occasion_tags, gender_tag } = req.body;
 
     const [existing] = await pool.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
     if (existing.length === 0) {
@@ -206,7 +252,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
 
     await pool.query(
       `UPDATE products
-       SET name = ?, slug = ?, category_id = ?, description = ?, price = ?, stock = ?, image_url = ?, is_featured = ?
+       SET name = ?, slug = ?, category_id = ?, description = ?, price = ?, stock = ?, image_url = ?, is_featured = ?, occasion_tags = ?, gender_tag = ?
        WHERE id = ?`,
       [
         name || existing[0].name,
@@ -217,6 +263,8 @@ router.put('/:id', requireAdmin, async (req, res) => {
         stock !== undefined ? stock : existing[0].stock,
         image_url || existing[0].image_url,
         is_featured !== undefined ? !!is_featured : existing[0].is_featured,
+        occasion_tags !== undefined ? occasion_tags : existing[0].occasion_tags,
+        gender_tag !== undefined ? gender_tag : existing[0].gender_tag,
         req.params.id,
       ]
     );
