@@ -56,7 +56,7 @@ export default function Checkout({ onCartChange }) {
     }
   }
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
     setPhoneError(null);
     setError(null);
@@ -66,16 +66,7 @@ export default function Checkout({ onCartChange }) {
       return;
     }
 
-    setSubmitting(true);
-    try {
-      const result = await placeOrder(form);
-      setOrderPlaced(result);
-      onCartChange?.();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setSubmitting(false);
-    }
+    navigate('/payment', { state: { deliveryDetails: form, cart } });
   }
 
   if (loading) return <p className="checkout-status container">Loading…</p>;
@@ -146,10 +137,10 @@ export default function Checkout({ onCartChange }) {
 
           {error && <p className="checkout-error">{error}</p>}
 
-          <button type="submit" className="btn btn-gold checkout-submit" disabled={submitting}>
-            {submitting ? 'Placing Order…' : `Place Order — ${formatCurrency(cart.total)}`}
+          <button type="submit" className="btn btn-gold checkout-submit">
+            Proceed to Payment — {formatCurrency(cart.total)}
           </button>
-          <p className="checkout-note">Guest checkout — no account needed. Payment collected on delivery for now.</p>
+          <p className="checkout-note">Guest checkout — no account needed. Safe & secure payment options.</p>
         </form>
 
         <div className="checkout-summary">

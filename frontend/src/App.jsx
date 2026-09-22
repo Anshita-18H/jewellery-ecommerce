@@ -8,6 +8,7 @@ import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import Payment from './pages/Payment';
 import Gallery from './pages/Gallery';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
@@ -77,6 +78,11 @@ export default function App() {
             <Route
               path="/checkout"
               element={<Checkout onCartChange={refreshCartCount} />}
+            />
+
+            <Route
+              path="/payment"
+              element={<Payment onCartChange={refreshCartCount} />}
             />
 
             <Route path="/gallery" element={<Gallery />} />
