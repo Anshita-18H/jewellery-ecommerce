@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const { requireAdmin } = require('../middleware/auth');
+const { searchProducts } = require('../utils/searchEngine');
 
 // Helper: turn a product name into a URL-friendly slug
 function slugify(name) {
@@ -57,16 +58,6 @@ router.get('/', async (req, res) => {
         params.push(maxNum);
       }
     }
-    if (search) {
-      const searchNum = Number(search);
-      if (Number.isInteger(searchNum) && searchNum > 0) {
-        sql += ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ? OR p.id = ?)';
-        params.push(`%${search}%`, `%${search}%`, `%${search}%`, searchNum);
-      } else {
-        sql += ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?)';
-        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
-      }
-    }
     if (featured === 'true') {
       sql += ' AND p.is_featured = TRUE';
     }
@@ -74,10 +65,12 @@ router.get('/', async (req, res) => {
     sql += ' GROUP BY p.id ORDER BY p.created_at DESC';
 
     const [rows] = await pool.query(sql, params);
-    res.json(rows);
+    const finalResults = search ? searchProducts(rows, search) : rows;
+    res.json(finalResults);
   } catch (err) {
     console.error('Products fetch error, attempting fallback query:', err.message);
     try {
+      const { category, search, featured, occasion, gender, min_price, max_price } = req.query;
       let fallbackSql = `
         SELECT p.*, c.name AS category_name, c.slug AS category_slug,
                0 AS avg_rating,
@@ -114,16 +107,6 @@ router.get('/', async (req, res) => {
           fallbackParams.push(maxNum);
         }
       }
-      if (search) {
-        const searchNum = Number(search);
-        if (Number.isInteger(searchNum) && searchNum > 0) {
-          fallbackSql += ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ? OR p.id = ?)';
-          fallbackParams.push(`%${search}%`, `%${search}%`, `%${search}%`, searchNum);
-        } else {
-          fallbackSql += ' AND (p.name LIKE ? OR p.description LIKE ? OR c.name LIKE ?)';
-          fallbackParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
-        }
-      }
       if (featured === 'true') {
         fallbackSql += ' AND p.is_featured = TRUE';
       }
@@ -131,7 +114,8 @@ router.get('/', async (req, res) => {
       fallbackSql += ' ORDER BY p.created_at DESC';
 
       const [fallbackRows] = await pool.query(fallbackSql, fallbackParams);
-      return res.json(fallbackRows);
+      const finalFallbackResults = search ? searchProducts(fallbackRows, search) : fallbackRows;
+      return res.json(finalFallbackResults);
     } catch (fallbackErr) {
       console.error('Fallback query error:', fallbackErr.message);
     }

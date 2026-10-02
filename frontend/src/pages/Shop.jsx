@@ -40,6 +40,7 @@ export default function Shop({ onCartChange }) {
   }, []);
 
   useEffect(() => {
+    setSearchInput(searchParams.get('search') || '');
     setMinPriceInput(searchParams.get('min_price') || '');
     setMaxPriceInput(searchParams.get('max_price') || '');
     setPriceError('');
