@@ -1,0 +1,162 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 8649 >>
+stream
+0.08 0.14 0.24 rg 42 698 511 82 re f
+0.77 0.66 0.50 RG 1.5 w 42 698 511 82 re S
+BT /F2 16 Tf 0.98 0.98 0.96 rg 58 752 Td (AURA React Functionalities Documentation) Tj ET
+BT /F1 9.5 Tf 0.77 0.66 0.50 rg 58 734 Td (REACT 19 / VITE / REACT ROUTER DOM V7) Tj ET
+BT /F1 8 Tf 0.70 0.75 0.82 rg 58 716 Td (Complete catalog of React hooks, context state management, lifecycle handling, and component architecture) Tj ET
+0.93 0.95 0.98 rg 42 662 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 662 42 680 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 667 Td (1. React Core Hooks & Usage Matrix) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 646.0 Td (- useState \(19 files\): Local reactive state management powering forms, active modal states, accordion toggles in Razorpay) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 635.0 Td (payment, search filters, and loading indicators.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 622.0 Td (- useEffect \(12 files\): Manages side effects: initial data fetching from API, URL query parameter synchronization,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 611.0 Td (automatic hero carousel interval timers with cleanup, and localStorage synchronization.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 598.0 Td (- useCallback \(6 files\): Memoizes functions to prevent unnecessary child re-renders \(e.g. refreshCartCount in App.jsx,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 587.0 Td (fetchProductDetail in ProductDetail.jsx, and authentication handlers\).) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 574.0 Td (- useRef \(3 files\): Stores mutable references that persist without triggering re-renders \(e.g. hero slide interval IDs) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 563.0 Td (in Hero.jsx, search input auto-focus in Navbar.jsx, and admin tab state\).) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 550.0 Td (- createContext \(3 files\): Instantiates global shared context channels: AuthContext for customers, AdminAuthContext for) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 539.0 Td (dashboard security, and WishlistContext for saved items.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 526.0 Td (- useContext \(3 files\): Consumes global state across deeply nested components without prop drilling.) Tj ET
+0.93 0.95 0.98 rg 42 503.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 503.0 42 521.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 508.0 Td (2. React Router DOM \(v7\) Capabilities) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 487.0 Td (- HashRouter: Client-side routing wrapper in main.jsx enabling seamless routing on static hosts without server-side rewrite) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 476.0 Td (issues.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 463.0 Td (- Routes & Route: Declarative routing engine in App.jsx defining paths for /shop, /cart, /checkout, /payment, /admin, etc.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 450.0 Td (- useNavigate: Imperative programmatic navigation \(redirecting to /payment with state, navigating to /checkout after cart,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 439.0 Td (or redirecting to /shop after order completion\).) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 426.0 Td (- useLocation: Accesses the current URL pathname and state payload passed between pages \(e.g.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 415.0 Td (location.state.deliveryDetails in Payment.jsx\).) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 402.0 Td (- useSearchParams: Two-way synchronization of URL search queries in Shop.jsx for category, occasion, gender, min_price,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 391.0 Td (max_price, and search terms.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 378.0 Td (- useParams: Extracts dynamic URL route parameters \(e.g. /product/:slug in ProductDetail.jsx\).) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 365.0 Td (- Link & NavLink: Accessible client-side link navigation preventing page refreshes and maintaining SPA state.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 352.0 Td (- Navigate: Declarative redirects in ProtectedAdminRoute.jsx redirecting unauthorized visitors to /admin-login.) Tj ET
+0.93 0.95 0.98 rg 42 329.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 329.0 42 347.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 334.0 Td (3. State Architecture & Context Providers) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 313.0 Td (- AuthContext \(AuthProvider\): Manages logged-in user credentials, JWT token persistence in localStorage, automatic) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 302.0 Td (session recovery on page reload, and login/register/logout actions.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 289.0 Td (- AdminAuthContext \(AdminAuthProvider\): Isolated administrator authentication context managing separate admin tokens,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 278.0 Td (RBAC roles, and protected route access.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 265.0 Td (- WishlistContext \(WishlistProvider\): Manages user wishlist items, seamless local-storage fallback for guests, item) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 254.0 Td (toggling, and navbar badge count updates.) Tj ET
+0.93 0.95 0.98 rg 42 231.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 231.0 42 249.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 236.0 Td (4. Component Design Patterns & UI Architecture) Tj ET
+0.12 0.22 0.38 rg 42 206.0 511 17 re f
+BT /F2 8 Tf 1 1 1 rg 46 211.0 Td (React Pattern / Concept) Tj ET
+BT /F2 8 Tf 1 1 1 rg 186 211.0 Td (Components Implementing Pattern) Tj ET
+BT /F2 8 Tf 1 1 1 rg 326 211.0 Td (Architectural Benefit) Tj ET
+1 1 1 rg 42 182.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 182.0 m 553 182.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 197.0 Td (Controlled Form Inputs) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 197.0 Td (Payment.jsx, Checkout.jsx,) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 188.0 Td (Login.jsx) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 197.0 Td (Single source of truth for form inputs with live) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 188.0 Td (validation & masking) Tj ET
+0.96 0.97 0.99 rg 42 158.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 158.0 m 553 158.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 173.0 Td (Compound Context Providers) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 173.0 Td (App.jsx \(AuthProvider,) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 164.0 Td (Admin, Wishlist\)) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 173.0 Td (Clean dependency injection without prop-drilling) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 164.0 Td (down component trees) Tj ET
+1 1 1 rg 42 134.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 134.0 m 553 134.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 149.0 Td (Accordion Accordion-State) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 149.0 Td (Payment.jsx \(Razorpay) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 140.0 Td (checkout\)) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 149.0 Td (Single active method expanded while others) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 140.0 Td (collapse automatically) Tj ET
+0.96 0.97 0.99 rg 42 110.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 110.0 m 553 110.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 125.0 Td (Dynamic Route Guards) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 125.0 Td (ProtectedAdminRoute.jsx) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 125.0 Td (Restricts admin dashboard to authenticated) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 116.0 Td (administrators with role verification) Tj ET
+1 1 1 rg 42 86.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 86.0 m 553 86.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 101.0 Td (URL Query Synchronization) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 101.0 Td (Shop.jsx \(Price filter,) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 92.0 Td (category, search\)) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 101.0 Td (Enables bookmarkable and shareable search/filter) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 92.0 Td (URLs) Tj ET
+0.96 0.97 0.99 rg 42 62.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 62.0 m 553 62.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 77.0 Td (Timer Cleanup Lifecycle) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 77.0 Td (Hero.jsx \(Carousel) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 68.0 Td (auto-rotate\)) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 77.0 Td (Prevents memory leaks by clearing setInterval on) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 68.0 Td (component unmount) Tj ET
+0.75 0.78 0.82 RG 0.7 w 42 805 m 553 805 l S
+BT /F1 7.5 Tf 0.35 0.40 0.48 rg 42 810 Td (AURA React 19 Functionalities Documentation - Hooks, State Architecture, Router v7 & UI) Tj ET
+0.82 0.84 0.88 RG 0.7 w 42 38 m 553 38 l S
+BT /F1 7.5 Tf 0.45 0.50 0.55 rg 42 28 Td (AURA Luxury Jewellery E-Commerce System - Technical Architecture) Tj ET
+BT /F2 7.5 Tf 0.15 0.20 0.30 rg 508 28 Td (Page 1) Tj ET
+
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 1299 >>
+stream
+1 1 1 rg 42 756.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 756.0 m 553 756.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 771 Td (Derived State Calculations) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 771 Td (Cart.jsx, Payment.jsx) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 771 Td (Instant subtotal, tax, and EMI calculations) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 762 Td (without redundant state) Tj ET
+0.96 0.97 0.99 rg 42 732.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 732.0 m 553 732.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 747.0 Td (Synthetic Event Handling) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 747.0 Td (Navbar.jsx, ProductCard.jsx,) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 738.0 Td (StarRating.jsx) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 747.0 Td (Consistent cross-browser event handling) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 326 738.0 Td (\(e.preventDefault, stopPropagation\)) Tj ET
+0.75 0.78 0.82 RG 0.7 w 42 805 m 553 805 l S
+BT /F1 7.5 Tf 0.35 0.40 0.48 rg 42 810 Td (AURA React 19 Functionalities Documentation - Hooks, State Architecture, Router v7 & UI) Tj ET
+0.82 0.84 0.88 RG 0.7 w 42 38 m 553 38 l S
+BT /F1 7.5 Tf 0.45 0.50 0.55 rg 42 28 Td (AURA Luxury Jewellery E-Commerce System - Technical Architecture) Tj ET
+BT /F2 7.5 Tf 0.15 0.20 0.30 rg 508 28 Td (Page 2) Tj ET
+
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000009027 00000 n 
+0000009163 00000 n 
+0000010514 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R >>
+startxref
+10650
+%%EOF

@@ -1,0 +1,131 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 8427 >>
+stream
+0.08 0.14 0.24 rg 42 698 511 82 re f
+0.77 0.66 0.50 RG 1.5 w 42 698 511 82 re S
+BT /F2 16 Tf 0.98 0.98 0.96 rg 58 752 Td (AURA E-Commerce: Whole Project Matrix) Tj ET
+BT /F1 9.5 Tf 0.77 0.66 0.50 rg 58 734 Td (FULL-STACK SYSTEM CAPABILITIES & FEATURE INVENTORY) Tj ET
+BT /F1 8 Tf 0.70 0.75 0.82 rg 58 716 Td (Comprehensive functionality inventory spanning Customer Storefront, Admin Management, Security & Database) Tj ET
+0.93 0.95 0.98 rg 42 662 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 662 42 680 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 667 Td (1. Customer Storefront & Shopping Experience) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 646.0 Td (- Hero Slider with Carousel Controls: Auto-rotating promotional banner in Hero.jsx with slide indicators, touch support,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 635.0 Td (and luxury jewellery call-to-actions.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 622.0 Td (- Tanishq-Style AURA Assurance Section: Two-column trust showcase in AssuranceSection.jsx highlighting 100% Certified) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 611.0 Td (Jewellery, Insured Express Shipping, and 30-Day Easy Returns.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 598.0 Td (- Multi-Faceted Product Filter \(Shop.jsx\): Simultaneous multi-parameter filtering by Category, Occasion, Gender, Search) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 587.0 Td (Keywords, and dynamic Min/Max Price range sliders.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 574.0 Td (- Product Detail & Interactive Rating \(ProductDetail.jsx\): High-resolution image gallery, real-time stock availability,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 563.0 Td (customer reviews with StarRating.jsx, and related recommendations.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 550.0 Td (- Cart Management & Subtotal Engine \(Cart.jsx\): Live quantity increment/decrement, item removal, instant subtotal) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 539.0 Td (calculation, free shipping threshold computation, and promotional discounts.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 526.0 Td (- Persistent Customer Wishlist \(Wishlist.jsx\): Heart-icon toggling on product cards, localStorage persistence for guest) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 515.0 Td (visitors, database sync for members, and 'Move to Cart' functionality.) Tj ET
+0.93 0.95 0.98 rg 42 492.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 492.0 42 510.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 497.0 Td (2. Checkout & Razorpay Payment Widget) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 476.0 Td (- Delivery Address Validation \(Checkout.jsx\): Customer name, formatted 10-digit telephone \(+91\), street address, city,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 465.0 Td (and pincode collection.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 452.0 Td (- Razorpay Standard Checkout Modal \(Payment.jsx\): Authentic phone-width centered modal \(#1859F1 header, AURA Verified) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 441.0 Td (Business badge, Total Amount display, and dark backdrop overlay\).) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 428.0 Td (- Two-Step Checkout Flow: Step 1: Contact Details mobile confirmation -> Step 2: All Payment Options accordion list.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 415.0 Td (- Accordion Payment Methods: Interactive accordion supporting UPI \(VPA handles\), Credit/Debit Cards, Netbanking \(SBI,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 404.0 Td (ICICI, Kotak, Axis, BOB\), EMI options, Digital Wallets, and Pay Later.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 391.0 Td (- Atomic Order Placement: Submits delivery details via POST /api/orders, triggers database transaction, decrements stock,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 380.0 Td (and presents instant order receipt confirmation.) Tj ET
+0.93 0.95 0.98 rg 42 357.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 357.0 42 375.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 362.0 Td (3. Administration & Business Management) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 341.0 Td (- Protected Admin Authentication: Dedicated login portal \(AdminLogin.jsx\) with separate admin session and route) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 330.0 Td (protection via ProtectedAdminRoute.jsx.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 317.0 Td (- Sales & Operations Dashboard \(Admin.jsx\): Aggregated metrics displaying total revenue, completed orders count,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 306.0 Td (registered customers, and low stock inventory alerts.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 293.0 Td (- Product Catalog CRUD: Add new jewellery products with images, price, categories, occasion tags, and stock counts; update) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 282.0 Td (or archive existing items.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 269.0 Td (- Order Lifecycle Management: View customer orders and transition statuses in real-time: Pending -> Processing -> Shipped) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 258.0 Td (-> Delivered.) Tj ET
+0.93 0.95 0.98 rg 42 235.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 235.0 42 253.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 240.0 Td (4. System Architecture & Capabilities Matrix) Tj ET
+0.12 0.22 0.38 rg 42 210.0 511 17 re f
+BT /F2 8 Tf 1 1 1 rg 46 215.0 Td (Functional Area) Tj ET
+BT /F2 8 Tf 1 1 1 rg 176 215.0 Td (Underlying Tech & Files) Tj ET
+BT /F2 8 Tf 1 1 1 rg 316 215.0 Td (Core Capability & Description) Tj ET
+1 1 1 rg 42 186.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 186.0 m 553 186.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 201.0 Td (Authentication & Security) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 201.0 Td (JWT, bcryptjs,) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 192.0 Td (AuthContext.jsx) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 201.0 Td (Secure salted hashing, token expiration,) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 192.0 Td (guest-to-member cart migration) Tj ET
+0.96 0.97 0.99 rg 42 162.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 162.0 m 553 162.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 177.0 Td (Database Integrity) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 177.0 Td (MySQL2 Pool, ACID) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 168.0 Td (Transactions) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 177.0 Td (Atomic order commits, connection pooling, prepared) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 168.0 Td (statements preventing SQLi) Tj ET
+1 1 1 rg 42 138.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 138.0 m 553 138.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 153.0 Td (Product Discovery) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 153.0 Td (Shop.jsx, routes/products.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 153.0 Td (Server-side and client-side compound filtering) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 144.0 Td (\(price, category, occasion\)) Tj ET
+0.96 0.97 0.99 rg 42 114.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 114.0 m 553 114.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 129.0 Td (Checkout & Payment) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 129.0 Td (Payment.jsx \(Razorpay) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 120.0 Td (widget\)) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 129.0 Td (Authentic 2-step Razorpay checkout modal with) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 120.0 Td (accordion payment options) Tj ET
+1 1 1 rg 42 90.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 90.0 m 553 90.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 105.0 Td (Storefront Branding) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 105.0 Td (index.css, Lucide Icons) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 105.0 Td (Luxury dark theme \(--gold, --cream, --bg-card\)) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 96.0 Td (with responsive mobile layouts) Tj ET
+0.96 0.97 0.99 rg 42 66.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 66.0 m 553 66.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 81.0 Td (Admin Operations) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 176 81.0 Td (Admin.jsx, routes/admin.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 81.0 Td (Full product catalog management, order fulfillment) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 316 72.0 Td (tracking, and KPI analytics) Tj ET
+0.75 0.78 0.82 RG 0.7 w 42 805 m 553 805 l S
+BT /F1 7.5 Tf 0.35 0.40 0.48 rg 42 810 Td (AURA Full-Stack E-Commerce Matrix - Complete System Functionalities) Tj ET
+0.82 0.84 0.88 RG 0.7 w 42 38 m 553 38 l S
+BT /F1 7.5 Tf 0.45 0.50 0.55 rg 42 28 Td (AURA Luxury Jewellery E-Commerce System - Technical Architecture) Tj ET
+BT /F2 7.5 Tf 0.15 0.20 0.30 rg 508 28 Td (Page 1) Tj ET
+
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000320 00000 n 
+0000008799 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+8935
+%%EOF

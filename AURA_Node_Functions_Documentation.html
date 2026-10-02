@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AURA Node.js Functions & API Documentation</title>
+<style>
+  :root {
+    --bg-page: #0f1219;
+    --bg-card: #181d27;
+    --border: #28303f;
+    --gold: #c5a880;
+    --blue: #3b82f6;
+    --text: #f3f4f6;
+    --text-muted: #9ca3af;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-page);
+    color: var(--text);
+    margin: 0;
+    padding: 2.5rem 1.5rem;
+    line-height: 1.6;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+  .header {
+    background: linear-gradient(135deg, #0c2340 0%, #1859f1 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  .header h1 { margin: 0 0 0.5rem; font-size: 2rem; color: #fff; }
+  .header p { margin: 0; color: #dbeafe; font-size: 1rem; }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.75rem;
+    margin-bottom: 2rem;
+  }
+  h2 { color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-top: 0; }
+  ul { padding-left: 1.25rem; }
+  li { margin-bottom: 0.6rem; color: #e5e7eb; }
+  li strong { color: var(--blue); }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  th { background: #131924; color: var(--gold); }
+  tr:hover { background: rgba(255,255,255,0.02); }
+  .print-btn {
+    background: var(--gold);
+    color: #0b0a09;
+    border: none;
+    padding: 0.65rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+  }
+  @media print {
+    body { background: #fff; color: #000; }
+    .print-btn { display: none; }
+    .card { border: 1px solid #ccc; background: #fff; }
+    th { background: #eee; color: #000; }
+    td, li { color: #222; }
+    li strong { color: #000; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <button class="print-btn" onclick="window.print()">Print or Save as PDF</button>
+  <div class="header">
+    <h1>AURA Node.js Backend Functions & API Documentation</h1>
+    <p>Complete Catalog: Express Framework, MySQL2 Connection Pool & Transactions, Custom Auth Middleware & 38-Endpoint REST API Matrix</p>
+  </div>
+  <div class="card">
+    <h2>1. Custom Developer-Defined Functions & Utilities</h2>
+    <ul>
+      <li><strong>verifyToken(req, res, next)</strong>: Authentication middleware in backend/middleware/auth.js validating JWT/session bearer tokens for protected customer routes.</li>
+      <li><strong>verifyAdmin(req, res, next)</strong>: Role-based access guard in backend/middleware/auth.js ensuring req.user.role === 'admin' before accessing dashboard resources.</li>
+      <li><strong>generateOrderNumber()</strong>: Order number generation utility producing unique formatted reference codes e.g. ORD-TIMESTAMP-RANDOM.</li>
+      <li><strong>formatCurrency(val)</strong>: Financial formatting utility in utils/format.js formatting numbers into Indian Rupee denomination format.</li>
+      <li><strong>parseFilterParams(query)</strong>: Query string parser in routes/products.js extracting and validating min_price, max_price, category, occasion, and gender.</li>
+      <li><strong>hashPassword(plaintext)</strong>: Asynchronous bcryptjs hashing utility in routes/auth.js with standard salt rounds (10) for credential protection.</li>
+      <li><strong>comparePassword(entered, hash)</strong>: Bcryptjs password verification function during user and administrator sign-in.</li>
+      <li><strong>syncCartWithDb(userId, sessionCart)</strong>: Synchronization utility transferring guest cart items into the MySQL database upon customer sign-in.</li>
+      <li><strong>initDbPool()</strong>: Database pool initializer in backend/config/db.js creating resilient connection pool with keep-alive limits.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>2. Express Framework Methods & Middleware</h2>
+    <ul>
+      <li><strong>express()</strong>: Primary Application instantiation in backend/server.js mounting global middleware and routes.</li>
+      <li><strong>app.use(middleware)</strong>: Mounts global plugins: cors(), express.json(), express.urlencoded(), and express-session.</li>
+      <li><strong>express.Router()</strong>: Modular route handlers in backend/routes/ (auth, products, orders, cart, wishlist, admin, etc.).</li>
+      <li><strong>app.listen(PORT, cb)</strong>: Starts HTTP listener on configured environment port (default 5000).</li>
+      <li><strong>router.get / post / put / delete</strong>: HTTP verb method handlers bound across all 38 application endpoints.</li>
+      <li><strong>res.status(code).json(body)</strong>: Standardized JSON response dispatch with HTTP status codes (200, 201, 400, 401, 404, 500).</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>3. Database Pool & ACID Transactions (mysql2/promise)</h2>
+    <ul>
+      <li><strong>pool.query(sql, params)</strong>: Prepared SQL statement execution with connection reuse and SQL injection prevention.</li>
+      <li><strong>pool.getConnection()</strong>: Acquires a dedicated DB connection for atomic transactions.</li>
+      <li><strong>connection.beginTransaction()</strong>: Starts an ACID atomic transaction in routes/orders.js for checkout placement.</li>
+      <li><strong>connection.commit()</strong>: Permanently commits inventory deductions, order record, and order items upon success.</li>
+      <li><strong>connection.rollback()</strong>: Rolls back inventory changes and database writes if any checkout step fails.</li>
+      <li><strong>connection.release()</strong>: Safely returns the connection to the connection pool in the finally block.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h2>4. Complete Backend API Endpoints Matrix</h2>
+    <table>
+      <thead>
+        <tr><th>HTTP Method & Path</th><th>Source File</th><th>Purpose & Operation</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>POST /api/auth/register</td><td>routes/auth.js</td><td>Create new customer with hashed password</td></tr>
+        <tr><td>POST /api/auth/login</td><td>routes/auth.js</td><td>Authenticate customer and issue session/token</td></tr>
+        <tr><td>GET /api/products</td><td>routes/products.js</td><td>List products with filters (price range, category, occasion)</td></tr>
+        <tr><td>GET /api/products/:id</td><td>routes/products.js</td><td>Fetch product detail by primary ID or slug</td></tr>
+        <tr><td>POST /api/orders</td><td>routes/orders.js</td><td>Atomic order creation with transaction & inventory decrement</td></tr>
+        <tr><td>GET /api/orders</td><td>routes/orders.js</td><td>Fetch order history for authenticated customer</td></tr>
+        <tr><td>GET /api/cart</td><td>routes/cart.js</td><td>Retrieve active cart items and compute total</td></tr>
+        <tr><td>POST /api/cart/items</td><td>routes/cart.js</td><td>Add item or increment quantity in customer cart</td></tr>
+        <tr><td>DELETE /api/cart/items/:id</td><td>routes/cart.js</td><td>Remove item from cart and recalculate subtotal</td></tr>
+        <tr><td>GET /api/wishlist</td><td>routes/wishlist.js</td><td>Fetch all wishlist items for current user</td></tr>
+        <tr><td>POST /api/wishlist/toggle</td><td>routes/wishlist.js</td><td>Toggle item in/out of customer wishlist</td></tr>
+        <tr><td>POST /api/admin/login</td><td>routes/admin.js</td><td>Authenticate admin credentials and issue admin session</td></tr>
+        <tr><td>GET /api/admin/metrics</td><td>routes/admin.js</td><td>Retrieve aggregated sales, total orders, and stock alerts</td></tr>
+        <tr><td>POST /api/admin/products</td><td>routes/admin.js</td><td>Create new jewellery catalog product</td></tr>
+        <tr><td>PUT /api/admin/orders/:id</td><td>routes/admin.js</td><td>Update order status: Pending, Processing, Shipped, Delivered</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

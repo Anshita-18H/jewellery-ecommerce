@@ -37,7 +37,7 @@ export default function App() {
     refreshCartCount();
   }, [refreshCartCount]);
 
-  // Admin ke saare pages par Navbar/Footer hide rahenge
+  // Admin pages hide global Navbar/Footer
   const isAdminPage = location.pathname.startsWith('/admin');
 
   return (

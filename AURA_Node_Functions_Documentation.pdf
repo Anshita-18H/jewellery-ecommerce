@@ -1,0 +1,187 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 8528 >>
+stream
+0.08 0.14 0.24 rg 42 698 511 82 re f
+0.77 0.66 0.50 RG 1.5 w 42 698 511 82 re S
+BT /F2 16 Tf 0.98 0.98 0.96 rg 58 752 Td (AURA Node.js Backend Functions) Tj ET
+BT /F1 9.5 Tf 0.77 0.66 0.50 rg 58 734 Td (NODE.JS / EXPRESS / MYSQL2 ARCHITECTURE) Tj ET
+BT /F1 8 Tf 0.70 0.75 0.82 rg 58 716 Td (Complete function catalog, custom controllers, middleware, and 38-endpoint API matrix) Tj ET
+0.93 0.95 0.98 rg 42 662 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 662 42 680 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 667 Td (1. Custom Developer-Defined Functions & Utilities) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 646.0 Td (- verifyToken\(req, res, next\): Authentication middleware in backend/middleware/auth.js validating JWT/session bearer) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 635.0 Td (tokens for protected customer routes.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 622.0 Td (- verifyAdmin\(req, res, next\): Role-based access guard in backend/middleware/auth.js ensuring req.user.role === 'admin') Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 611.0 Td (before accessing dashboard resources.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 598.0 Td (- generateOrderNumber\(\): Order number generation utility producing unique formatted reference codes e.g.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 587.0 Td (ORD-TIMESTAMP-RANDOM.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 574.0 Td (- formatCurrency\(val\): Financial formatting utility in utils/format.js formatting numbers into Indian Rupee denomination) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 563.0 Td (format.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 550.0 Td (- parseFilterParams\(query\): Query string parser in routes/products.js extracting and validating min_price, max_price,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 539.0 Td (category, occasion, and gender.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 526.0 Td (- hashPassword\(plaintext\): Asynchronous bcryptjs hashing utility in routes/auth.js with standard salt rounds \(10\) for) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 515.0 Td (credential protection.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 502.0 Td (- comparePassword\(entered, hash\): Bcryptjs password verification function during user and administrator sign-in.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 489.0 Td (- syncCartWithDb\(userId, sessionCart\): Synchronization utility transferring guest cart items into the MySQL database upon) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 478.0 Td (customer sign-in.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 465.0 Td (- initDbPool\(\): Database pool initializer in backend/config/db.js creating resilient connection pool with keep-alive) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 454.0 Td (limits.) Tj ET
+0.93 0.95 0.98 rg 42 431.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 431.0 42 449.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 436.0 Td (2. Express Framework Methods & Middleware) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 415.0 Td (- express\(\): Primary Application instantiation in backend/server.js mounting global middleware and routes.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 402.0 Td (- app.use\(middleware\): Mounts global plugins: cors\(\), express.json\(\), express.urlencoded\(\), and express-session.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 389.0 Td (- express.Router\(\): Modular route handlers in backend/routes/ \(auth, products, orders, cart, wishlist, admin, etc.\).) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 376.0 Td (- app.listen\(PORT, cb\): Starts HTTP listener on configured environment port \(default 5000\).) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 363.0 Td (- router.get / post / put / delete: HTTP verb method handlers bound across all 38 application endpoints.) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 350.0 Td (- res.status\(code\).json\(body\): Standardized JSON response dispatch with HTTP status codes \(200, 201, 400, 401, 404,) Tj ET
+BT /F1 8.0 Tf 0.15 0.18 0.22 rg 50 339.0 Td (500\).) Tj ET
+0.93 0.95 0.98 rg 42 316.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 316.0 42 334.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 321.0 Td (3. Database Pool & ACID Transactions \(mysql2/promise\)) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 300.0 Td (- pool.query\(sql, params\): Prepared SQL statement execution with connection reuse and SQL injection prevention.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 287.0 Td (- pool.getConnection\(\): Acquires a dedicated DB connection for atomic transactions.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 274.0 Td (- connection.beginTransaction\(\): Starts an ACID atomic transaction in routes/orders.js for checkout placement.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 261.0 Td (- connection.commit\(\): Permanently commits inventory deductions, order record, and order items upon success.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 248.0 Td (- connection.rollback\(\): Rolls back inventory changes and database writes if any checkout step fails.) Tj ET
+BT /F2 8.0 Tf 0.15 0.18 0.22 rg 50 235.0 Td (- connection.release\(\): Safely returns the connection to the connection pool in the finally block.) Tj ET
+0.93 0.95 0.98 rg 42 212.0 511 18 re f
+0.10 0.35 0.85 RG 2 w 42 212.0 42 230.0 l S
+BT /F2 11 Tf 0.08 0.18 0.40 rg 50 217.0 Td (4. Backend API Endpoints Matrix \(Sample\)) Tj ET
+0.12 0.22 0.38 rg 42 187.0 511 17 re f
+BT /F2 8 Tf 1 1 1 rg 46 192.0 Td (HTTP Method & Path) Tj ET
+BT /F2 8 Tf 1 1 1 rg 186 192.0 Td (Source File) Tj ET
+BT /F2 8 Tf 1 1 1 rg 286 192.0 Td (Purpose & Operation) Tj ET
+1 1 1 rg 42 172.0 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 172.0 m 553 172.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 178.0 Td (POST /api/auth/register) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 178.0 Td (routes/auth.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 178.0 Td (Create new customer with hashed password) Tj ET
+0.96 0.97 0.99 rg 42 157.0 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 157.0 m 553 157.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 163.0 Td (POST /api/auth/login) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 163.0 Td (routes/auth.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 163.0 Td (Authenticate customer and issue session/token) Tj ET
+1 1 1 rg 42 133.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 133.0 m 553 133.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 148.0 Td (GET /api/products) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 148.0 Td (routes/products.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 148.0 Td (List products with filters \(price range, category,) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 139.0 Td (occasion\)) Tj ET
+0.96 0.97 0.99 rg 42 118.0 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 118.0 m 553 118.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 124.0 Td (GET /api/products/:id) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 124.0 Td (routes/products.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 124.0 Td (Fetch product detail by primary ID or slug) Tj ET
+1 1 1 rg 42 94.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 94.0 m 553 94.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 109.0 Td (POST /api/orders) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 109.0 Td (routes/orders.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 109.0 Td (Atomic order creation with transaction & inventory) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 100.0 Td (decrement) Tj ET
+0.96 0.97 0.99 rg 42 79.0 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 79.0 m 553 79.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 85.0 Td (GET /api/orders) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 85.0 Td (routes/orders.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 85.0 Td (Fetch order history for authenticated customer) Tj ET
+1 1 1 rg 42 64.0 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 64.0 m 553 64.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 70.0 Td (GET /api/cart) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 70.0 Td (routes/cart.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 70.0 Td (Retrieve active cart items and compute total) Tj ET
+0.96 0.97 0.99 rg 42 49.0 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 49.0 m 553 49.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 55.0 Td (POST /api/cart/items) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 55.0 Td (routes/cart.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 55.0 Td (Add item or increment quantity in customer cart) Tj ET
+0.75 0.78 0.82 RG 0.7 w 42 805 m 553 805 l S
+BT /F1 7.5 Tf 0.35 0.40 0.48 rg 42 810 Td (AURA Node.js Functions Documentation - Express, MySQL2, Middleware & APIs) Tj ET
+0.82 0.84 0.88 RG 0.7 w 42 38 m 553 38 l S
+BT /F1 7.5 Tf 0.45 0.50 0.55 rg 42 28 Td (AURA Luxury Jewellery E-Commerce System - Technical Architecture) Tj ET
+BT /F2 7.5 Tf 0.15 0.20 0.30 rg 508 28 Td (Page 1) Tj ET
+
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 2668 >>
+stream
+1 1 1 rg 42 765 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 765 m 553 765 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 771 Td (DELETE /api/cart/items/:id) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 771 Td (routes/cart.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 771 Td (Remove item from cart and recalculate subtotal) Tj ET
+0.96 0.97 0.99 rg 42 750 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 750 m 553 750 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 756 Td (GET /api/wishlist) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 756 Td (routes/wishlist.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 756 Td (Fetch all wishlist items for current user) Tj ET
+1 1 1 rg 42 735 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 735 m 553 735 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 741 Td (POST /api/wishlist/toggle) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 741 Td (routes/wishlist.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 741 Td (Toggle item in/out of customer wishlist) Tj ET
+0.96 0.97 0.99 rg 42 720 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 720 m 553 720 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 726 Td (POST /api/admin/login) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 726 Td (routes/admin.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 726 Td (Authenticate admin credentials and issue admin session) Tj ET
+1 1 1 rg 42 705 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 705 m 553 705 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 711 Td (GET /api/admin/metrics) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 711 Td (routes/admin.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 711 Td (Retrieve aggregated sales, total orders, and stock alerts) Tj ET
+0.96 0.97 0.99 rg 42 690 511 15 re f
+0.88 0.90 0.93 RG 0.5 w 42 690 m 553 690 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 696 Td (POST /api/admin/products) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 696 Td (routes/admin.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 696 Td (Create new jewellery catalog product) Tj ET
+1 1 1 rg 42 666.0 511 24.0 re f
+0.88 0.90 0.93 RG 0.5 w 42 666.0 m 553 666.0 l S
+BT /F2 7.5 Tf 0.08 0.20 0.50 rg 46 681 Td (PUT /api/admin/orders/:id) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 186 681 Td (routes/admin.js) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 681 Td (Update order status: Pending, Processing, Shipped,) Tj ET
+BT /F1 7.5 Tf 0.20 0.22 0.26 rg 286 672 Td (Delivered) Tj ET
+0.75 0.78 0.82 RG 0.7 w 42 805 m 553 805 l S
+BT /F1 7.5 Tf 0.35 0.40 0.48 rg 42 810 Td (AURA Node.js Functions Documentation - Express, MySQL2, Middleware & APIs) Tj ET
+0.82 0.84 0.88 RG 0.7 w 42 38 m 553 38 l S
+BT /F1 7.5 Tf 0.45 0.50 0.55 rg 42 28 Td (AURA Luxury Jewellery E-Commerce System - Technical Architecture) Tj ET
+BT /F2 7.5 Tf 0.15 0.20 0.30 rg 508 28 Td (Page 2) Tj ET
+
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+xref
+0 9
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000326 00000 n 
+0000008906 00000 n 
+0000009042 00000 n 
+0000011762 00000 n 
+trailer
+<< /Size 9 /Root 1 0 R >>
+startxref
+11898
+%%EOF
