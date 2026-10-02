@@ -1,10 +1,23 @@
-const rawBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const BASE_URL = rawBaseUrl.replace(/\/+$/, '');
+// Ensure BASE_URL always contains exactly one '/api' suffix regardless of env configuration
+function getBaseUrl() {
+  const raw = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim().replace(/\/+$/, '');
+  return raw.endsWith('/api') ? raw : `${raw}/api`;
+}
+
+const BASE_URL = getBaseUrl();
 
 // `credentials: 'include'` is required so the session cookie
 // (used for cart and auth) is sent and stored by the browser.
 async function request(path, options = {}) {
-  const url = `${BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+  // Normalize path and prevent duplicate /api if path already starts with /api
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const cleanPath = normalizedPath.startsWith('/api/')
+    ? normalizedPath.slice(4)
+    : normalizedPath === '/api'
+    ? ''
+    : normalizedPath;
+
+  const url = `${BASE_URL}${cleanPath}`;
   const res = await fetch(url, {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
