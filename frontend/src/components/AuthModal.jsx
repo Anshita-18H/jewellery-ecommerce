@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Mail, Lock, User, AlertCircle, ArrowRight } from 'lucide-react';
+import { X, Mail, Lock, User, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './AuthModal.css';
 
@@ -13,6 +13,7 @@ export default function AuthModal() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -23,6 +24,7 @@ export default function AuthModal() {
       setName('');
       setEmail('');
       setPassword('');
+      setShowPassword(false);
     }
   }, [isOpen, initialMode]);
 
@@ -31,6 +33,7 @@ export default function AuthModal() {
   function switchMode(newMode) {
     setMode(newMode);
     setError(null);
+    setShowPassword(false);
   }
 
   async function handleSubmit(e) {
@@ -170,14 +173,22 @@ export default function AuthModal() {
               <Lock size={16} className="auth-modal-input-icon" />
               <input
                 id="modal-password"
-                type="password"
-                className="auth-modal-input"
+                type={showPassword ? 'text' : 'password'}
+                className="auth-modal-input auth-modal-input-password"
                 placeholder="At least 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading}
                 required
               />
+              <button
+                type="button"
+                className="auth-modal-password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
           </div>
 

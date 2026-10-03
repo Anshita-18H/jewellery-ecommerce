@@ -210,6 +210,38 @@
   font-size: 0.82rem;
 }
 
+.auth-modal-input.auth-modal-input-password {
+  padding-right: 2.85rem;
+}
+
+.auth-modal-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.auth-modal-password-toggle:hover {
+  color: var(--gold-light);
+}
+
+.auth-modal-password-toggle:focus-visible {
+  outline: 1px solid var(--gold);
+  color: var(--cream);
+}
+
+.auth-modal-input:focus + .auth-modal-password-toggle {
+  color: var(--gold-bright);
+}
+
 .auth-modal-submit-btn {
   width: 100%;
   padding: 0.82rem 1.2rem;

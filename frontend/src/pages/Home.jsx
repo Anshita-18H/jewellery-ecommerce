@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Hero from '../components/Hero';
+import NewArrivals from '../components/NewArrivals';
 import ProductCard from '../components/ProductCard';
 import AssuranceSection from '../components/AssuranceSection';
 import OccasionGrid from '../components/OccasionGrid';
@@ -10,12 +11,16 @@ import './Home.css';
 
 export default function Home({ onCartChange }) {
   const [featured, setFeatured] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    getProducts({ featured: 'true' })
-      .then((data) => setFeatured(data))
+    Promise.all([getProducts({ featured: 'true' }), getProducts()])
+      .then(([featuredData, allData]) => {
+        setFeatured(featuredData);
+        setAllProducts(allData);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -36,6 +41,8 @@ export default function Home({ onCartChange }) {
       <Hero product={heroProduct} />
 
       <AssuranceSection />
+
+      <NewArrivals products={allProducts} />
 
       <section className="home-collections container">
         <div className="home-section-header text-center">

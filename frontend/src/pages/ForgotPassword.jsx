@@ -1,26 +1,44 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Mail, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Mail, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { requestPasswordReset } from '../api';
 import './Login.css';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState(null);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!email || !email.trim()) {
+    setError(null);
+
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
       setError('Please enter your email address');
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
+    if (!emailRegex.test(cleanEmail)) {
       setError('Please enter a valid email address');
       return;
     }
-    setError(null);
-    setSubmitted(true);
+
+    setLoading(true);
+    try {
+      const res = await requestPasswordReset(cleanEmail);
+      setSuccessMessage(
+        res.message ||
+          'If an account with that email exists, a password reset link has been sent.'
+      );
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message || 'Unable to process reset request. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -31,11 +49,11 @@ export default function ForgotPassword() {
           <div className="login-header">
             <div className="login-emblem">♦</div>
             <p className="eyebrow">Password Recovery</p>
-            <h1 className="login-title">Reset Password</h1>
+            <h1 className="login-title">Forgot Password</h1>
             <p className="login-subtitle">
               {submitted
                 ? 'Check your inbox for reset instructions'
-                : 'Enter your email to receive password recovery instructions'}
+                : 'Enter your registered email address to receive a secure password reset link.'}
             </p>
           </div>
 
@@ -49,9 +67,13 @@ export default function ForgotPassword() {
           {submitted ? (
             <div style={{ textAlign: 'center' }}>
               <div className="login-alert login-alert-success" style={{ marginBottom: '2rem' }}>
-                <span>Recovery instructions have been sent to <strong>{email}</strong> if an account exists.</span>
+                <CheckCircle2 size={16} className="login-alert-icon" />
+                <span>{successMessage}</span>
               </div>
-              <Link to="/login" className="btn btn-gold" style={{ width: '100%' }}>
+              <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
+                Please check your email inbox and spam folder. The reset link will remain active for 30 minutes.
+              </p>
+              <Link to="/login" className="btn btn-gold" style={{ width: '100%', justifyContent: 'center' }}>
                 <ArrowLeft size={16} />
                 Return to Sign In
               </Link>
@@ -74,17 +96,26 @@ export default function ForgotPassword() {
                       setEmail(e.target.value);
                       if (error) setError(null);
                     }}
+                    disabled={loading}
                     required
                   />
                 </div>
               </div>
 
-              <button type="submit" className="btn btn-gold login-submit-btn">
-                Send Recovery Instructions
+              <button
+                type="submit"
+                className="btn btn-gold login-submit-btn"
+                disabled={loading}
+              >
+                {loading ? 'Sending Reset Link...' : 'Send Reset Link'}
               </button>
 
               <div className="login-footer" style={{ marginTop: '1.5rem', paddingTop: '1.2rem' }}>
-                <Link to="/login" className="login-register-link" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Link
+                  to="/login"
+                  className="login-register-link"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                >
                   <ArrowLeft size={14} /> Back to Sign In
                 </Link>
               </div>

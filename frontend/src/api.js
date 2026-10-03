@@ -87,6 +87,12 @@ export const loginUser = (data) =>
   request('/auth/login', { method: 'POST', body: JSON.stringify(data) });
 export const getMe = () => request('/auth/me');
 export const logoutUser = () => request('/auth/logout', { method: 'POST' });
+export const requestPasswordReset = (email) =>
+  request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+export const verifyResetToken = (token) =>
+  request(`/auth/verify-reset-token?token=${encodeURIComponent(token)}`);
+export const resetPassword = (token, password) =>
+  request('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) });
 
 // ---- Product Ratings & Reviews ----
 export const getProductRatings = (productId) =>

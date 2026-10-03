@@ -99,3 +99,38 @@ Once your Render service is live (e.g. `https://aura-backend.onrender.com`):
    Log in at `#/admin/login` using:
    - **Email**: `admin@aura.com`
    - **Password**: `Admin@Aura2026!`
+
+---
+
+## Part 5: Promoting a User to Administrator
+
+To grant administrator privileges and/or update the password for any existing or new user:
+
+### Step 1: Generate a Bcrypt Password Hash
+AURA uses `bcryptjs` with **10 salt rounds** (configured in `backend/routes/auth.js`). Run this one-liner in your terminal from the `backend/` directory:
+
+```bash
+node -e "console.log(require('bcryptjs').hashSync('YOUR_NEW_PASSWORD', 10))"
+```
+
+*Example output:*
+`$2b$10$z/gBje11PxAL10HIH3cisOyDQX2hFIhSxgQ3mHYACxTaRCU6zdPw.`
+
+### Step 2: Execute the SQL Update
+Connect to your database (locally or via Aiven MySQL console/CLI) and run:
+
+```sql
+UPDATE users 
+SET role = 'admin', password_hash = '<GENERATED_BCRYPT_HASH>' 
+WHERE email = 'user@example.com';
+```
+
+*(If you only need to change the role without altering their password, simply run: `UPDATE users SET role = 'admin' WHERE email = 'user@example.com';`)*
+
+### Step 3: Verify the Update
+
+```sql
+SELECT id, name, email, role FROM users WHERE email = 'user@example.com';
+```
+
+The user will now be able to authenticate at the Admin Management portal (`#/admin/login`).
