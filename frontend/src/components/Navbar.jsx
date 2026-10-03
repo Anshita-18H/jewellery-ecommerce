@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, User, Menu, X, Heart, LogOut, Shield } from 'lucide-react';
+import { Search, ShoppingBag, UserRound, Menu, X, Heart, LogOut, Shield } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
@@ -82,7 +82,7 @@ export default function Navbar({ cartCount = 0 }) {
               aria-label={user ? `Signed in as ${user.name}` : 'Sign in or create account'}
               title={user ? `Account: ${user.name}` : 'Sign In'}
             >
-              <User size={19} strokeWidth={1.75} />
+              <UserRound size={21} strokeWidth={2} className="navbar-account-icon" aria-hidden="true" />
               {user && <span className="navbar-auth-dot" />}
             </button>
 
@@ -101,7 +101,7 @@ export default function Navbar({ cartCount = 0 }) {
                         className="navbar-dropdown-item"
                         onClick={() => setAccountOpen(false)}
                       >
-                        <User size={15} />
+                        <UserRound size={16} strokeWidth={2} aria-hidden="true" />
                         <span>My Account</span>
                       </Link>
                       <Link

@@ -96,26 +96,63 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
   color: var(--text-primary);
   transition: all 0.2s var(--ease);
   text-decoration: none;
+  outline: none;
 }
 
 .navbar-icon-btn:hover {
   color: var(--gold-bright);
-  background: rgba(201, 164, 92, 0.1);
+  background: rgba(201, 164, 92, 0.12);
   transform: translateY(-1px);
+}
+
+.navbar-icon-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* Dedicated Account/Profile Icon Button */
+.navbar-account {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.navbar-account-icon {
+  display: block;
+  flex-shrink: 0;
+  color: currentColor;
+  stroke: currentColor;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+  transition: stroke 0.2s var(--ease), filter 0.2s var(--ease);
+}
+
+.navbar-account:hover .navbar-account-icon,
+.navbar-account:focus-visible .navbar-account-icon {
+  stroke: var(--gold-bright);
+  filter: drop-shadow(0 0 8px rgba(226, 194, 122, 0.45));
 }
 
 .navbar-auth-dot {
   position: absolute;
-  bottom: 3px;
-  right: 3px;
-  width: 7px;
-  height: 7px;
+  bottom: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
   background: #81c784;
+  border: 1.5px solid var(--bg-primary);
   border-radius: 50%;
   box-shadow: 0 0 8px #81c784;
+  pointer-events: none;
 }
 
 /* Account Wrap & Dropdown */
@@ -367,7 +404,12 @@
   }
 
   .navbar-icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .navbar-account-icon {
+    width: 20px;
+    height: 20px;
   }
 }
