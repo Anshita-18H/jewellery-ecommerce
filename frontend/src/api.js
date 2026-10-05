@@ -73,6 +73,7 @@ export const clearWishlistApi = () =>
 
 // ---- Orders ----
 export const placeOrder = (data) => request('/orders', { method: 'POST', body: JSON.stringify(data) });
+export const getMyOrders = () => request('/orders/mine');
 export const getOrders = () => request('/orders');
 export const getOrder = (id) => request(`/orders/${id}`);
 export const updateOrderStatus = (id, status) =>

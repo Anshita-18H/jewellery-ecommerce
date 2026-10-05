@@ -18,6 +18,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import GoogleLoginSuccess from './pages/GoogleLoginSuccess';
 import Wishlist from './pages/Wishlist';
+import MyOrders from './pages/MyOrders';
 
 import { WishlistProvider } from './context/WishlistContext';
 import { AuthProvider } from './context/AuthContext';
@@ -71,6 +72,9 @@ export default function App() {
               path="/wishlist"
               element={<Wishlist onCartChange={refreshCartCount} />}
             />
+
+            <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/orders" element={<MyOrders />} />
 
             <Route
               path="/cart"

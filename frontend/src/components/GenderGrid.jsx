@@ -26,7 +26,7 @@ const GENDERS = [
     title: 'Kids Jewellery',
     tag: 'Gentle Keepsakes',
     description: 'Precious heirloom charms and bracelets in pure hypoallergenic gold',
-    image: 'https://placehold.co/800x800/1b1712/c9a876?text=Kids+Jewellery',
+    image: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&auto=format&fit=crop&q=80',
     link: '/shop?gender=kids',
     actionText: 'Shop Kids',
   },

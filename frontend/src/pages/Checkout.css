@@ -168,6 +168,416 @@
   font-size: 0.95rem;
 }
 
+/* ========================================================
+   CHECKOUT AUTH TABS & EMBEDDED AUTH FORM (DARK + GOLD)
+   Consistent with AURA's luxury aesthetic and Shop filter chips
+   ======================================================== */
+
+.checkout-auth-tabs-wrap {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checkout-auth-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.checkout-auth-tab {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.4rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: inherit;
+}
+
+.checkout-auth-tab:hover {
+  border-color: var(--border-strong);
+  color: var(--gold-bright);
+  background: var(--bg-elevated);
+  transform: translateY(-1px);
+}
+
+.checkout-auth-tab.active {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-bright));
+  border-color: var(--gold-bright);
+  color: #0B0A09;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(200, 169, 110, 0.35);
+  transform: translateY(-1px);
+}
+
+.checkout-tab-icon {
+  flex-shrink: 0;
+}
+
+/* Logged-In Account Banner */
+.checkout-user-banner {
+  background: rgba(200, 169, 110, 0.08);
+  border: 1px solid rgba(200, 169, 110, 0.25);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.checkout-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.checkout-user-icon {
+  color: var(--gold-bright);
+  flex-shrink: 0;
+}
+
+.checkout-user-title {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem;
+}
+
+.checkout-user-title strong {
+  color: var(--gold-bright);
+}
+
+.checkout-user-sub {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.checkout-signout-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.checkout-signout-btn:hover {
+  border-color: #f28b82;
+  color: #f28b82;
+  background: rgba(242, 139, 130, 0.1);
+}
+
+/* Guest Info Banner */
+.checkout-guest-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+}
+
+.checkout-guest-icon {
+  color: var(--gold-bright);
+  flex-shrink: 0;
+}
+
+.checkout-inline-link {
+  background: none;
+  border: none;
+  color: var(--gold-bright);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+}
+.checkout-inline-link:hover {
+  color: var(--gold-primary);
+}
+
+/* Guest View when user is already logged in */
+.checkout-guest-logged-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.checkout-guest-logged-card p {
+  margin: 0 0 0.5rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.checkout-guest-logged-card strong {
+  color: var(--gold-bright);
+}
+
+.checkout-guest-logged-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Embedded Auth Form Card */
+.checkout-auth-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 2.2rem 2.4rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.checkout-auth-header {
+  margin-bottom: 1.5rem;
+}
+
+.checkout-auth-header .eyebrow {
+  margin-bottom: 0.35rem;
+}
+
+.checkout-auth-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.checkout-auth-header p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.checkout-auth-subtabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  gap: 1.5rem;
+}
+
+.checkout-auth-subtab {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.65rem 0.25rem;
+  font-size: 0.84rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.checkout-auth-subtab:hover {
+  color: var(--text-primary);
+}
+
+.checkout-auth-subtab.active {
+  color: var(--gold-bright);
+  border-bottom-color: var(--gold-bright);
+  font-weight: 600;
+}
+
+.checkout-auth-error {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: rgba(229, 115, 115, 0.12);
+  border: 1px solid rgba(229, 115, 115, 0.35);
+  color: #f28b82;
+  font-size: 0.82rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.2rem;
+}
+
+.checkout-auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.checkout-auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.checkout-auth-label {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold-bright);
+  font-weight: 500;
+}
+
+.checkout-auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.checkout-auth-input-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.checkout-auth-input {
+  width: 100%;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 0.85rem 1rem 0.85rem 2.6rem;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.92rem;
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+
+.checkout-auth-input:focus {
+  outline: none;
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 0 2px rgba(201, 164, 92, 0.22);
+}
+
+.checkout-auth-input-password {
+  padding-right: 2.8rem;
+}
+
+.checkout-auth-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.checkout-auth-password-toggle:hover {
+  color: var(--gold-bright);
+}
+
+.checkout-auth-submit-btn {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.95rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.checkout-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.25rem 0;
+}
+
+.checkout-auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.checkout-auth-divider-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.checkout-auth-google-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: #ffffff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.checkout-auth-google-btn:hover {
+  background: #f8f9fa;
+  border-color: #c6c9cc;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
+}
+
+.checkout-auth-switch {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+}
+
+.checkout-auth-switch-btn {
+  background: none;
+  border: none;
+  color: var(--gold-bright);
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  font-family: inherit;
+  margin-left: 0.35rem;
+}
+
+.checkout-auth-switch-btn:hover {
+  color: var(--gold-primary);
+}
+
 @media (max-width: 860px) {
   .checkout-grid {
     grid-template-columns: 1fr;
@@ -175,5 +585,12 @@
   }
   .checkout-form-row {
     grid-template-columns: 1fr;
+  }
+  .checkout-auth-card {
+    padding: 1.6rem 1.4rem;
+  }
+  .checkout-user-banner {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

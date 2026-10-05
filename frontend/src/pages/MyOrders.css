@@ -1,0 +1,416 @@
+/* ========================================================
+   AURA — MY ORDERS (DARK LUXURY UI)
+   Matches AURA's gold-accented luxury design system
+   ======================================================== */
+
+.myorders-page {
+  padding-top: 3.5rem;
+  padding-bottom: 6rem;
+  min-height: 70vh;
+}
+
+.myorders-header {
+  margin-bottom: 2.75rem;
+  text-align: center;
+}
+
+.myorders-header .eyebrow {
+  margin-bottom: 0.4rem;
+}
+
+.myorders-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  color: var(--text-primary);
+  margin: 0.25rem 0 0.65rem;
+  letter-spacing: 0.02em;
+}
+
+.myorders-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Loading State */
+.myorders-loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  gap: 1.25rem;
+}
+
+.myorders-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid rgba(200, 169, 110, 0.2);
+  border-top-color: var(--gold-bright);
+  border-radius: 50%;
+  animation: myordersSpin 0.8s linear infinite;
+}
+
+@keyframes myordersSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.myorders-loading-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* Error Banner */
+.myorders-error-banner {
+  background: rgba(229, 115, 115, 0.12);
+  border: 1px solid rgba(229, 115, 115, 0.35);
+  color: #f28b82;
+  padding: 1rem 1.4rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* Empty State */
+.myorders-empty-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 3.5rem 2rem;
+  text-align: center;
+  max-width: 560px;
+  margin: 0 auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.myorders-empty-icon-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(200, 169, 110, 0.08);
+  border: 1px solid rgba(200, 169, 110, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  color: var(--gold-bright);
+}
+
+.myorders-empty-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--text-primary);
+  margin-bottom: 0.6rem;
+}
+
+.myorders-empty-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  margin-bottom: 2rem;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.myorders-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 2rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Orders List */
+.myorders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Single Order Card */
+.myorders-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+}
+
+.myorders-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* Card Header */
+.myorders-card-header {
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.myorders-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 2.25rem;
+  flex-wrap: wrap;
+}
+
+.myorders-meta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.myorders-meta-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.myorders-meta-value {
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.myorders-total-highlight {
+  color: var(--gold-bright);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Status Badges */
+.myorders-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.myorders-status-badge.status-pending {
+  background: rgba(200, 169, 110, 0.14);
+  border: 1px solid rgba(200, 169, 110, 0.35);
+  color: var(--gold-bright);
+}
+
+.myorders-status-badge.status-shipped {
+  background: rgba(100, 181, 246, 0.14);
+  border: 1px solid rgba(100, 181, 246, 0.35);
+  color: #64b5f6;
+}
+
+.myorders-status-badge.status-delivered {
+  background: rgba(129, 199, 132, 0.14);
+  border: 1px solid rgba(129, 199, 132, 0.35);
+  color: #81c784;
+}
+
+.myorders-status-badge.status-cancelled {
+  background: rgba(242, 139, 130, 0.14);
+  border: 1px solid rgba(242, 139, 130, 0.35);
+  color: #f28b82;
+}
+
+/* Card Body */
+.myorders-card-body {
+  padding: 1.75rem;
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 2.5rem;
+}
+
+.myorders-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold-bright);
+  font-weight: 600;
+  margin-bottom: 0.85rem;
+}
+
+.myorders-section-icon {
+  flex-shrink: 0;
+}
+
+/* Shipping Details Column */
+.myorders-shipping-info {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+}
+
+.myorders-recipient-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin: 0 0 0.35rem;
+}
+
+.myorders-recipient-address {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.6rem;
+}
+
+.myorders-recipient-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Items List Column */
+.myorders-items-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.myorders-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.myorders-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: background 0.2s ease;
+}
+
+.myorders-item-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.myorders-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.myorders-item-name {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.myorders-item-qty {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.myorders-item-pricing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.myorders-item-unit {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.myorders-item-subtotal {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--gold-bright);
+}
+
+/* Card Footer */
+.myorders-card-footer {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.82rem;
+}
+
+.myorders-shipping-badge {
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.myorders-reorder-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--gold-bright);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.myorders-reorder-link:hover {
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  .myorders-card-body {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.25rem;
+  }
+
+  .myorders-card-header {
+    padding: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .myorders-meta-group {
+    gap: 1.25rem;
+  }
+
+  .myorders-card-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+  }
+}

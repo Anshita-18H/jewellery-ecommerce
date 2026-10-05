@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, UserRound, Menu, X, Heart, LogOut, Shield } from 'lucide-react';
+import { Search, ShoppingBag, UserRound, Menu, X, Heart, LogOut, Shield, Package } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
@@ -65,6 +65,15 @@ export default function Navbar({ cartCount = 0 }) {
               {link.label}
             </NavLink>
           ))}
+          {user && (
+            <NavLink
+              to="/my-orders"
+              className={({ isActive }) => `navbar-link ${isActive ? 'active' : ''}`}
+              onClick={() => setMenuOpen(false)}
+            >
+              My Orders
+            </NavLink>
+          )}
         </nav>
 
         {/* Right: Actions */}
@@ -103,6 +112,14 @@ export default function Navbar({ cartCount = 0 }) {
                       >
                         <UserRound size={16} strokeWidth={2} aria-hidden="true" />
                         <span>My Account</span>
+                      </Link>
+                      <Link
+                        to="/my-orders"
+                        className="navbar-dropdown-item"
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <Package size={15} />
+                        <span>My Orders</span>
                       </Link>
                       <Link
                         to="/wishlist"

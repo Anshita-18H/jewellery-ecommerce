@@ -21,6 +21,12 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Enter a valid 10-digit phone number, with or without +91' });
     }
 
+    const pincodeRegex = /^[0-9]{6}$/;
+    if (!pincodeRegex.test(String(pincode).trim())) {
+      connection.release();
+      return res.status(400).json({ error: 'Enter a valid 6-digit pincode' });
+    }
+
     const [cartRows] = await connection.query(
       `SELECT ci.quantity, p.id AS product_id, p.name, p.price, p.stock
        FROM cart_items ci
@@ -38,10 +44,12 @@ router.post('/', async (req, res) => {
 
     await connection.beginTransaction();
 
+    const userId = req.session?.userId || null;
+
     const [orderResult] = await connection.query(
-      `INSERT INTO orders (session_id, customer_name, phone, address, city, pincode, total_amount)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [req.sessionID, customer_name, phone, address, city, pincode, total]
+      `INSERT INTO orders (session_id, user_id, customer_name, phone, address, city, pincode, total_amount)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [req.sessionID, userId, customer_name, phone, address, city, pincode, total]
     );
     const orderId = orderResult.insertId;
 
@@ -70,6 +78,51 @@ router.post('/', async (req, res) => {
     connection.release();
     console.error(err);
     res.status(500).json({ error: 'Failed to place order' });
+  }
+});
+
+// GET /api/orders/mine — customer: list own order history with line items
+router.get('/mine', async (req, res) => {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: 'Authentication required to view order history' });
+  }
+
+  try {
+    const [orders] = await pool.query(
+      `SELECT id, customer_name, phone, address, city, pincode, total_amount, status, created_at
+       FROM orders
+       WHERE user_id = ?
+       ORDER BY created_at DESC`,
+      [req.session.userId]
+    );
+
+    if (orders.length === 0) {
+      return res.json([]);
+    }
+
+    const orderIds = orders.map((o) => o.id);
+    const [items] = await pool.query(
+      `SELECT order_id, product_id, product_name, price, quantity
+       FROM order_items
+       WHERE order_id IN (?)`,
+      [orderIds]
+    );
+
+    const itemsByOrder = items.reduce((acc, item) => {
+      if (!acc[item.order_id]) acc[item.order_id] = [];
+      acc[item.order_id].push(item);
+      return acc;
+    }, {});
+
+    const enrichedOrders = orders.map((order) => ({
+      ...order,
+      items: itemsByOrder[order.id] || [],
+    }));
+
+    res.json(enrichedOrders);
+  } catch (err) {
+    console.error('Failed to fetch customer orders:', err);
+    res.status(500).json({ error: 'Failed to fetch order history' });
   }
 });
 

@@ -179,6 +179,20 @@ async function initDatabase() {
       console.warn('Could not verify gender_tag column on products:', err.message);
     }
 
+    try {
+      const [orderCols] = await pool.query(`SHOW COLUMNS FROM orders LIKE 'user_id'`);
+      if (orderCols.length === 0) {
+        await pool.query(`
+          ALTER TABLE orders
+          ADD COLUMN user_id INT DEFAULT NULL AFTER session_id,
+          ADD CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+        `);
+        console.log('Added user_id column to orders table');
+      }
+    } catch (err) {
+      console.warn('Could not verify user_id column on orders:', err.message);
+    }
+
     console.log('Database tables verified successfully');
   } catch (err) {
     console.warn('Database table verification notice:', err.message);

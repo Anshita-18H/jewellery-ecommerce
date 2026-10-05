@@ -115,7 +115,10 @@ export default function Login() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-              <Link to="/shop" className="btn btn-gold" style={{ textAlign: 'center' }}>
+              <Link to="/my-orders" className="btn btn-gold" style={{ textAlign: 'center' }}>
+                View My Orders
+              </Link>
+              <Link to="/shop" className="btn btn-outline" style={{ textAlign: 'center' }}>
                 Explore Jewellery Collections
               </Link>
               {user.role === 'admin' && (
