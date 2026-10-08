@@ -34,6 +34,23 @@ function getSenderConfig() {
 }
 
 /**
+ * Safely masks an email address to avoid printing full email addresses in logs.
+ * Example: srishtihedau@gmail.com -> s***u@gmail.com
+ */
+function maskEmail(email) {
+  if (!email || typeof email !== 'string') return 'none';
+  const clean = email.trim();
+  const atIdx = clean.indexOf('@');
+  if (atIdx <= 0) return '***';
+  const name = clean.slice(0, atIdx);
+  const domain = clean.slice(atIdx + 1);
+  if (name.length <= 2) {
+    return `${name[0]}***@${domain}`;
+  }
+  return `${name[0]}***${name[name.length - 1]}@${domain}`;
+}
+
+/**
  * Sends an automatic customer email notification for an order status transition via Brevo.
  *
  * @param {number|string|Object} orderOrId - Order ID or Order record
@@ -51,6 +68,7 @@ async function sendOrderStatusEmail(orderOrId, status, options = {}) {
 
     const normalizedStatus = String(status || '').toLowerCase().trim();
     if (!normalizedStatus) {
+      console.warn(`[EmailService] Missing status for Order #${orderId}`);
       return { success: false, reason: 'missing_status' };
     }
 
@@ -61,7 +79,7 @@ async function sendOrderStatusEmail(orderOrId, status, options = {}) {
         [orderId, normalizedStatus]
       );
       if (existingNotifications.length > 0) {
-        console.log(`[EmailService] Notification for order #${orderId} with status "${normalizedStatus}" was already sent on ${existingNotifications[0].sent_at}. Skipping duplicate.`);
+        console.log(`[EmailService] Duplicate check: Notification for Order #${orderId} with status "${normalizedStatus}" was already sent on ${existingNotifications[0].sent_at}. Skipping duplicate.`);
         return { success: true, duplicate: true, skipped: true };
       }
     } catch (dbErr) {
@@ -71,8 +89,8 @@ async function sendOrderStatusEmail(orderOrId, status, options = {}) {
     // Step 2: Fetch order details and resolve real customer email from database
     const [orderRows] = await pool.query(
       `SELECT o.*, 
-              COALESCE(o.customer_email, u.email) AS resolved_email,
-              COALESCE(u.name, o.customer_name) AS resolved_name
+              COALESCE(NULLIF(TRIM(o.customer_email), ''), NULLIF(TRIM(u.email), '')) AS resolved_email,
+              COALESCE(NULLIF(TRIM(u.name), ''), NULLIF(TRIM(o.customer_name), '')) AS resolved_name
        FROM orders o
        LEFT JOIN users u ON o.user_id = u.id
        WHERE o.id = ?`,
@@ -85,13 +103,15 @@ async function sendOrderStatusEmail(orderOrId, status, options = {}) {
     }
 
     const order = orderRows[0];
-    const customerEmail = (order.resolved_email || '').trim();
+    const customerEmail = (order.resolved_email || order.customer_email || '').trim().toLowerCase();
 
     // Step 3: Handle missing customer email safely
     if (!customerEmail || !customerEmail.includes('@')) {
-      console.log(`[EmailService] Order #${orderId} has no associated customer email address. Skipping email notification safely.`);
+      console.log(`[EmailService] Recipient check: Order #${orderId} has no associated customer email address (customer_email is NULL/empty and linked user account has no email). Skipping email notification safely.`);
       return { success: false, reason: 'missing_email', skipped: true };
     }
+
+    console.log(`[EmailService] Recipient found for Order #${orderId}: ${maskEmail(customerEmail)} (status: "${normalizedStatus}")`);
 
     // Step 4: Fetch order line items
     let lineItems = [];
@@ -107,7 +127,7 @@ async function sendOrderStatusEmail(orderOrId, status, options = {}) {
 
     // Step 5: Generate the appropriate AURA luxury email template
     const templateData = {
-      customerName: order.customer_name || order.resolved_name || 'Valued Client',
+      customerName: order.resolved_name || order.customer_name || 'Valued Client',
       orderNumber: order.id,
       orderDate: order.created_at,
       orderItems: lineItems,
@@ -127,19 +147,21 @@ async function sendOrderStatusEmail(orderOrId, status, options = {}) {
 
     const emailContent = getOrderEmailTemplate(normalizedStatus, templateData);
     if (!emailContent) {
-      console.log(`[EmailService] No email template configured for order status "${normalizedStatus}".`);
+      console.log(`[EmailService] No email template configured for order status "${normalizedStatus}". Skipping email.`);
       return { success: false, reason: 'unsupported_status', skipped: true };
     }
 
     // Step 6: Dispatch email through Brevo
     const brevo = getBrevoClient();
     if (!brevo) {
-      console.warn('[EmailService] Brevo client unavailable. Skipping email dispatch.');
+      console.warn('[EmailService] Brevo client unavailable (BREVO_API_KEY is missing from environment). Skipping email dispatch.');
       return { success: false, reason: 'brevo_client_unavailable' };
     }
 
     const sender = getSenderConfig();
-    const customerName = order.customer_name || order.resolved_name || 'Valued Client';
+    const customerName = order.resolved_name || order.customer_name || 'Valued Client';
+
+    console.log(`[EmailService] Email-send attempt: Dispatching "${normalizedStatus}" email for Order #${orderId} to ${maskEmail(customerEmail)} via Brevo (sender: ${sender.email})`);
 
     let sendResult;
     try {
@@ -152,25 +174,27 @@ async function sendOrderStatusEmail(orderOrId, status, options = {}) {
         tags: [`order-${orderId}`, normalizedStatus],
       });
     } catch (brevoErr) {
-      const errMsg = brevoErr.message || String(brevoErr);
-      console.error(`[EmailService] Brevo API error sending email for order #${orderId} to ${customerEmail}:`, errMsg);
-      return { success: false, error: errMsg };
+      const statusCode = brevoErr.statusCode || brevoErr.status || brevoErr.response?.status || 'Unknown';
+      const safeMessage = brevoErr.message || (typeof brevoErr === 'string' ? brevoErr : 'Unknown Brevo API error');
+      console.error(`[EmailService] Brevo failure for Order #${orderId} (HTTP ${statusCode}): ${safeMessage}`);
+      return { success: false, error: safeMessage, statusCode };
     }
 
-    const messageId = sendResult?.messageId || sendResult?.data?.messageId || null;
+    const messageId = sendResult?.messageId || sendResult?.data?.messageId || (typeof sendResult === 'string' ? sendResult : null);
+    console.log(`[EmailService] Brevo success: Sent "${normalizedStatus}" email for Order #${orderId} to ${maskEmail(customerEmail)} (Message ID: ${messageId || 'accepted'})`);
 
     // Step 7: Record notification in database for duplicate protection
     try {
       await pool.query(
-        `INSERT IGNORE INTO order_email_notifications (order_id, status, email, resend_id)
-         VALUES (?, ?, ?, ?)`,
+        `INSERT INTO order_email_notifications (order_id, status, email, resend_id)
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE resend_id = VALUES(resend_id), sent_at = CURRENT_TIMESTAMP`,
         [orderId, normalizedStatus, customerEmail, messageId]
       );
     } catch (logErr) {
       console.warn(`[EmailService] Warning: Could not log email notification for order #${orderId}:`, logErr.message);
     }
 
-    console.log(`[EmailService] Successfully sent "${normalizedStatus}" email for order #${orderId} to ${customerEmail} via Brevo (MessageId: ${messageId})`);
     return { success: true, messageId };
   } catch (err) {
     // Top-level catch guarantee: email failure must never break order updates

@@ -175,6 +175,10 @@ router.get('/:id', requireAdmin, async (req, res) => {
 router.put('/:id/status', requireAdmin, async (req, res) => {
   try {
     const { status, trackingNumber, trackingUrl } = req.body;
+    const targetStatus = String(status || '').toLowerCase().trim();
+
+    console.log(`[Admin Orders] Status update request received for Order #${req.params.id} (target: "${targetStatus}")`);
+
     const validStatuses = [
       'pending',
       'confirmed',
@@ -186,35 +190,39 @@ router.put('/:id/status', requireAdmin, async (req, res) => {
       'refunded',
     ];
 
-    if (!validStatuses.includes(status)) {
+    if (!validStatuses.includes(targetStatus)) {
+      console.warn(`[Admin Orders] Invalid status rejected for Order #${req.params.id}: "${status}"`);
       return res.status(400).json({ error: `status must be one of: ${validStatuses.join(', ')}` });
     }
 
     // 1. Fetch existing order to check previous status
     const [orderRows] = await pool.query('SELECT id, status, customer_name, user_id FROM orders WHERE id = ?', [req.params.id]);
     if (orderRows.length === 0) {
+      console.warn(`[Admin Orders] Order #${req.params.id} not found.`);
       return res.status(404).json({ error: 'Order not found' });
     }
-    const oldStatus = orderRows[0].status;
+    const oldStatus = String(orderRows[0].status || '').toLowerCase().trim();
 
     // 2. Update order status in database
-    const [result] = await pool.query('UPDATE orders SET status = ? WHERE id = ?', [status, req.params.id]);
+    const [result] = await pool.query('UPDATE orders SET status = ? WHERE id = ?', [targetStatus, req.params.id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Order not found' });
     }
 
     // 3. If old status !== new status: trigger customer email notification safely
-    if (oldStatus !== status) {
-      sendOrderStatusEmail(req.params.id, status, { trackingNumber, trackingUrl }).catch((emailErr) => {
-        console.error(`[Orders] Background email error for order #${req.params.id}:`, emailErr.message);
+    if (oldStatus !== targetStatus) {
+      console.log(`[Admin Orders] Status changed for Order #${req.params.id}: "${oldStatus}" -> "${targetStatus}". Triggering notification.`);
+      // Background dispatch: email failure NEVER rolls back or blocks the database update
+      sendOrderStatusEmail(req.params.id, targetStatus, { trackingNumber, trackingUrl }).catch((emailErr) => {
+        console.error(`[Admin Orders] Background email dispatch error for Order #${req.params.id}:`, emailErr.message || emailErr);
       });
     } else {
-      console.log(`[Orders] Order #${req.params.id} status unchanged (${status}). Skipping email.`);
+      console.log(`[Admin Orders] Order #${req.params.id} status unchanged ("${oldStatus}"). Skipping email dispatch.`);
     }
 
     res.json({ message: 'Order status updated' });
   } catch (err) {
-    console.error(err);
+    console.error(`[Admin Orders] Failed to update status for Order #${req.params.id}:`, err);
     res.status(500).json({ error: 'Failed to update order status' });
   }
 });
