@@ -85,12 +85,10 @@ router.post('/', async (req, res) => {
     await connection.commit();
     connection.release();
 
-    // If order was created directly with status 'confirmed', send confirmation email
-    if (req.body.status === 'confirmed') {
-      sendOrderStatusEmail(orderId, 'confirmed').catch((err) => {
-        console.warn('[Orders] Background order confirmation email error:', err.message);
-      });
-    }
+    // Send order confirmation email immediately upon order creation
+    sendOrderStatusEmail(orderId, 'confirmed').catch((err) => {
+      console.warn('[Orders] Background order confirmation email error:', err.message);
+    });
 
     res.status(201).json({ order_id: orderId, total, message: 'Order placed' });
   } catch (err) {

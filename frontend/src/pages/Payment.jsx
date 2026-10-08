@@ -183,7 +183,9 @@ export default function Payment({ onCartChange }) {
         <p className="checkout-success-text">
           Your order <strong>#{orderPlaced.order_id}</strong> has been placed for{' '}
           <strong>{formatCurrency(orderPlaced.total)}</strong>. We'll reach out on{' '}
-          <strong>{deliveryDetails.phone}</strong> with delivery updates.
+          <strong>{deliveryDetails.phone}</strong> with delivery updates{deliveryDetails?.email ? (
+            <> and a confirmation receipt has been sent to <strong>{deliveryDetails.email}</strong></>
+          ) : null}.
         </p>
         <Link to="/shop" className="btn btn-gold">Continue Shopping</Link>
       </div>
