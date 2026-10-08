@@ -26,6 +26,7 @@ export default function Checkout({ onCartChange }) {
   const [error, setError] = useState(null);
   const [phoneError, setPhoneError] = useState(null);
   const [pincodeError, setPincodeError] = useState(null);
+  const [emailError, setEmailError] = useState(null);
 
   // Checkout Mode Tab: 'guest' (default) vs 'auth'
   const [checkoutTab, setCheckoutTab] = useState(user ? 'auth' : 'guest');
@@ -149,6 +150,9 @@ export default function Checkout({ onCartChange }) {
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === 'email' && emailError) {
+      setEmailError(null);
+    }
   }
 
   function handlePhoneChange(e) {
@@ -169,11 +173,19 @@ export default function Checkout({ onCartChange }) {
 
   function handleSubmit(e) {
     e.preventDefault();
+    setEmailError(null);
     setPhoneError(null);
     setPincodeError(null);
     setError(null);
 
     let hasError = false;
+
+    const cleanEmail = (form.email || '').trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!cleanEmail || !emailRegex.test(cleanEmail)) {
+      setEmailError('Please enter a valid email address to receive your instant order confirmation');
+      hasError = true;
+    }
 
     if (!PHONE_REGEX.test(form.phone.trim())) {
       setPhoneError('Enter a valid 10-digit phone number, with or without +91');
@@ -557,15 +569,18 @@ export default function Checkout({ onCartChange }) {
                 />
               </label>
               <label>
-                Email Address <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>(for order &amp; delivery updates)</span>
+                Email Address <span style={{ fontSize: '0.8rem', color: 'var(--gold)', fontWeight: 500 }}>(for real-time order confirmation email)</span>
                 <input
                   name="email"
                   type="email"
                   value={form.email}
                   onChange={handleChange}
+                  required
                   placeholder="e.g. yourname@example.com"
+                  className={emailError ? 'input-error' : ''}
                   autoComplete="email"
                 />
+                {emailError && <span className="checkout-field-error">{emailError}</span>}
               </label>
               <label>
                 Phone Number

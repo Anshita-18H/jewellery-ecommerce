@@ -47,16 +47,23 @@ router.post('/', async (req, res) => {
 
     const userId = req.session?.userId || null;
     let customerEmail = null;
-    if (userId) {
+
+    // Prioritize the email explicitly entered during checkout
+    if (req.body.customer_email || req.body.email) {
+      const inputEmail = String(req.body.customer_email || req.body.email).trim().toLowerCase();
+      if (inputEmail && inputEmail.includes('@')) {
+        customerEmail = inputEmail;
+      }
+    }
+
+    // Fallback: If not explicitly provided, use the registered user's account email
+    if (!customerEmail && userId) {
       try {
         const [[userRow]] = await connection.query('SELECT email FROM users WHERE id = ?', [userId]);
-        if (userRow?.email) customerEmail = userRow.email;
+        if (userRow?.email) customerEmail = String(userRow.email).trim().toLowerCase();
       } catch (userErr) {
         console.warn('Could not fetch user email for order:', userErr.message);
       }
-    }
-    if (!customerEmail && (req.body.customer_email || req.body.email)) {
-      customerEmail = String(req.body.customer_email || req.body.email).trim().toLowerCase();
     }
 
     const [orderResult] = await connection.query(
@@ -85,9 +92,10 @@ router.post('/', async (req, res) => {
     await connection.commit();
     connection.release();
 
-    // Send order confirmation email immediately upon order creation
+    // Send order confirmation email immediately upon order creation in real time
+    console.log(`[Orders] Real-time checkout: Triggering confirmation email for Order #${orderId}`);
     sendOrderStatusEmail(orderId, 'confirmed').catch((err) => {
-      console.warn('[Orders] Background order confirmation email error:', err.message);
+      console.warn(`[Orders] Background order confirmation email error for Order #${orderId}:`, err.message);
     });
 
     res.status(201).json({ order_id: orderId, total, message: 'Order placed' });
