@@ -115,12 +115,13 @@ CREATE TABLE IF NOT EXISTS orders (
   session_id VARCHAR(255) DEFAULT NULL,
   user_id INT DEFAULT NULL,
   customer_name VARCHAR(150) NOT NULL,
+  customer_email VARCHAR(150) DEFAULT NULL,
   phone VARCHAR(20) NOT NULL,
   address VARCHAR(255) NOT NULL,
   city VARCHAR(100) NOT NULL,
   pincode VARCHAR(10) NOT NULL,
   total_amount DECIMAL(10, 2) NOT NULL,
-  status ENUM('pending', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
+  status VARCHAR(50) DEFAULT 'pending',
   payment_status VARCHAR(50) DEFAULT 'pending',
   payment_method VARCHAR(50) DEFAULT 'card',
   razorpay_order_id VARCHAR(100) DEFAULT NULL,
@@ -183,6 +184,20 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   INDEX idx_token_hash (token_hash),
   INDEX idx_user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================================================
+-- 11. ORDER EMAIL NOTIFICATIONS TABLE (Duplicate protection & audit log)
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS order_email_notifications (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  status VARCHAR(50) NOT NULL,
+  email VARCHAR(150) NOT NULL,
+  resend_id VARCHAR(100) DEFAULT NULL,
+  sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_order_status_email (order_id, status),
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =============================================================================

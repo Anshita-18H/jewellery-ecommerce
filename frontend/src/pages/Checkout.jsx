@@ -41,6 +41,7 @@ export default function Checkout({ onCartChange }) {
 
   const [form, setForm] = useState({
     customer_name: '',
+    email: '',
     phone: '',
     address: '',
     city: '',
@@ -63,6 +64,7 @@ export default function Checkout({ onCartChange }) {
       setForm((prev) => ({
         ...prev,
         customer_name: prev.customer_name || user.name || '',
+        email: prev.email || user.email || '',
         phone: prev.phone || user.phone || '',
       }));
     }
@@ -105,6 +107,7 @@ export default function Checkout({ onCartChange }) {
         setForm((prev) => ({
           ...prev,
           customer_name: prev.customer_name || authenticatedUser.name || '',
+          email: prev.email || authenticatedUser.email || '',
           phone: prev.phone || authenticatedUser.phone || '',
         }));
       }
@@ -549,6 +552,17 @@ export default function Checkout({ onCartChange }) {
                   onChange={handleChange}
                   required
                   placeholder="e.g. Anshita Hedau"
+                />
+              </label>
+              <label>
+                Email Address <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 400 }}>(for order &amp; delivery updates)</span>
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="e.g. yourname@example.com"
+                  autoComplete="email"
                 />
               </label>
               <label>

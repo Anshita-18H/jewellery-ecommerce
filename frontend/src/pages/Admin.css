@@ -1055,10 +1055,28 @@
   border: 1px solid rgba(201, 168, 118, 0.3);
 }
 
+.admin-order-badge.status-confirmed {
+  background: rgba(201, 168, 118, 0.22);
+  color: var(--gold-bright);
+  border: 1px solid rgba(201, 168, 118, 0.45);
+}
+
+.admin-order-badge.status-processing {
+  background: rgba(255, 183, 77, 0.16);
+  color: #ffb74d;
+  border: 1px solid rgba(255, 183, 77, 0.35);
+}
+
 .admin-order-badge.status-shipped {
   background: rgba(33, 150, 243, 0.16);
   color: #90caf9;
   border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.admin-order-badge.status-out_for_delivery {
+  background: rgba(56, 189, 248, 0.16);
+  color: #7dd3fc;
+  border: 1px solid rgba(56, 189, 248, 0.35);
 }
 
 .admin-order-badge.status-delivered {
@@ -1071,6 +1089,12 @@
   background: rgba(244, 67, 54, 0.16);
   color: #ef9a9a;
   border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.admin-order-badge.status-refunded {
+  background: rgba(192, 132, 252, 0.16);
+  color: #d8b4fe;
+  border: 1px solid rgba(192, 132, 252, 0.35);
 }
 
 .admin-status-select {

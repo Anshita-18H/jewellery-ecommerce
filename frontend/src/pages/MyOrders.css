@@ -218,10 +218,28 @@
   color: var(--gold-bright);
 }
 
+.myorders-status-badge.status-confirmed {
+  background: rgba(200, 169, 110, 0.18);
+  border: 1px solid rgba(200, 169, 110, 0.45);
+  color: var(--gold-bright);
+}
+
+.myorders-status-badge.status-processing {
+  background: rgba(255, 183, 77, 0.14);
+  border: 1px solid rgba(255, 183, 77, 0.35);
+  color: #ffb74d;
+}
+
 .myorders-status-badge.status-shipped {
   background: rgba(100, 181, 246, 0.14);
   border: 1px solid rgba(100, 181, 246, 0.35);
   color: #64b5f6;
+}
+
+.myorders-status-badge.status-out-for-delivery {
+  background: rgba(79, 195, 247, 0.14);
+  border: 1px solid rgba(79, 195, 247, 0.35);
+  color: #4fc3f7;
 }
 
 .myorders-status-badge.status-delivered {
@@ -234,6 +252,12 @@
   background: rgba(242, 139, 130, 0.14);
   border: 1px solid rgba(242, 139, 130, 0.35);
   color: #f28b82;
+}
+
+.myorders-status-badge.status-refunded {
+  background: rgba(186, 104, 200, 0.14);
+  border: 1px solid rgba(186, 104, 200, 0.35);
+  color: #ba68c8;
 }
 
 /* Card Body */

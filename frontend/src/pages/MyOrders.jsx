@@ -62,10 +62,28 @@ export default function MyOrders() {
   function renderStatusBadge(status) {
     const s = (status || 'pending').toLowerCase();
     switch (s) {
+      case 'confirmed':
+        return (
+          <span className="myorders-status-badge status-confirmed">
+            <CheckCircle size={13} /> Confirmed
+          </span>
+        );
+      case 'processing':
+        return (
+          <span className="myorders-status-badge status-processing">
+            <Clock size={13} /> Processing
+          </span>
+        );
       case 'shipped':
         return (
           <span className="myorders-status-badge status-shipped">
             <Truck size={13} /> Shipped
+          </span>
+        );
+      case 'out_for_delivery':
+        return (
+          <span className="myorders-status-badge status-out-for-delivery">
+            <Truck size={13} /> Out for Delivery
           </span>
         );
       case 'delivered':
@@ -80,11 +98,17 @@ export default function MyOrders() {
             <XCircle size={13} /> Cancelled
           </span>
         );
+      case 'refunded':
+        return (
+          <span className="myorders-status-badge status-refunded">
+            <Package size={13} /> Refunded
+          </span>
+        );
       case 'pending':
       default:
         return (
           <span className="myorders-status-badge status-pending">
-            <Clock size={13} /> Processing
+            <Clock size={13} /> Pending
           </span>
         );
     }

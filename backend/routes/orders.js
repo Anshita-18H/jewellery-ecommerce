@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/db');
 const { requireAdmin } = require('../middleware/auth');
+const { sendOrderStatusEmail } = require('../services/emailService');
 
 // POST /api/orders — checkout: turns the current session's cart into an order
 // Body: { customer_name, phone, address, city, pincode }
@@ -45,11 +46,23 @@ router.post('/', async (req, res) => {
     await connection.beginTransaction();
 
     const userId = req.session?.userId || null;
+    let customerEmail = null;
+    if (userId) {
+      try {
+        const [[userRow]] = await connection.query('SELECT email FROM users WHERE id = ?', [userId]);
+        if (userRow?.email) customerEmail = userRow.email;
+      } catch (userErr) {
+        console.warn('Could not fetch user email for order:', userErr.message);
+      }
+    }
+    if (!customerEmail && (req.body.customer_email || req.body.email)) {
+      customerEmail = String(req.body.customer_email || req.body.email).trim().toLowerCase();
+    }
 
     const [orderResult] = await connection.query(
-      `INSERT INTO orders (session_id, user_id, customer_name, phone, address, city, pincode, total_amount)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [req.sessionID, userId, customer_name, phone, address, city, pincode, total]
+      `INSERT INTO orders (session_id, user_id, customer_name, customer_email, phone, address, city, pincode, total_amount)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [req.sessionID, userId, customer_name, customerEmail, phone, address, city, pincode, total]
     );
     const orderId = orderResult.insertId;
 
@@ -71,6 +84,13 @@ router.post('/', async (req, res) => {
 
     await connection.commit();
     connection.release();
+
+    // If order was created directly with status 'confirmed', send confirmation email
+    if (req.body.status === 'confirmed') {
+      sendOrderStatusEmail(orderId, 'confirmed').catch((err) => {
+        console.warn('[Orders] Background order confirmation email error:', err.message);
+      });
+    }
 
     res.status(201).json({ order_id: orderId, total, message: 'Order placed' });
   } catch (err) {
@@ -153,20 +173,47 @@ router.get('/:id', requireAdmin, async (req, res) => {
 });
 
 // PUT /api/orders/:id/status — admin: update order status
-// Body: { status: 'pending' | 'shipped' | 'delivered' | 'cancelled' }
+// Body: { status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'out_for_delivery' | 'delivered' | 'cancelled' | 'refunded', trackingNumber?, trackingUrl? }
 router.put('/:id/status', requireAdmin, async (req, res) => {
   try {
-    const { status } = req.body;
-    const validStatuses = ['pending', 'shipped', 'delivered', 'cancelled'];
+    const { status, trackingNumber, trackingUrl } = req.body;
+    const validStatuses = [
+      'pending',
+      'confirmed',
+      'processing',
+      'shipped',
+      'out_for_delivery',
+      'delivered',
+      'cancelled',
+      'refunded',
+    ];
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: `status must be one of: ${validStatuses.join(', ')}` });
     }
 
+    // 1. Fetch existing order to check previous status
+    const [orderRows] = await pool.query('SELECT id, status, customer_name, user_id FROM orders WHERE id = ?', [req.params.id]);
+    if (orderRows.length === 0) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    const oldStatus = orderRows[0].status;
+
+    // 2. Update order status in database
     const [result] = await pool.query('UPDATE orders SET status = ? WHERE id = ?', [status, req.params.id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Order not found' });
     }
+
+    // 3. If old status !== new status: trigger customer email notification safely
+    if (oldStatus !== status) {
+      sendOrderStatusEmail(req.params.id, status, { trackingNumber, trackingUrl }).catch((emailErr) => {
+        console.error(`[Orders] Background email error for order #${req.params.id}:`, emailErr.message);
+      });
+    } else {
+      console.log(`[Orders] Order #${req.params.id} status unchanged (${status}). Skipping email.`);
+    }
+
     res.json({ message: 'Order status updated' });
   } catch (err) {
     console.error(err);

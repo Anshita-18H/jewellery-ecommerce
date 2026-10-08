@@ -193,6 +193,39 @@ async function initDatabase() {
       console.warn('Could not verify user_id column on orders:', err.message);
     }
 
+    try {
+      const [emailCols] = await pool.query(`SHOW COLUMNS FROM orders LIKE 'customer_email'`);
+      if (emailCols.length === 0) {
+        await pool.query(`ALTER TABLE orders ADD COLUMN customer_email VARCHAR(150) DEFAULT NULL AFTER customer_name`);
+        console.log('Added customer_email column to orders table');
+      }
+    } catch (err) {
+      console.warn('Could not verify customer_email column on orders:', err.message);
+    }
+
+    try {
+      await pool.query(`ALTER TABLE orders MODIFY COLUMN status VARCHAR(50) DEFAULT 'pending'`);
+    } catch (err) {
+      console.warn('Could not verify status column type on orders:', err.message);
+    }
+
+    try {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS order_email_notifications (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          order_id INT NOT NULL,
+          status VARCHAR(50) NOT NULL,
+          email VARCHAR(150) NOT NULL,
+          resend_id VARCHAR(100) DEFAULT NULL,
+          sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_order_status_email (order_id, status),
+          FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+      `);
+    } catch (err) {
+      console.warn('Could not verify order_email_notifications table:', err.message);
+    }
+
     console.log('Database tables verified successfully');
   } catch (err) {
     console.warn('Database table verification notice:', err.message);

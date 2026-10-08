@@ -1144,9 +1144,13 @@ function AdminOrders() {
                         className={`admin-status-select status-${o.status}`}
                       >
                         <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
+                        <option value="out_for_delivery">Out for Delivery</option>
                         <option value="delivered">Delivered</option>
                         <option value="cancelled">Cancelled</option>
+                        <option value="refunded">Refunded</option>
                       </select>
                     </td>
                     <td>{new Date(o.created_at).toLocaleDateString()}</td>
