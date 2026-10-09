@@ -55,13 +55,13 @@ export default function Hero({ products = [] }) {
     setCurrentIndex(index);
   };
 
-  // Auto-slide effect (interval 3.5s), pauses on hover or touch if multiple slides exist
+  // Auto-slide effect (interval 2s), pauses on hover or touch if multiple slides exist
   useEffect(() => {
     if (isPaused || totalSlides <= 1) return;
 
     const interval = setInterval(() => {
       goToNext();
-    }, 3500);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [isPaused, totalSlides]);
