@@ -115,5 +115,18 @@ router.get('/customers', async (req, res) => {
   }
 });
 
+// GET /api/admin/email-logs — View sent transactional email notifications
+router.get('/email-logs', async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM order_email_notifications ORDER BY sent_at DESC LIMIT 50'
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error('Admin email logs fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch email logs' });
+  }
+});
+
 module.exports = router;
 
