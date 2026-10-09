@@ -9,13 +9,9 @@ export default function Hero({ products = [] }) {
   const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef(null);
 
-  // If no products available at all, do not render an empty container
-  if (!products || products.length === 0) {
-    return null;
-  }
-
   // Construct slides 100% dynamically from database-managed products
-  const slides = products.map((prod, idx) => {
+  const safeProducts = Array.isArray(products) ? products : [];
+  const slides = safeProducts.map((prod, idx) => {
     const categoryLabel = prod.category_name || (prod.category_slug ? prod.category_slug.toUpperCase() : 'FINE JEWELLERY');
     const ctaText = `SHOP ${categoryLabel.toUpperCase()}`;
     const ctaLink = prod.category_slug
@@ -23,13 +19,13 @@ export default function Hero({ products = [] }) {
       : (prod.slug ? `/product/${prod.slug}` : '/shop');
 
     const rawEyebrow = prod.occasion_tags
-      ? prod.occasion_tags.split(',')[0].trim().toUpperCase()
-      : (prod.gender_tag ? `${prod.gender_tag.toUpperCase()} COLLECTION` : 'SIGNATURE PIECE');
+      ? String(prod.occasion_tags).split(',')[0].trim().toUpperCase()
+      : (prod.gender_tag ? `${String(prod.gender_tag).toUpperCase()} COLLECTION` : 'SIGNATURE PIECE');
 
     return {
       id: prod.id || idx + 1,
       eyebrow: rawEyebrow,
-      title: prod.name,
+      title: prod.name || 'Fine Jewellery Piece',
       subtitle: (prod.description && prod.description.trim())
         ? prod.description.trim()
         : 'Handcrafted fine jewellery sculpted for timeless distinction.',
@@ -41,14 +37,18 @@ export default function Hero({ products = [] }) {
   });
 
   const totalSlides = slides.length;
-  const activeIndex = currentIndex % totalSlides;
+  const activeIndex = totalSlides > 0 ? currentIndex % totalSlides : 0;
 
   const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % totalSlides);
+    if (totalSlides > 0) {
+      setCurrentIndex((prev) => (prev + 1) % totalSlides);
+    }
   };
 
   const goToPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
+    if (totalSlides > 0) {
+      setCurrentIndex((prev) => (prev - 1 + totalSlides) % totalSlides);
+    }
   };
 
   const goToSlide = (index) => {
@@ -85,6 +85,11 @@ export default function Hero({ products = [] }) {
     touchStartX.current = null;
     setIsPaused(false);
   };
+
+  // If no products available at all, do not render an empty container (returned AFTER all hooks)
+  if (totalSlides === 0) {
+    return null;
+  }
 
   return (
     <section

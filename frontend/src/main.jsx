@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 // Support direct URL hits on GitHub Pages without hash (e.g. /reset-password?token=... or /google-login-success)
 if (window.location.pathname.includes('/reset-password') && !window.location.hash.includes('/reset-password')) {
@@ -17,8 +18,10 @@ if (window.location.pathname.includes('/reset-password') && !window.location.has
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <HashRouter >
-      <App />
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <App />
+      </HashRouter>
+    </ErrorBoundary>
   </StrictMode>
 )
