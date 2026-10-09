@@ -9,28 +9,61 @@ export default function Cart({ onCartChange }) {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  function loadCart() {
-    setLoading(true);
+  useEffect(() => {
     getCart()
       .then(setCart)
       .finally(() => setLoading(false));
-  }
-
-  useEffect(() => {
-    loadCart();
   }, []);
 
-  async function handleQuantityChange(productId, quantity) {
-    if (quantity < 1) return;
-    await updateCartItem(productId, quantity);
-    loadCart();
-    onCartChange?.();
+  async function handleQuantityChange(productId, newQuantity) {
+    if (newQuantity < 1) return;
+
+    // 1. Optimistic smooth update: immediately update item quantity & totals
+    setCart((prevCart) => {
+      const updatedItems = prevCart.items.map((item) => {
+        if (item.product_id === productId) {
+          const clampedQty = item.stock ? Math.min(newQuantity, item.stock) : newQuantity;
+          return {
+            ...item,
+            quantity: clampedQty,
+            subtotal: Number(item.price) * clampedQty,
+          };
+        }
+        return item;
+      });
+      const newTotal = updatedItems.reduce((sum, i) => sum + i.subtotal, 0);
+      return { ...prevCart, items: updatedItems, total: newTotal };
+    });
+
+    try {
+      // 2. Persist to server in background without page reload or loading flicker
+      await updateCartItem(productId, newQuantity);
+      const refreshedCart = await getCart();
+      setCart(refreshedCart);
+      onCartChange?.();
+    } catch (err) {
+      console.error('Failed to update cart quantity:', err);
+      getCart().then(setCart);
+    }
   }
 
   async function handleRemove(productId) {
-    await removeCartItem(productId);
-    loadCart();
-    onCartChange?.();
+    // Optimistic smooth removal
+    setCart((prevCart) => {
+      const filtered = prevCart.items.filter((item) => item.product_id !== productId);
+      const newTotal = filtered.reduce((sum, i) => sum + i.subtotal, 0);
+      return { ...prevCart, items: filtered, total: newTotal };
+    });
+
+    try {
+      await removeCartItem(productId);
+      const refreshedCart = await getCart();
+      setCart(refreshedCart);
+      onCartChange?.();
+    } catch (err) {
+      console.error('Failed to remove cart item:', err);
+      getCart().then(setCart);
+    }
   }
 
   if (loading) return <p className="cart-status container">Loading cart…</p>;
@@ -60,17 +93,19 @@ export default function Cart({ onCartChange }) {
                 <p className="cart-item-price">{formatCurrency(item.price)}</p>
               </div>
               <div className="pd-qty cart-item-qty">
-                <button onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}>−</button>
+                <button type="button" onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)} aria-label="Decrease quantity">−</button>
                 <span>{item.quantity}</span>
                 <button
+                  type="button"
                   onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}
                   disabled={item.quantity >= item.stock}
+                  aria-label="Increase quantity"
                 >
                   +
                 </button>
               </div>
               <p className="cart-item-subtotal">{formatCurrency(item.subtotal)}</p>
-              <button className="cart-item-remove" onClick={() => handleRemove(item.product_id)} aria-label="Remove item">
+              <button type="button" className="cart-item-remove" onClick={() => handleRemove(item.product_id)} aria-label="Remove item">
                 ×
               </button>
             </div>
