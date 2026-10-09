@@ -1,38 +1,47 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { heroSlides } from '../data/heroSlides';
 import { formatCurrency } from '../utils/format';
 import './Hero.css';
 
-export default function Hero({ product }) {
+export default function Hero({ products = [] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef(null);
 
-  // Combine data-driven slides with hero product if provided
-  const slides = heroSlides.map((slide, idx) => {
-    if (idx === 0 && product) {
-      const categoryLabel = product.category_name || (product.category_slug ? product.category_slug.toUpperCase() : null);
-      const ctaText = categoryLabel ? `SHOP ${categoryLabel.toUpperCase()}` : slide.ctaText;
-      const ctaLink = product.category_slug
-        ? `/shop?category=${product.category_slug}`
-        : (product.slug ? `/product/${product.slug}` : slide.ctaLink);
+  // If no products available at all, do not render an empty container
+  if (!products || products.length === 0) {
+    return null;
+  }
 
-      return {
-        ...slide,
-        title: product.name || slide.title,
-        subtitle: (product.description && product.description.trim()) ? product.description.trim() : slide.subtitle,
-        image: product.image_url || slide.image,
-        price: product.price !== undefined ? product.price : slide.price,
-        ctaText,
-        ctaLink,
-      };
-    }
-    return slide;
+  // Construct slides 100% dynamically from database-managed products
+  const slides = products.map((prod, idx) => {
+    const categoryLabel = prod.category_name || (prod.category_slug ? prod.category_slug.toUpperCase() : 'FINE JEWELLERY');
+    const ctaText = `SHOP ${categoryLabel.toUpperCase()}`;
+    const ctaLink = prod.category_slug
+      ? `/shop?category=${prod.category_slug}`
+      : (prod.slug ? `/product/${prod.slug}` : '/shop');
+
+    const rawEyebrow = prod.occasion_tags
+      ? prod.occasion_tags.split(',')[0].trim().toUpperCase()
+      : (prod.gender_tag ? `${prod.gender_tag.toUpperCase()} COLLECTION` : 'SIGNATURE PIECE');
+
+    return {
+      id: prod.id || idx + 1,
+      eyebrow: rawEyebrow,
+      title: prod.name,
+      subtitle: (prod.description && prod.description.trim())
+        ? prod.description.trim()
+        : 'Handcrafted fine jewellery sculpted for timeless distinction.',
+      image: prod.image_url || 'https://placehold.co/1000x800/1a1815/d4af37?text=AURA',
+      price: prod.price,
+      ctaText,
+      ctaLink,
+    };
   });
 
   const totalSlides = slides.length;
+  const activeIndex = currentIndex % totalSlides;
 
   const goToNext = () => {
     setCurrentIndex((prev) => (prev + 1) % totalSlides);
@@ -46,13 +55,13 @@ export default function Hero({ product }) {
     setCurrentIndex(index);
   };
 
-  // Auto-slide effect (interval 5.5s), pauses on hover or touch
+  // Auto-slide effect (interval 3.5s), pauses on hover or touch if multiple slides exist
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || totalSlides <= 1) return;
 
     const interval = setInterval(() => {
       goToNext();
-    }, 2000);
+    }, 3500);
 
     return () => clearInterval(interval);
   }, [isPaused, totalSlides]);
@@ -91,13 +100,13 @@ export default function Hero({ product }) {
       {/* Slide Track */}
       <div
         className="hero-slider-track"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        style={{ transform: `translateX(-${activeIndex * 100}%)` }}
       >
         {slides.map((slide, index) => (
           <div
             key={slide.id}
-            className={`hero-slide ${index === currentIndex ? 'is-active' : ''}`}
-            aria-hidden={index !== currentIndex}
+            className={`hero-slide ${index === activeIndex ? 'is-active' : ''}`}
+            aria-hidden={index !== activeIndex}
           >
             <div className="hero-inner container">
               <div className="hero-copy">
@@ -109,7 +118,7 @@ export default function Hero({ product }) {
                   <Link to={slide.ctaLink} className="btn btn-gold">
                     {slide.ctaText}
                   </Link>
-                  {slide.price && (
+                  {slide.price !== undefined && slide.price !== null && (
                     <span className="hero-price">
                       {formatCurrency(slide.price)}
                     </span>
@@ -133,39 +142,43 @@ export default function Hero({ product }) {
         ))}
       </div>
 
-      {/* Navigation Arrows */}
-      <button
-        type="button"
-        className="hero-nav-btn hero-nav-prev"
-        onClick={goToPrev}
-        aria-label="Previous slide"
-      >
-        <ChevronLeft size={22} />
-      </button>
-
-      <button
-        type="button"
-        className="hero-nav-btn hero-nav-next"
-        onClick={goToNext}
-        aria-label="Next slide"
-      >
-        <ChevronRight size={22} />
-      </button>
-
-      {/* Slide Indicators */}
-      <div className="hero-indicators" role="tablist" aria-label="Hero slider pagination">
-        {slides.map((slide, index) => (
+      {/* Navigation Arrows (rendered only if multiple slides exist) */}
+      {totalSlides > 1 && (
+        <>
           <button
-            key={slide.id}
             type="button"
-            role="tab"
-            aria-selected={index === currentIndex}
-            aria-label={`Go to slide ${index + 1}: ${slide.title}`}
-            className={`hero-indicator-dot ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => goToSlide(index)}
-          />
-        ))}
-      </div>
+            className="hero-nav-btn hero-nav-prev"
+            onClick={goToPrev}
+            aria-label="Previous slide"
+          >
+            <ChevronLeft size={22} />
+          </button>
+
+          <button
+            type="button"
+            className="hero-nav-btn hero-nav-next"
+            onClick={goToNext}
+            aria-label="Next slide"
+          >
+            <ChevronRight size={22} />
+          </button>
+
+          {/* Slide Indicators */}
+          <div className="hero-indicators" role="tablist" aria-label="Hero slider pagination">
+            {slides.map((slide, index) => (
+              <button
+                key={slide.id}
+                type="button"
+                role="tab"
+                aria-selected={index === activeIndex}
+                aria-label={`Go to slide ${index + 1}: ${slide.title}`}
+                className={`hero-indicator-dot ${index === activeIndex ? 'active' : ''}`}
+                onClick={() => goToSlide(index)}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }

@@ -207,11 +207,6 @@ router.post('/', requireAdmin, async (req, res) => {
 
     const slug = await getUniqueSlug(slugify(name));
 
-    // If marked as hero banner, clear other hero banners so there is a single primary piece
-    if (is_hero_banner) {
-      await pool.query('UPDATE products SET is_hero_banner = FALSE');
-    }
-
     // If marked as section cover, clear any previous product for this section
     const cleanSectionCover = section_cover ? String(section_cover).trim().toLowerCase() : null;
     if (cleanSectionCover) {
@@ -270,11 +265,6 @@ router.put('/:id', requireAdmin, async (req, res) => {
     }
 
     const slug = name ? await getUniqueSlug(slugify(name), req.params.id) : existing[0].slug;
-
-    // If marked as hero banner, clear other hero banners
-    if (is_hero_banner) {
-      await pool.query('UPDATE products SET is_hero_banner = FALSE WHERE id != ?', [req.params.id]);
-    }
 
     // If marked as section cover, clear other products for that section
     const cleanSectionCover = section_cover !== undefined

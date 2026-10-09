@@ -34,11 +34,14 @@ export default function Home({ onCartChange }) {
     }
   }
 
-  const heroProduct = allProducts.find((p) => Boolean(p.is_hero_banner)) || null;
+  // Products selected for hero banner in Admin panel
+  const heroProducts = allProducts.filter((p) => Boolean(p.is_hero_banner));
+  // If none explicitly marked, fallback to catalog featured pieces
+  const bannerProducts = heroProducts.length > 0 ? heroProducts : featured.slice(0, 3);
 
   return (
     <div>
-      <Hero product={heroProduct} />
+      <Hero products={bannerProducts} />
 
       <AssuranceSection />
 
