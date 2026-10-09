@@ -32,7 +32,20 @@ const GENDERS = [
   },
 ];
 
-export default function GenderGrid() {
+export default function GenderGrid({ products = [] }) {
+  const genderItems = GENDERS.map((item) => {
+    const assignedProduct = products.find(
+      (p) => p.section_cover && p.section_cover.toLowerCase() === item.id.toLowerCase()
+    );
+    if (assignedProduct && assignedProduct.image_url) {
+      return {
+        ...item,
+        image: assignedProduct.image_url,
+      };
+    }
+    return item;
+  });
+
   return (
     <section className="gender-section container" aria-label="Shop By Gender">
       <div className="home-section-header text-center">
@@ -44,7 +57,7 @@ export default function GenderGrid() {
       </div>
 
       <div className="gender-grid">
-        {GENDERS.map((item) => (
+        {genderItems.map((item) => (
           <Link
             key={item.id}
             to={item.link}

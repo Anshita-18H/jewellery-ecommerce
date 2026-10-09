@@ -50,6 +50,8 @@ const emptyForm = {
   stock: '',
   image_url: '',
   is_featured: false,
+  is_hero_banner: false,
+  section_cover: '',
   occasion_tags: '',
   gender_tag: '',
 };
@@ -710,6 +712,8 @@ function AdminProducts({
       stock: product.stock,
       image_url: product.image_url || '',
       is_featured: !!product.is_featured,
+      is_hero_banner: !!product.is_hero_banner,
+      section_cover: product.section_cover || '',
       occasion_tags: product.occasion_tags || '',
       gender_tag: product.gender_tag || '',
     });
@@ -869,15 +873,46 @@ function AdminProducts({
             </label>
           </div>
 
-          <label className="admin-checkbox-label">
-            <input
-              type="checkbox"
-              name="is_featured"
-              checked={form.is_featured}
-              onChange={handleChange}
-            />
-            Show in Featured Collections on storefront
-          </label>
+          <div className="admin-form-row">
+            <label>
+              Section Main Cover Card (Homepage)
+              <select name="section_cover" value={form.section_cover || ''} onChange={handleChange}>
+                <option value="">None (Regular Product)</option>
+                <optgroup label="Shop by Gender Section Cards">
+                  <option value="women">Women Jewellery — Main Card Cover</option>
+                  <option value="men">Men Jewellery — Main Card Cover</option>
+                  <option value="kids">Kids Jewellery — Main Card Cover</option>
+                </optgroup>
+                <optgroup label="Shop by Occasion Section Cards">
+                  <option value="bridal">Bridal Edit — Main Card Cover</option>
+                  <option value="gifting">Gifting Jewellery — Main Card Cover</option>
+                  <option value="everyday">Everyday Wear — Main Card Cover</option>
+                </optgroup>
+              </select>
+            </label>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', margin: '0.75rem 0 1.25rem' }}>
+            <label className="admin-checkbox-label">
+              <input
+                type="checkbox"
+                name="is_hero_banner"
+                checked={form.is_hero_banner}
+                onChange={handleChange}
+              />
+              Show on Homepage Hero Banner (Top main carousel slide)
+            </label>
+
+            <label className="admin-checkbox-label">
+              <input
+                type="checkbox"
+                name="is_featured"
+                checked={form.is_featured}
+                onChange={handleChange}
+              />
+              Show in Featured Collections on storefront (4-card showcase grid)
+            </label>
+          </div>
 
           <div className="admin-form-actions">
             <button type="submit" className="btn btn-gold">
@@ -979,6 +1014,23 @@ function AdminProducts({
                             Gender: {p.gender_tag}
                           </span>
                         )}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                          {Boolean(p.is_hero_banner) && (
+                            <span className="admin-stock-badge" style={{ background: 'rgba(212, 175, 55, 0.25)', color: 'var(--gold)', border: '1px solid var(--gold)', fontSize: '0.68rem', padding: '2px 6px' }}>
+                              ★ Hero Banner
+                            </span>
+                          )}
+                          {p.section_cover && (
+                            <span className="admin-stock-badge" style={{ background: 'rgba(129, 199, 132, 0.25)', color: '#81c784', border: '1px solid #81c784', fontSize: '0.68rem', padding: '2px 6px', textTransform: 'capitalize' }}>
+                              Cover: {p.section_cover}
+                            </span>
+                          )}
+                          {Boolean(p.is_featured) && (
+                            <span className="admin-stock-badge" style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--text-muted)', fontSize: '0.68rem', padding: '2px 6px' }}>
+                              Featured
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td>{formatCurrency(p.price)}</td>
                       <td>

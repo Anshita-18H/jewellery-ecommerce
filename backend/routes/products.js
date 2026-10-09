@@ -184,10 +184,22 @@ router.get('/:slug', async (req, res) => {
 });
 
 // POST /api/products — admin: add a new product
-// Body: { name, category_id, description, price, stock, image_url, is_featured, occasion_tags, gender_tag }
+// Body: { name, category_id, description, price, stock, image_url, is_featured, is_hero_banner, section_cover, occasion_tags, gender_tag }
 router.post('/', requireAdmin, async (req, res) => {
   try {
-    const { name, category_id, description, price, stock, image_url, is_featured, occasion_tags, gender_tag } = req.body;
+    const {
+      name,
+      category_id,
+      description,
+      price,
+      stock,
+      image_url,
+      is_featured,
+      is_hero_banner,
+      section_cover,
+      occasion_tags,
+      gender_tag,
+    } = req.body;
 
     if (!name || !price) {
       return res.status(400).json({ error: 'name and price are required' });
@@ -195,9 +207,20 @@ router.post('/', requireAdmin, async (req, res) => {
 
     const slug = await getUniqueSlug(slugify(name));
 
+    // If marked as hero banner, clear other hero banners so there is a single primary piece
+    if (is_hero_banner) {
+      await pool.query('UPDATE products SET is_hero_banner = FALSE');
+    }
+
+    // If marked as section cover, clear any previous product for this section
+    const cleanSectionCover = section_cover ? String(section_cover).trim().toLowerCase() : null;
+    if (cleanSectionCover) {
+      await pool.query('UPDATE products SET section_cover = NULL WHERE section_cover = ?', [cleanSectionCover]);
+    }
+
     const [result] = await pool.query(
-      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, occasion_tags, gender_tag)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, is_hero_banner, section_cover, occasion_tags, gender_tag)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         category_id || null,
         name,
@@ -207,6 +230,8 @@ router.post('/', requireAdmin, async (req, res) => {
         stock || 0,
         image_url || 'https://placehold.co/500x500/f5e6e0/8b5e3c?text=Product',
         !!is_featured,
+        !!is_hero_banner,
+        cleanSectionCover || null,
         occasion_tags || null,
         gender_tag || null,
       ]
@@ -225,7 +250,19 @@ router.post('/', requireAdmin, async (req, res) => {
 // PUT /api/products/:id — admin: edit an existing product
 router.put('/:id', requireAdmin, async (req, res) => {
   try {
-    const { name, category_id, description, price, stock, image_url, is_featured, occasion_tags, gender_tag } = req.body;
+    const {
+      name,
+      category_id,
+      description,
+      price,
+      stock,
+      image_url,
+      is_featured,
+      is_hero_banner,
+      section_cover,
+      occasion_tags,
+      gender_tag,
+    } = req.body;
 
     const [existing] = await pool.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
     if (existing.length === 0) {
@@ -234,9 +271,23 @@ router.put('/:id', requireAdmin, async (req, res) => {
 
     const slug = name ? await getUniqueSlug(slugify(name), req.params.id) : existing[0].slug;
 
+    // If marked as hero banner, clear other hero banners
+    if (is_hero_banner) {
+      await pool.query('UPDATE products SET is_hero_banner = FALSE WHERE id != ?', [req.params.id]);
+    }
+
+    // If marked as section cover, clear other products for that section
+    const cleanSectionCover = section_cover !== undefined
+      ? (section_cover ? String(section_cover).trim().toLowerCase() : null)
+      : existing[0].section_cover;
+
+    if (cleanSectionCover) {
+      await pool.query('UPDATE products SET section_cover = NULL WHERE section_cover = ? AND id != ?', [cleanSectionCover, req.params.id]);
+    }
+
     await pool.query(
       `UPDATE products
-       SET name = ?, slug = ?, category_id = ?, description = ?, price = ?, stock = ?, image_url = ?, is_featured = ?, occasion_tags = ?, gender_tag = ?
+       SET name = ?, slug = ?, category_id = ?, description = ?, price = ?, stock = ?, image_url = ?, is_featured = ?, is_hero_banner = ?, section_cover = ?, occasion_tags = ?, gender_tag = ?
        WHERE id = ?`,
       [
         name || existing[0].name,
@@ -247,6 +298,8 @@ router.put('/:id', requireAdmin, async (req, res) => {
         stock !== undefined ? stock : existing[0].stock,
         image_url || existing[0].image_url,
         is_featured !== undefined ? !!is_featured : existing[0].is_featured,
+        is_hero_banner !== undefined ? !!is_hero_banner : existing[0].is_hero_banner,
+        cleanSectionCover,
         occasion_tags !== undefined ? occasion_tags : existing[0].occasion_tags,
         gender_tag !== undefined ? gender_tag : existing[0].gender_tag,
         req.params.id,

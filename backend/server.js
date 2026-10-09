@@ -226,6 +226,26 @@ async function initDatabase() {
       console.warn('Could not verify order_email_notifications table:', err.message);
     }
 
+    try {
+      const [heroCols] = await pool.query(`SHOW COLUMNS FROM products LIKE 'is_hero_banner'`);
+      if (heroCols.length === 0) {
+        await pool.query(`ALTER TABLE products ADD COLUMN is_hero_banner BOOLEAN DEFAULT FALSE AFTER is_featured`);
+        console.log('Added is_hero_banner column to products table');
+      }
+    } catch (err) {
+      console.warn('Could not verify is_hero_banner column on products:', err.message);
+    }
+
+    try {
+      const [coverCols] = await pool.query(`SHOW COLUMNS FROM products LIKE 'section_cover'`);
+      if (coverCols.length === 0) {
+        await pool.query(`ALTER TABLE products ADD COLUMN section_cover VARCHAR(50) DEFAULT NULL AFTER is_hero_banner`);
+        console.log('Added section_cover column to products table');
+      }
+    } catch (err) {
+      console.warn('Could not verify section_cover column on products:', err.message);
+    }
+
     console.log('Database tables verified successfully');
   } catch (err) {
     console.warn('Database table verification notice:', err.message);

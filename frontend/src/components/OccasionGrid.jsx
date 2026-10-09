@@ -32,7 +32,20 @@ const OCCASIONS = [
   },
 ];
 
-export default function OccasionGrid() {
+export default function OccasionGrid({ products = [] }) {
+  const occasionItems = OCCASIONS.map((occ) => {
+    const assignedProduct = products.find(
+      (p) => p.section_cover && p.section_cover.toLowerCase() === occ.id.toLowerCase()
+    );
+    if (assignedProduct && assignedProduct.image_url) {
+      return {
+        ...occ,
+        image: assignedProduct.image_url,
+      };
+    }
+    return occ;
+  });
+
   return (
     <section className="occasion-section container">
       <div className="home-section-header text-center">
@@ -44,7 +57,7 @@ export default function OccasionGrid() {
       </div>
 
       <div className="occasion-grid">
-        {OCCASIONS.map((occ) => (
+        {occasionItems.map((occ) => (
           <Link
             key={occ.id}
             to={occ.link}

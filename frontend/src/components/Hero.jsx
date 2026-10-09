@@ -22,7 +22,7 @@ export default function Hero({ product }) {
       return {
         ...slide,
         title: product.name || slide.title,
-        subtitle: product.description || slide.subtitle,
+        subtitle: (product.description && product.description.trim()) ? product.description.trim() : slide.subtitle,
         image: product.image_url || slide.image,
         price: product.price !== undefined ? product.price : slide.price,
         ctaText,

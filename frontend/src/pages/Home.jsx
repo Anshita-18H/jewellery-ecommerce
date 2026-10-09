@@ -34,7 +34,7 @@ export default function Home({ onCartChange }) {
     }
   }
 
-  const heroProduct = featured[0];
+  const heroProduct = allProducts.find((p) => Boolean(p.is_hero_banner)) || null;
 
   return (
     <div>
@@ -63,9 +63,9 @@ export default function Home({ onCartChange }) {
         )}
       </section>
 
-      <OccasionGrid />
+      <OccasionGrid products={allProducts} />
 
-      <GenderGrid />
+      <GenderGrid products={allProducts} />
 
       <GalleryBanner />
     </div>
