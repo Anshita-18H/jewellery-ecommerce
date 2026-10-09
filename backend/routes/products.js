@@ -19,7 +19,7 @@ function slugify(name) {
 // include_hidden=true to see everything, including soft-deleted products.
 router.get('/', async (req, res) => {
   try {
-    const { category, search, featured, occasion, gender, min_price, max_price } = req.query;
+    const { category, search, featured, gallery, occasion, gender, min_price, max_price } = req.query;
 
     let sql = `
       SELECT p.*, c.name AS category_name, c.slug AS category_slug,
@@ -60,6 +60,9 @@ router.get('/', async (req, res) => {
     }
     if (featured === 'true') {
       sql += ' AND p.is_featured = TRUE';
+    }
+    if (gallery === 'true') {
+      sql += ' AND p.is_in_gallery = TRUE';
     }
 
     sql += ' GROUP BY p.id ORDER BY p.created_at DESC';
@@ -184,7 +187,7 @@ router.get('/:slug', async (req, res) => {
 });
 
 // POST /api/products — admin: add a new product
-// Body: { name, category_id, description, price, stock, image_url, is_featured, is_hero_banner, section_cover, occasion_tags, gender_tag }
+// Body: { name, category_id, description, price, stock, image_url, is_featured, is_hero_banner, is_in_gallery, section_cover, occasion_tags, gender_tag }
 router.post('/', requireAdmin, async (req, res) => {
   try {
     const {
@@ -196,6 +199,7 @@ router.post('/', requireAdmin, async (req, res) => {
       image_url,
       is_featured,
       is_hero_banner,
+      is_in_gallery,
       section_cover,
       occasion_tags,
       gender_tag,
@@ -214,8 +218,8 @@ router.post('/', requireAdmin, async (req, res) => {
     }
 
     const [result] = await pool.query(
-      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, is_hero_banner, section_cover, occasion_tags, gender_tag)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, is_hero_banner, is_in_gallery, section_cover, occasion_tags, gender_tag)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         category_id || null,
         name,
@@ -226,6 +230,7 @@ router.post('/', requireAdmin, async (req, res) => {
         image_url || 'https://placehold.co/500x500/f5e6e0/8b5e3c?text=Product',
         !!is_featured,
         !!is_hero_banner,
+        !!is_in_gallery,
         cleanSectionCover || null,
         occasion_tags || null,
         gender_tag || null,
@@ -254,6 +259,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
       image_url,
       is_featured,
       is_hero_banner,
+      is_in_gallery,
       section_cover,
       occasion_tags,
       gender_tag,
@@ -277,7 +283,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
 
     await pool.query(
       `UPDATE products
-       SET name = ?, slug = ?, category_id = ?, description = ?, price = ?, stock = ?, image_url = ?, is_featured = ?, is_hero_banner = ?, section_cover = ?, occasion_tags = ?, gender_tag = ?
+       SET name = ?, slug = ?, category_id = ?, description = ?, price = ?, stock = ?, image_url = ?, is_featured = ?, is_hero_banner = ?, is_in_gallery = ?, section_cover = ?, occasion_tags = ?, gender_tag = ?
        WHERE id = ?`,
       [
         name || existing[0].name,
@@ -289,6 +295,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
         image_url || existing[0].image_url,
         is_featured !== undefined ? !!is_featured : existing[0].is_featured,
         is_hero_banner !== undefined ? !!is_hero_banner : existing[0].is_hero_banner,
+        is_in_gallery !== undefined ? !!is_in_gallery : existing[0].is_in_gallery,
         cleanSectionCover,
         occasion_tags !== undefined ? occasion_tags : existing[0].occasion_tags,
         gender_tag !== undefined ? gender_tag : existing[0].gender_tag,

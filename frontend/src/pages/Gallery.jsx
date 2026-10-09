@@ -1,14 +1,26 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getProducts } from '../api';
+import { formatCurrency } from '../utils/format';
 import './Gallery.css';
-const galleryImages = [
-  { src: 'https://images.unsplash.com/photo-1551811040-f13e57351ef3?w=600&h=750&auto=format&fit=crop&q=80', caption: 'The Radiance Edit' },
-  { src: 'https://images.unsplash.com/photo-1742891603547-950f510710d7?w=600&h=750&auto=format&fit=crop&q=80', caption: 'Bridal Story' },
-  { src: 'https://images.unsplash.com/photo-1599481805056-1c61a8975797?w=600&h=750&auto=format&fit=crop&q=80', caption: 'Everyday Gold' },
-  { src: 'https://images.unsplash.com/photo-1680968921717-4abbbe793bb3?w=600&h=750&auto=format&fit=crop&q=80', caption: 'Kundan Heritage' },
-  { src: 'https://images.unsplash.com/photo-1654699991520-aaaf4dd2608b?w=600&h=750&auto=format&fit=crop&q=80', caption: 'Studio Portraits' },
-  { src: 'https://images.unsplash.com/photo-1758995115682-1452a1a9e35b?w=600&h=750&auto=format&fit=crop&q=80', caption: 'The Aura Campaign' },
-];
 
 export default function Gallery() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getProducts()
+      .then((allProducts) => {
+        const safe = Array.isArray(allProducts) ? allProducts : [];
+        const galleryItems = safe.filter((p) => Boolean(p.is_in_gallery));
+        // Fallback to active catalog products if none explicitly marked as gallery
+        setItems(galleryItems.length > 0 ? galleryItems : safe.slice(0, 6));
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="gallery-page container">
       <div className="gallery-page-header">
@@ -19,14 +31,44 @@ export default function Gallery() {
         </p>
       </div>
 
-      <div className="gallery-page-grid">
-        {galleryImages.map((img, i) => (
-          <figure key={i} className="gallery-page-item">
-            <img src={img.src} alt={img.caption} />
-            <figcaption>{img.caption}</figcaption>
-          </figure>
-        ))}
-      </div>
+      {loading && <p className="gallery-status">Loading luxury lookbook…</p>}
+      {error && <p className="gallery-status gallery-error">Couldn't load gallery: {error}</p>}
+
+      {!loading && !error && items.length === 0 && (
+        <p className="gallery-status">
+          No gallery pieces selected yet. Please check "Show in Luxury Gallery" on products in the Admin Panel.
+        </p>
+      )}
+
+      {!loading && !error && items.length > 0 && (
+        <div className="gallery-page-grid">
+          {items.map((prod) => (
+            <Link
+              key={prod.id}
+              to={`/product/${prod.slug}`}
+              className="gallery-page-item"
+              aria-label={`View ${prod.name} details`}
+            >
+              <img
+                src={prod.image_url || 'https://placehold.co/600x750/1b1712/c9a876?text=AURA'}
+                alt={prod.name}
+                loading="lazy"
+              />
+              <figcaption>
+                <div className="gallery-caption-info">
+                  <span className="gallery-caption-title">{prod.name}</span>
+                  {prod.category_name && (
+                    <span className="gallery-caption-category">{prod.category_name}</span>
+                  )}
+                </div>
+                {prod.price !== undefined && prod.price !== null && (
+                  <span className="gallery-caption-price">{formatCurrency(prod.price)}</span>
+                )}
+              </figcaption>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

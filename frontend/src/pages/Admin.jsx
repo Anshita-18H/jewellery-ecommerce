@@ -51,6 +51,7 @@ const emptyForm = {
   image_url: '',
   is_featured: false,
   is_hero_banner: false,
+  is_in_gallery: false,
   section_cover: '',
   occasion_tags: '',
   gender_tag: '',
@@ -713,6 +714,7 @@ function AdminProducts({
       image_url: product.image_url || '',
       is_featured: !!product.is_featured,
       is_hero_banner: !!product.is_hero_banner,
+      is_in_gallery: !!product.is_in_gallery,
       section_cover: product.section_cover || '',
       occasion_tags: product.occasion_tags || '',
       gender_tag: product.gender_tag || '',
@@ -906,6 +908,16 @@ function AdminProducts({
             <label className="admin-checkbox-label">
               <input
                 type="checkbox"
+                name="is_in_gallery"
+                checked={form.is_in_gallery}
+                onChange={handleChange}
+              />
+              Show in Luxury Gallery (Lookbook gallery grid)
+            </label>
+
+            <label className="admin-checkbox-label">
+              <input
+                type="checkbox"
                 name="is_featured"
                 checked={form.is_featured}
                 onChange={handleChange}
@@ -1018,6 +1030,11 @@ function AdminProducts({
                           {Boolean(p.is_hero_banner) && (
                             <span className="admin-stock-badge" style={{ background: 'rgba(212, 175, 55, 0.25)', color: 'var(--gold)', border: '1px solid var(--gold)', fontSize: '0.68rem', padding: '2px 6px' }}>
                               ★ Hero Banner
+                            </span>
+                          )}
+                          {Boolean(p.is_in_gallery) && (
+                            <span className="admin-stock-badge" style={{ background: 'rgba(186, 104, 200, 0.25)', color: '#ce93d8', border: '1px solid #ce93d8', fontSize: '0.68rem', padding: '2px 6px' }}>
+                              ✦ Gallery
                             </span>
                           )}
                           {p.section_cover && (

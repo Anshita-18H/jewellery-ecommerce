@@ -246,6 +246,16 @@ async function initDatabase() {
       console.warn('Could not verify section_cover column on products:', err.message);
     }
 
+    try {
+      const [galleryCols] = await pool.query(`SHOW COLUMNS FROM products LIKE 'is_in_gallery'`);
+      if (galleryCols.length === 0) {
+        await pool.query(`ALTER TABLE products ADD COLUMN is_in_gallery BOOLEAN DEFAULT FALSE AFTER is_hero_banner`);
+        console.log('Added is_in_gallery column to products table');
+      }
+    } catch (err) {
+      console.warn('Could not verify is_in_gallery column on products:', err.message);
+    }
+
     console.log('Database tables verified successfully');
   } catch (err) {
     console.warn('Database table verification notice:', err.message);
