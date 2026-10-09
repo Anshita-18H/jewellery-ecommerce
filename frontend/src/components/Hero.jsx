@@ -13,10 +13,20 @@ export default function Hero({ product }) {
   // Combine data-driven slides with hero product if provided
   const slides = heroSlides.map((slide, idx) => {
     if (idx === 0 && product) {
+      const categoryLabel = product.category_name || (product.category_slug ? product.category_slug.toUpperCase() : null);
+      const ctaText = categoryLabel ? `SHOP ${categoryLabel.toUpperCase()}` : slide.ctaText;
+      const ctaLink = product.category_slug
+        ? `/shop?category=${product.category_slug}`
+        : (product.slug ? `/product/${product.slug}` : slide.ctaLink);
+
       return {
         ...slide,
+        title: product.name || slide.title,
+        subtitle: product.description || slide.subtitle,
         image: product.image_url || slide.image,
-        price: product.price,
+        price: product.price !== undefined ? product.price : slide.price,
+        ctaText,
+        ctaLink,
       };
     }
     return slide;
