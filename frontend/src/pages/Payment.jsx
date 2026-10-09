@@ -89,6 +89,10 @@ export default function Payment({ onCartChange }) {
   const [submitting, setSubmitting] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(null);
   const [error, setError] = useState(null);
+  const [upiError, setUpiError] = useState(null);
+  const [cardError, setCardError] = useState(null);
+
+  const UPI_REGEX = /^[a-zA-Z0-9.\-_]+@[a-zA-Z0-9]+$/;
 
   // If user reaches /payment without submitting delivery details, redirect to /checkout
   useEffect(() => {
@@ -128,6 +132,9 @@ export default function Payment({ onCartChange }) {
   // Handle toggle accordion
   function handleToggleMethod(methodKey) {
     setExpandedMethod((prev) => (prev === methodKey ? null : methodKey));
+    setError(null);
+    setUpiError(null);
+    setCardError(null);
   }
 
   // Format card number with spaces every 4 digits
@@ -135,6 +142,8 @@ export default function Payment({ onCartChange }) {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
     const formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ');
     setCardForm((prev) => ({ ...prev, number: formatted }));
+    if (cardError) setCardError(null);
+    if (error) setError(null);
   }
 
   // Format MM/YY
@@ -144,18 +153,68 @@ export default function Payment({ onCartChange }) {
       val = val.slice(0, 2) + '/' + val.slice(2);
     }
     setCardForm((prev) => ({ ...prev, expiry: val }));
+    if (cardError) setCardError(null);
+    if (error) setError(null);
   }
 
   // CVV up to 4 digits
   function handleCvvChange(e) {
     const val = e.target.value.replace(/\D/g, '').slice(0, 4);
     setCardForm((prev) => ({ ...prev, cvv: val }));
+    if (cardError) setCardError(null);
+    if (error) setError(null);
   }
 
   // Final Pay submission: calls existing POST /api/orders
   async function handleFinalPay(e) {
     if (e) e.preventDefault();
     setError(null);
+    setUpiError(null);
+    setCardError(null);
+
+    if (!expandedMethod) {
+      setError('Please select a payment option to continue.');
+      return;
+    }
+
+    if (expandedMethod === 'upi') {
+      const cleanUpi = upiId.trim();
+      if (!cleanUpi) {
+        setUpiError('Please enter your UPI ID / VPA to proceed');
+        setError('Please enter your UPI ID / VPA before clicking Pay.');
+        return;
+      }
+      if (!UPI_REGEX.test(cleanUpi)) {
+        setUpiError('Enter a valid UPI ID in username@bank format');
+        setError('Please enter a valid UPI ID (e.g. yourname@okhdfcbank or 9876543210@paytm).');
+        return;
+      }
+    }
+
+    if (expandedMethod === 'card') {
+      const rawCardNum = cardForm.number.replace(/\s/g, '');
+      if (rawCardNum.length !== 16) {
+        setCardError('Enter a valid 16-digit card number');
+        setError('Please enter a valid 16-digit card number.');
+        return;
+      }
+      if (!/^\d{2}\/\d{2}$/.test(cardForm.expiry)) {
+        setCardError('Enter valid expiry date (MM/YY)');
+        setError('Please enter a valid card expiry date (MM/YY).');
+        return;
+      }
+      if (cardForm.cvv.length < 3) {
+        setCardError('Enter a valid 3-digit CVV');
+        setError('Please enter a valid CVV.');
+        return;
+      }
+      if (!cardForm.name.trim()) {
+        setCardError('Enter the cardholder name');
+        setError('Please enter the name on your card.');
+        return;
+      }
+    }
+
     setSubmitting(true);
 
     try {
@@ -312,10 +371,15 @@ export default function Payment({ onCartChange }) {
                         type="text"
                         placeholder="yourname@upi or mobile@bank"
                         value={upiId}
-                        onChange={(e) => setUpiId(e.target.value)}
-                        className="rzp-text-input"
+                        onChange={(e) => {
+                          setUpiId(e.target.value);
+                          if (upiError) setUpiError(null);
+                          if (error) setError(null);
+                        }}
+                        className={`rzp-text-input ${upiError ? 'input-error' : ''}`}
                       />
                     </div>
+                    {upiError && <span className="rzp-field-error">{upiError}</span>}
                     <div className="rzp-quick-pills">
                       <span className="rzp-quick-label">Suggested:</span>
                       {['@okhdfcbank', '@okaxis', '@paytm', '@ybl'].map((h) => (
@@ -326,6 +390,8 @@ export default function Payment({ onCartChange }) {
                           onClick={() => {
                             const prefix = upiId.includes('@') ? upiId.split('@')[0] : upiId || 'customer';
                             setUpiId(prefix + h);
+                            if (upiError) setUpiError(null);
+                            if (error) setError(null);
                           }}
                         >
                           {h}
@@ -364,6 +430,7 @@ export default function Payment({ onCartChange }) {
 
                 {expandedMethod === 'card' && (
                   <div className="rzp-row-content">
+                    {cardError && <div className="rzp-field-error" style={{ marginBottom: '0.65rem' }}>{cardError}</div>}
                     <div className="rzp-input-group">
                       <label className="rzp-field-label">Card Number</label>
                       <input
@@ -371,7 +438,7 @@ export default function Payment({ onCartChange }) {
                         placeholder="4532 0123 4567 8901"
                         value={cardForm.number}
                         onChange={handleCardNumberChange}
-                        className="rzp-text-input"
+                        className={`rzp-text-input ${cardError && cardForm.number.replace(/\s/g, '').length !== 16 ? 'input-error' : ''}`}
                       />
                     </div>
 
@@ -383,7 +450,7 @@ export default function Payment({ onCartChange }) {
                           placeholder="MM/YY"
                           value={cardForm.expiry}
                           onChange={handleExpiryChange}
-                          className="rzp-text-input"
+                          className={`rzp-text-input ${cardError && !/^\d{2}\/\d{2}$/.test(cardForm.expiry) ? 'input-error' : ''}`}
                         />
                       </div>
                       <div className="rzp-input-group">
@@ -394,7 +461,7 @@ export default function Payment({ onCartChange }) {
                           placeholder="•••"
                           value={cardForm.cvv}
                           onChange={handleCvvChange}
-                          className="rzp-text-input"
+                          className={`rzp-text-input ${cardError && cardForm.cvv.length < 3 ? 'input-error' : ''}`}
                         />
                       </div>
                     </div>
@@ -405,8 +472,12 @@ export default function Payment({ onCartChange }) {
                         type="text"
                         placeholder="Name as on card"
                         value={cardForm.name}
-                        onChange={(e) => setCardForm((prev) => ({ ...prev, name: e.target.value }))}
-                        className="rzp-text-input"
+                        onChange={(e) => {
+                          setCardForm((prev) => ({ ...prev, name: e.target.value }));
+                          if (cardError) setCardError(null);
+                          if (error) setError(null);
+                        }}
+                        className={`rzp-text-input ${cardError && !cardForm.name.trim() ? 'input-error' : ''}`}
                       />
                     </div>
                   </div>
