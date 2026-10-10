@@ -19,7 +19,7 @@ function slugify(name) {
 // include_hidden=true to see everything, including soft-deleted products.
 router.get('/', async (req, res) => {
   try {
-    const { category, search, featured, gallery, occasion, gender, min_price, max_price } = req.query;
+    const { category, search, featured, gallery, occasion, gender, min_price, max_price, include_hidden } = req.query;
 
     let sql = `
       SELECT p.*, c.name AS category_name, c.slug AS category_slug,
@@ -31,6 +31,11 @@ router.get('/', async (req, res) => {
       WHERE 1 = 1
     `;
     const params = [];
+
+    // By default, public storefront only sees active products. Admin panel passes include_hidden=true
+    if (include_hidden !== 'true') {
+      sql += ' AND COALESCE(p.is_active, 1) = 1';
+    }
 
     if (category) {
       sql += ' AND c.slug = ?';
@@ -73,7 +78,7 @@ router.get('/', async (req, res) => {
   } catch (err) {
     console.error('Products fetch error, attempting fallback query:', err.message);
     try {
-      const { category, search, featured, occasion, gender, min_price, max_price } = req.query;
+      const { category, search, featured, gallery, occasion, gender, min_price, max_price, include_hidden } = req.query;
       let fallbackSql = `
         SELECT p.*, c.name AS category_name, c.slug AS category_slug,
                0 AS avg_rating,
@@ -83,6 +88,10 @@ router.get('/', async (req, res) => {
         WHERE 1 = 1
       `;
       const fallbackParams = [];
+
+      if (include_hidden !== 'true') {
+        fallbackSql += ' AND COALESCE(p.is_active, 1) = 1';
+      }
 
       if (category) {
         fallbackSql += ' AND c.slug = ?';
@@ -112,6 +121,9 @@ router.get('/', async (req, res) => {
       }
       if (featured === 'true') {
         fallbackSql += ' AND p.is_featured = TRUE';
+      }
+      if (gallery === 'true') {
+        fallbackSql += ' AND p.is_in_gallery = TRUE';
       }
 
       fallbackSql += ' ORDER BY p.created_at DESC';
@@ -187,7 +199,7 @@ router.get('/:slug', async (req, res) => {
 });
 
 // POST /api/products — admin: add a new product
-// Body: { name, category_id, description, price, stock, image_url, is_featured, is_hero_banner, is_in_gallery, section_cover, occasion_tags, gender_tag }
+// Body: { name, category_id, description, price, stock, image_url, is_featured, is_hero_banner, is_in_gallery, is_active, section_cover, occasion_tags, gender_tag }
 router.post('/', requireAdmin, async (req, res) => {
   try {
     const {
@@ -200,6 +212,7 @@ router.post('/', requireAdmin, async (req, res) => {
       is_featured,
       is_hero_banner,
       is_in_gallery,
+      is_active,
       section_cover,
       occasion_tags,
       gender_tag,
@@ -217,9 +230,11 @@ router.post('/', requireAdmin, async (req, res) => {
       await pool.query('UPDATE products SET section_cover = NULL WHERE section_cover = ?', [cleanSectionCover]);
     }
 
+    const activeFlag = is_active !== undefined ? (is_active ? 1 : 0) : 1;
+
     const [result] = await pool.query(
-      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, is_hero_banner, is_in_gallery, section_cover, occasion_tags, gender_tag)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (category_id, name, slug, description, price, stock, image_url, is_featured, is_hero_banner, is_in_gallery, is_active, section_cover, occasion_tags, gender_tag)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         category_id || null,
         name,
@@ -231,6 +246,7 @@ router.post('/', requireAdmin, async (req, res) => {
         !!is_featured,
         !!is_hero_banner,
         !!is_in_gallery,
+        activeFlag,
         cleanSectionCover || null,
         occasion_tags || null,
         gender_tag || null,
@@ -260,6 +276,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
       is_featured,
       is_hero_banner,
       is_in_gallery,
+      is_active,
       section_cover,
       occasion_tags,
       gender_tag,
@@ -281,9 +298,11 @@ router.put('/:id', requireAdmin, async (req, res) => {
       await pool.query('UPDATE products SET section_cover = NULL WHERE section_cover = ? AND id != ?', [cleanSectionCover, req.params.id]);
     }
 
+    const activeFlag = is_active !== undefined ? (is_active ? 1 : 0) : existing[0].is_active;
+
     await pool.query(
       `UPDATE products
-       SET name = ?, slug = ?, category_id = ?, description = ?, price = ?, stock = ?, image_url = ?, is_featured = ?, is_hero_banner = ?, is_in_gallery = ?, section_cover = ?, occasion_tags = ?, gender_tag = ?
+       SET name = ?, slug = ?, category_id = ?, description = ?, price = ?, stock = ?, image_url = ?, is_featured = ?, is_hero_banner = ?, is_in_gallery = ?, is_active = ?, section_cover = ?, occasion_tags = ?, gender_tag = ?
        WHERE id = ?`,
       [
         name || existing[0].name,
@@ -296,6 +315,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
         is_featured !== undefined ? !!is_featured : existing[0].is_featured,
         is_hero_banner !== undefined ? !!is_hero_banner : existing[0].is_hero_banner,
         is_in_gallery !== undefined ? !!is_in_gallery : existing[0].is_in_gallery,
+        activeFlag,
         cleanSectionCover,
         occasion_tags !== undefined ? occasion_tags : existing[0].occasion_tags,
         gender_tag !== undefined ? gender_tag : existing[0].gender_tag,
@@ -310,21 +330,61 @@ router.put('/:id', requireAdmin, async (req, res) => {
   }
 });
 
-// DELETE /api/products/:id — admin: remove a product
-router.delete('/:id', requireAdmin, async (req, res) => {
+// PUT /api/products/:id/status — admin: activate or deactivate product (soft toggle)
+router.put('/:id/status', requireAdmin, async (req, res) => {
   try {
-    const [result] = await pool.query('DELETE FROM products WHERE id = ?', [req.params.id]);
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Product not found' });
+    const { is_active } = req.body;
+    let newStatus;
+    if (is_active !== undefined) {
+      newStatus = is_active ? 1 : 0;
+    } else {
+      const [existing] = await pool.query('SELECT is_active FROM products WHERE id = ?', [req.params.id]);
+      if (existing.length === 0) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      newStatus = existing[0].is_active === 1 ? 0 : 1;
     }
-    res.json({ message: 'Product deleted' });
+
+    await pool.query('UPDATE products SET is_active = ? WHERE id = ?', [newStatus, req.params.id]);
+    res.json({
+      message: newStatus === 1 ? 'Product activated successfully' : 'Product deactivated successfully',
+      is_active: newStatus,
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to delete product' });
+    res.status(500).json({ error: 'Failed to update product status' });
   }
 });
 
-// DELETE /api/products/:id/permanent — admin: permanently remove a product from DB
+// PUT /api/products/:id/restore — admin: activate a deactivated product
+router.put('/:id/restore', requireAdmin, async (req, res) => {
+  try {
+    const [result] = await pool.query('UPDATE products SET is_active = 1 WHERE id = ?', [req.params.id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ message: 'Product activated successfully', is_active: 1 });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to activate product' });
+  }
+});
+
+// DELETE /api/products/:id — admin: soft-delete (deactivate) a product to keep database records intact
+router.delete('/:id', requireAdmin, async (req, res) => {
+  try {
+    const [result] = await pool.query('UPDATE products SET is_active = 0 WHERE id = ?', [req.params.id]);
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    res.json({ message: 'Product deactivated (soft-deleted) successfully', is_active: 0 });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to deactivate product' });
+  }
+});
+
+// DELETE /api/products/:id/permanent — admin: permanently remove a product from DB if specifically needed
 router.delete('/:id/permanent', requireAdmin, async (req, res) => {
   try {
     const [result] = await pool.query('DELETE FROM products WHERE id = ?', [req.params.id]);

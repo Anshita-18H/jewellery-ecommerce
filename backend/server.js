@@ -256,6 +256,16 @@ async function initDatabase() {
       console.warn('Could not verify is_in_gallery column on products:', err.message);
     }
 
+    try {
+      const [activeCols] = await pool.query(`SHOW COLUMNS FROM products LIKE 'is_active'`);
+      if (activeCols.length === 0) {
+        await pool.query(`ALTER TABLE products ADD COLUMN is_active TINYINT(1) DEFAULT 1 AFTER is_in_gallery`);
+        console.log('Added is_active column to products table');
+      }
+    } catch (err) {
+      console.warn('Could not verify is_active column on products:', err.message);
+    }
+
     console.log('Database tables verified successfully');
   } catch (err) {
     console.warn('Database table verification notice:', err.message);

@@ -28,6 +28,8 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  updateProductStatus,
+  restoreProduct,
   getOrders,
   updateOrderStatus,
   getAdminDashboard,
@@ -52,6 +54,7 @@ const emptyForm = {
   is_featured: false,
   is_hero_banner: false,
   is_in_gallery: false,
+  is_active: true,
   section_cover: '',
   occasion_tags: '',
   gender_tag: '',
@@ -662,7 +665,7 @@ function AdminProducts({
       setLoading(true);
       onSearchingStateChange?.(true);
       try {
-        const params = {};
+        const params = { include_hidden: 'true' };
         if (search && search.trim()) {
           params.search = search.trim();
         }
@@ -715,6 +718,7 @@ function AdminProducts({
       is_featured: !!product.is_featured,
       is_hero_banner: !!product.is_hero_banner,
       is_in_gallery: !!product.is_in_gallery,
+      is_active: product.is_active !== 0 && product.is_active !== false,
       section_cover: product.section_cover || '',
       occasion_tags: product.occasion_tags || '',
       gender_tag: product.gender_tag || '',
@@ -746,20 +750,46 @@ function AdminProducts({
     }
   }
 
-  async function handleDelete(id) {
-    if (!confirm('Permanently delete this product from the database? This action cannot be undone.')) return;
+  async function handleToggleActive(product) {
+    const isCurrentlyActive = product.is_active !== 0 && product.is_active !== false;
+    const newStatus = isCurrentlyActive ? 0 : 1;
     try {
-      await deleteProduct(id);
-      setMessage('Product deleted successfully.');
+      await updateProductStatus(product.id, newStatus);
+      setMessage(newStatus === 1 ? `"${product.name}" is now Active on website.` : `"${product.name}" has been Deactivated (hidden from website, records preserved).`);
       fetchProducts(searchQuery);
     } catch (err) {
-      setMessage(err.message || 'Failed to delete product');
+      setMessage(err.message || 'Failed to update product status');
+    }
+  }
+
+  async function handleDelete(product) {
+    const isCurrentlyActive = product.is_active !== 0 && product.is_active !== false;
+    if (isCurrentlyActive) {
+      if (!confirm(`Deactivate "${product.name}"? This soft-deletes the product by hiding it from the website storefront while keeping your database records intact.`)) return;
+      try {
+        await deleteProduct(product.id);
+        setMessage(`"${product.name}" soft-deleted (deactivated). Database record safely preserved.`);
+        fetchProducts(searchQuery);
+      } catch (err) {
+        setMessage(err.message || 'Failed to deactivate product');
+      }
+    } else {
+      if (!confirm(`"${product.name}" is currently deactivated. Would you like to reactivate it on the website?`)) return;
+      try {
+        await updateProductStatus(product.id, 1);
+        setMessage(`"${product.name}" is now Active on the website.`);
+        fetchProducts(searchQuery);
+      } catch (err) {
+        setMessage(err.message || 'Failed to activate product');
+      }
     }
   }
 
   const filteredProducts = products.filter((p) => {
     if (filter === 'instock') return p.stock > 5;
     if (filter === 'lowstock') return p.stock <= 5;
+    if (filter === 'active') return p.is_active !== 0 && p.is_active !== false;
+    if (filter === 'deactive') return p.is_active === 0 || p.is_active === false;
     return true;
   });
 
@@ -924,6 +954,16 @@ function AdminProducts({
               />
               Show in Featured Collections on storefront (4-card showcase grid)
             </label>
+
+            <label className="admin-checkbox-label">
+              <input
+                type="checkbox"
+                name="is_active"
+                checked={form.is_active}
+                onChange={handleChange}
+              />
+              Active on Storefront (Uncheck to deactivate / hide piece from customers)
+            </label>
           </div>
 
           <div className="admin-form-actions">
@@ -951,6 +991,20 @@ function AdminProducts({
                 onClick={() => setFilter('all')}
               >
                 All ({products.length})
+              </button>
+              <button
+                type="button"
+                className={`admin-filter-btn ${filter === 'active' ? 'active' : ''}`}
+                onClick={() => setFilter('active')}
+              >
+                Active ({products.filter((p) => p.is_active !== 0 && p.is_active !== false).length})
+              </button>
+              <button
+                type="button"
+                className={`admin-filter-btn ${filter === 'deactive' ? 'active' : ''}`}
+                onClick={() => setFilter('deactive')}
+              >
+                Deactive ({products.filter((p) => p.is_active === 0 || p.is_active === false).length})
               </button>
               <button
                 type="button"
@@ -1027,6 +1081,15 @@ function AdminProducts({
                           </span>
                         )}
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                          {p.is_active === 0 || p.is_active === false ? (
+                            <span className="admin-stock-badge deactive" style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
+                              Deactivated
+                            </span>
+                          ) : (
+                            <span className="admin-stock-badge active-status" style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
+                              Active
+                            </span>
+                          )}
                           {Boolean(p.is_hero_banner) && (
                             <span className="admin-stock-badge" style={{ background: 'rgba(212, 175, 55, 0.25)', color: 'var(--gold)', border: '1px solid var(--gold)', fontSize: '0.68rem', padding: '2px 6px' }}>
                               ★ Hero Banner
@@ -1069,11 +1132,30 @@ function AdminProducts({
                         <button type="button" onClick={() => startEdit(p)}>
                           Edit
                         </button>
+                        {p.is_active === 0 || p.is_active === false ? (
+                          <button
+                            type="button"
+                            className="admin-active-btn"
+                            onClick={() => handleToggleActive(p)}
+                            title="Activate piece on website"
+                          >
+                            Active
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="admin-deactive-btn"
+                            onClick={() => handleToggleActive(p)}
+                            title="Deactivate piece (hide from website without deleting from database)"
+                          >
+                            Deactive
+                          </button>
+                        )}
                         <button
                           type="button"
                           className="admin-delete-btn"
-                          onClick={() => handleDelete(p.id)}
-                          title="Delete product"
+                          onClick={() => handleDelete(p)}
+                          title="Soft delete (deactivate) product"
                         >
                           Delete
                         </button>

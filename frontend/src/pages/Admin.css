@@ -1029,6 +1029,42 @@
   background: rgba(229, 115, 115, 0.12) !important;
 }
 
+.admin-deactive-btn {
+  border-color: rgba(242, 139, 130, 0.4) !important;
+  color: #f28b82 !important;
+  font-weight: 500;
+}
+
+.admin-deactive-btn:hover {
+  border-color: #f28b82 !important;
+  background: rgba(242, 139, 130, 0.15) !important;
+  color: #ff8a80 !important;
+}
+
+.admin-active-btn {
+  border-color: rgba(129, 199, 132, 0.4) !important;
+  color: #81c784 !important;
+  font-weight: 500;
+}
+
+.admin-active-btn:hover {
+  border-color: #81c784 !important;
+  background: rgba(129, 199, 132, 0.15) !important;
+  color: #a5d6a7 !important;
+}
+
+.admin-stock-badge.deactive {
+  background: rgba(242, 139, 130, 0.18);
+  color: #f28b82;
+  border: 1px solid rgba(242, 139, 130, 0.35);
+}
+
+.admin-stock-badge.active-status {
+  background: rgba(76, 175, 80, 0.14);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.28);
+}
+
 .admin-prod-link {
   color: var(--cream);
   font-weight: 500;

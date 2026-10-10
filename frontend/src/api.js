@@ -43,6 +43,8 @@ export const createProduct = (data) => request('/products', { method: 'POST', bo
 export const updateProduct = (id, data) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const deleteProduct = (id) => request(`/products/${id}`, { method: 'DELETE' });
 export const restoreProduct = (id) => request(`/products/${id}/restore`, { method: 'PUT' });
+export const updateProductStatus = (id, is_active) =>
+  request(`/products/${id}/status`, { method: 'PUT', body: JSON.stringify({ is_active }) });
 export const hardDeleteProduct = (id) => request(`/products/${id}/permanent`, { method: 'DELETE' });
 
 // ---- Categories ----
