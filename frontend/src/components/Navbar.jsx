@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, UserRound, Menu, X, Heart, LogOut, Shield, Package } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
@@ -25,14 +25,33 @@ export default function Navbar({ cartCount = 0 }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const activeCategory = (searchParams.get('category') || '').trim().toLowerCase();
+
   const links = [
     { label: 'Home', to: '/' },
     { label: 'Shop', to: '/shop' },
-    { label: 'Rings', to: '/shop?category=rings' },
-    { label: 'Necklaces', to: '/shop?category=necklaces' },
-    { label: 'Bridal', to: '/shop?category=bridal' },
+    { label: 'Rings', to: '/shop?category=rings', category: 'rings' },
+    { label: 'Necklaces', to: '/shop?category=necklaces', category: 'necklaces' },
+    { label: 'Earrings', to: '/shop?category=earrings', category: 'earrings' },
+    { label: 'Bracelets', to: '/shop?category=bracelets', category: 'bracelets' },
+    { label: 'Bridal', to: '/shop?category=bridal', category: 'bridal' },
     { label: 'Gallery', to: '/gallery' },
   ];
+
+  const isLinkActive = (link) => {
+    if (link.to === '/') {
+      return location.pathname === '/';
+    }
+    if (link.category) {
+      return location.pathname === '/shop' && activeCategory === link.category.toLowerCase();
+    }
+    if (link.to === '/shop') {
+      return location.pathname === '/shop' && !activeCategory;
+    }
+    return location.pathname.startsWith(link.to);
+  };
 
   return (
     <header className="navbar">
@@ -55,24 +74,23 @@ export default function Navbar({ cartCount = 0 }) {
         {/* Center: Main Navigation */}
         <nav className={`navbar-links ${menuOpen ? 'open' : ''}`}>
           {links.map((link) => (
-            <NavLink
+            <Link
               key={link.label}
               to={link.to}
-              end={link.to === '/'}
-              className={({ isActive }) => `navbar-link ${isActive ? 'active' : ''}`}
+              className={`navbar-link ${isLinkActive(link) ? 'active' : ''}`}
               onClick={() => setMenuOpen(false)}
             >
               {link.label}
-            </NavLink>
+            </Link>
           ))}
           {user && (
-            <NavLink
+            <Link
               to="/my-orders"
-              className={({ isActive }) => `navbar-link ${isActive ? 'active' : ''}`}
+              className={`navbar-link ${location.pathname === '/my-orders' ? 'active' : ''}`}
               onClick={() => setMenuOpen(false)}
             >
               My Orders
-            </NavLink>
+            </Link>
           )}
         </nav>
 
