@@ -706,6 +706,16 @@ function AdminProducts({
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value });
   }
 
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [formError, setFormError] = useState(null);
+
+  function openAddForm() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setFormError(null);
+    setIsFormOpen(true);
+  }
+
   function startEdit(product) {
     setEditingId(product.id);
     setForm({
@@ -723,30 +733,44 @@ function AdminProducts({
       occasion_tags: product.occasion_tags || '',
       gender_tag: product.gender_tag || '',
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setFormError(null);
+    setIsFormOpen(true);
   }
 
-  function cancelEdit() {
+  function closeForm() {
+    setIsFormOpen(false);
     setEditingId(null);
     setForm(emptyForm);
+    setFormError(null);
   }
+
+  // Close modal on Escape key press
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape' && isFormOpen) {
+        closeForm();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFormOpen]);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setMessage(null);
+    setFormError(null);
     try {
       const payload = { ...form, category_id: form.category_id || null };
       if (editingId) {
         await updateProduct(editingId, payload);
-        setMessage('Product updated successfully.');
+        setMessage(`Product "${form.name}" updated successfully.`);
       } else {
         await createProduct(payload);
-        setMessage('New product created successfully.');
+        setMessage(`New product "${form.name}" created successfully.`);
       }
-      cancelEdit();
+      closeForm();
       fetchProducts(searchQuery);
     } catch (err) {
-      setMessage(err.message);
+      setFormError(err.message || 'Failed to save product');
     }
   }
 
@@ -800,7 +824,25 @@ function AdminProducts({
           <p className="eyebrow">Catalog Management</p>
           <h1 className="admin-page-title">Products ({products.length})</h1>
         </div>
+        <button
+          type="button"
+          className="btn btn-gold admin-add-product-btn"
+          onClick={openAddForm}
+        >
+          <Plus size={16} />
+          <span>Add Product</span>
+        </button>
       </div>
+
+      {/* Action / Success Message Banner */}
+      {message && (
+        <div className="admin-status-message-banner">
+          <span>{message}</span>
+          <button type="button" onClick={() => setMessage(null)} aria-label="Dismiss">
+            <X size={15} />
+          </button>
+        </div>
+      )}
 
       {/* Search notification banner */}
       {searchQuery && (
@@ -814,171 +856,210 @@ function AdminProducts({
         </div>
       )}
 
-      <div className="admin-section">
-        {/* ADD / EDIT FORM */}
-        <form className="admin-form" onSubmit={handleSubmit}>
-          <h3>{editingId ? 'Edit Product' : 'Add New Jewellery Piece'}</h3>
+      {/* MAIN PRODUCTS CONTENT (FULL WIDTH) */}
+      <div className="admin-products-layout">
+        {/* ADD / EDIT PRODUCT MODAL */}
+        {isFormOpen && (
+          <div
+            className="admin-modal-overlay"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) closeForm();
+            }}
+          >
+            <div className="admin-modal-card">
+              <div className="admin-modal-header">
+                <h3>{editingId ? 'Edit Product' : 'Add New Jewellery Piece'}</h3>
+                <button
+                  type="button"
+                  className="admin-modal-close-btn"
+                  onClick={closeForm}
+                  aria-label="Close form"
+                >
+                  <X size={18} />
+                </button>
+              </div>
 
-          <div className="admin-form-row">
-            <label>
-              Piece Name *
-              <input name="name" value={form.name} onChange={handleChange} required placeholder="e.g. Solitaire Diamond Ring" />
-            </label>
-            <label>
-              Category
-              <select name="category_id" value={form.category_id} onChange={handleChange}>
-                <option value="">— Select Category —</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <form onSubmit={handleSubmit}>
+                <div className="admin-modal-body">
+                  {formError && <p className="admin-message error">{formError}</p>}
+
+                  <div className="admin-form-row">
+                    <label>
+                      Piece Name *
+                      <input
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        required
+                        placeholder="e.g. Solitaire Diamond Ring"
+                      />
+                    </label>
+                    <label>
+                      Category
+                      <select name="category_id" value={form.category_id} onChange={handleChange}>
+                        <option value="">— Select Category —</option>
+                        {categories.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <label>
+                    Description
+                    <textarea
+                      name="description"
+                      rows={3}
+                      value={form.description}
+                      onChange={handleChange}
+                      placeholder="Describe stone clarity, metal hallmarks, carat weight..."
+                    />
+                  </label>
+
+                  <div className="admin-form-row">
+                    <label>
+                      Price (₹) *
+                      <input
+                        name="price"
+                        type="number"
+                        step="0.01"
+                        value={form.price}
+                        onChange={handleChange}
+                        required
+                        placeholder="4999.00"
+                      />
+                    </label>
+                    <label>
+                      Inventory Stock *
+                      <input
+                        name="stock"
+                        type="number"
+                        value={form.stock}
+                        onChange={handleChange}
+                        required
+                        placeholder="10"
+                      />
+                    </label>
+                  </div>
+
+                  <label>
+                    Image URL (Unsplash or direct asset)
+                    <input
+                      name="image_url"
+                      value={form.image_url}
+                      onChange={handleChange}
+                      placeholder="https://images.unsplash.com/..."
+                    />
+                  </label>
+
+                  <div className="admin-form-row">
+                    <label>
+                      Occasion Tags (comma-separated, e.g. bridal, gifting, everyday)
+                      <input
+                        name="occasion_tags"
+                        value={form.occasion_tags}
+                        onChange={handleChange}
+                        placeholder="e.g. bridal, gifting, everyday"
+                      />
+                    </label>
+                    <label>
+                      Gender Tag
+                      <select name="gender_tag" value={form.gender_tag} onChange={handleChange}>
+                        <option value="">None (Unisex / General)</option>
+                        <option value="women">Women</option>
+                        <option value="men">Men</option>
+                        <option value="kids">Kids</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="admin-form-row">
+                    <label>
+                      Section Main Cover Card (Homepage)
+                      <select
+                        name="section_cover"
+                        value={form.section_cover || ''}
+                        onChange={handleChange}
+                      >
+                        <option value="">None (Regular Product)</option>
+                        <optgroup label="Shop by Gender Section Cards">
+                          <option value="women">Women Jewellery — Main Card Cover</option>
+                          <option value="men">Men Jewellery — Main Card Cover</option>
+                          <option value="kids">Kids Jewellery — Main Card Cover</option>
+                        </optgroup>
+                        <optgroup label="Shop by Occasion Section Cards">
+                          <option value="bridal">Bridal Edit — Main Card Cover</option>
+                          <option value="gifting">Gifting Jewellery — Main Card Cover</option>
+                          <option value="everyday">Everyday Wear — Main Card Cover</option>
+                        </optgroup>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.65rem',
+                      margin: '0.5rem 0',
+                    }}
+                  >
+                    <label className="admin-checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="is_hero_banner"
+                        checked={form.is_hero_banner}
+                        onChange={handleChange}
+                      />
+                      Show on Homepage Hero Banner (Top main carousel slide)
+                    </label>
+
+                    <label className="admin-checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="is_in_gallery"
+                        checked={form.is_in_gallery}
+                        onChange={handleChange}
+                      />
+                      Show in Luxury Gallery (Lookbook gallery grid)
+                    </label>
+
+                    <label className="admin-checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="is_featured"
+                        checked={form.is_featured}
+                        onChange={handleChange}
+                      />
+                      Show in Featured Collections on storefront (4-card showcase grid)
+                    </label>
+
+                    <label className="admin-checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="is_active"
+                        checked={form.is_active}
+                        onChange={handleChange}
+                      />
+                      Active on Storefront (Uncheck to deactivate / hide piece from customers)
+                    </label>
+                  </div>
+                </div>
+
+                <div className="admin-modal-footer">
+                  <button type="button" className="btn btn-outline" onClick={closeForm}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-gold">
+                    {editingId ? 'Save Changes' : 'Create Piece'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-
-          <label>
-            Description
-            <textarea
-              name="description"
-              rows={3}
-              value={form.description}
-              onChange={handleChange}
-              placeholder="Describe stone clarity, metal hallmarks, carat weight..."
-            />
-          </label>
-
-          <div className="admin-form-row">
-            <label>
-              Price (₹) *
-              <input
-                name="price"
-                type="number"
-                step="0.01"
-                value={form.price}
-                onChange={handleChange}
-                required
-                placeholder="4999.00"
-              />
-            </label>
-            <label>
-              Inventory Stock *
-              <input
-                name="stock"
-                type="number"
-                value={form.stock}
-                onChange={handleChange}
-                required
-                placeholder="10"
-              />
-            </label>
-          </div>
-
-          <label>
-            Image URL (Unsplash or direct asset)
-            <input
-              name="image_url"
-              value={form.image_url}
-              onChange={handleChange}
-              placeholder="https://images.unsplash.com/..."
-            />
-          </label>
-
-          <div className="admin-form-row">
-            <label>
-              Occasion Tags (comma-separated, e.g. bridal, gifting, everyday)
-              <input
-                name="occasion_tags"
-                value={form.occasion_tags}
-                onChange={handleChange}
-                placeholder="e.g. bridal, gifting, everyday"
-              />
-            </label>
-            <label>
-              Gender Tag
-              <select name="gender_tag" value={form.gender_tag} onChange={handleChange}>
-                <option value="">None (Unisex / General)</option>
-                <option value="women">Women</option>
-                <option value="men">Men</option>
-                <option value="kids">Kids</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="admin-form-row">
-            <label>
-              Section Main Cover Card (Homepage)
-              <select name="section_cover" value={form.section_cover || ''} onChange={handleChange}>
-                <option value="">None (Regular Product)</option>
-                <optgroup label="Shop by Gender Section Cards">
-                  <option value="women">Women Jewellery — Main Card Cover</option>
-                  <option value="men">Men Jewellery — Main Card Cover</option>
-                  <option value="kids">Kids Jewellery — Main Card Cover</option>
-                </optgroup>
-                <optgroup label="Shop by Occasion Section Cards">
-                  <option value="bridal">Bridal Edit — Main Card Cover</option>
-                  <option value="gifting">Gifting Jewellery — Main Card Cover</option>
-                  <option value="everyday">Everyday Wear — Main Card Cover</option>
-                </optgroup>
-              </select>
-            </label>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', margin: '0.75rem 0 1.25rem' }}>
-            <label className="admin-checkbox-label">
-              <input
-                type="checkbox"
-                name="is_hero_banner"
-                checked={form.is_hero_banner}
-                onChange={handleChange}
-              />
-              Show on Homepage Hero Banner (Top main carousel slide)
-            </label>
-
-            <label className="admin-checkbox-label">
-              <input
-                type="checkbox"
-                name="is_in_gallery"
-                checked={form.is_in_gallery}
-                onChange={handleChange}
-              />
-              Show in Luxury Gallery (Lookbook gallery grid)
-            </label>
-
-            <label className="admin-checkbox-label">
-              <input
-                type="checkbox"
-                name="is_featured"
-                checked={form.is_featured}
-                onChange={handleChange}
-              />
-              Show in Featured Collections on storefront (4-card showcase grid)
-            </label>
-
-            <label className="admin-checkbox-label">
-              <input
-                type="checkbox"
-                name="is_active"
-                checked={form.is_active}
-                onChange={handleChange}
-              />
-              Active on Storefront (Uncheck to deactivate / hide piece from customers)
-            </label>
-          </div>
-
-          <div className="admin-form-actions">
-            <button type="submit" className="btn btn-gold">
-              {editingId ? 'Save Changes' : 'Create Piece'}
-            </button>
-            {editingId && (
-              <button type="button" className="btn btn-outline" onClick={cancelEdit}>
-                Cancel
-              </button>
-            )}
-          </div>
-
-          {message && <p className="admin-message">{message}</p>}
-        </form>
+        )}
 
         {/* PRODUCTS LIST TABLE */}
         <div className="admin-list-card">
