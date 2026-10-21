@@ -16,7 +16,15 @@ import {
   Check,
   ShieldCheck,
 } from 'lucide-react';
-import { placeOrder, getCart } from '../api';
+import {
+  placeOrder,
+  getCart,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+  reportPaymentFailure,
+  getPaymentConfig,
+} from '../api';
+import { loadRazorpayScript } from '../utils/razorpay';
 import { formatCurrency } from '../utils/format';
 import './Payment.css';
 
@@ -137,7 +145,6 @@ export default function Payment({ onCartChange }) {
     setCardError(null);
   }
 
-  // Format card number with spaces every 4 digits
   function handleCardNumberChange(e) {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 16);
     const formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ');
@@ -165,66 +172,127 @@ export default function Payment({ onCartChange }) {
     if (error) setError(null);
   }
 
-  // Final Pay submission: calls existing POST /api/orders
+  // Launch official Razorpay Checkout in TEST MODE
   async function handleFinalPay(e) {
     if (e) e.preventDefault();
     setError(null);
     setUpiError(null);
     setCardError(null);
 
-    if (!expandedMethod) {
-      setError('Please select a payment option to continue.');
-      return;
-    }
-
-    if (expandedMethod === 'upi') {
-      const cleanUpi = upiId.trim();
-      if (!cleanUpi) {
-        setUpiError('Please enter your UPI ID / VPA to proceed');
-        setError('Please enter your UPI ID / VPA before clicking Pay.');
-        return;
-      }
-      if (!UPI_REGEX.test(cleanUpi)) {
-        setUpiError('Enter a valid UPI ID in username@bank format');
-        setError('Please enter a valid UPI ID (e.g. yourname@okhdfcbank or 9876543210@paytm).');
-        return;
-      }
-    }
-
-    if (expandedMethod === 'card') {
-      const rawCardNum = cardForm.number.replace(/\s/g, '');
-      if (rawCardNum.length !== 16) {
-        setCardError('Enter a valid 16-digit card number');
-        setError('Please enter a valid 16-digit card number.');
-        return;
-      }
-      if (!/^\d{2}\/\d{2}$/.test(cardForm.expiry)) {
-        setCardError('Enter valid expiry date (MM/YY)');
-        setError('Please enter a valid card expiry date (MM/YY).');
-        return;
-      }
-      if (cardForm.cvv.length < 3) {
-        setCardError('Enter a valid 3-digit CVV');
-        setError('Please enter a valid CVV.');
-        return;
-      }
-      if (!cardForm.name.trim()) {
-        setCardError('Enter the cardholder name');
-        setError('Please enter the name on your card.');
-        return;
-      }
-    }
-
     setSubmitting(true);
 
     try {
-      const result = await placeOrder(deliveryDetails);
-      setOrderPlaced(result);
-      onCartChange?.();
+      // 1. Ensure Razorpay Checkout SDK script is loaded
+      const isScriptLoaded = await loadRazorpayScript();
+      if (!isScriptLoaded || typeof window.Razorpay === 'undefined') {
+        throw new Error('Could not load Razorpay payment gateway. Please check your internet connection.');
+      }
+
+      // 2. Format phone number and call backend to create Razorpay Order & internal pending order
+      const rawPhone = mobileNumber ? mobileNumber.trim() : (deliveryDetails.phone || '').trim();
+      const formattedPhone = rawPhone.startsWith('+91')
+        ? rawPhone
+        : rawPhone.length === 10
+        ? `+91${rawPhone}`
+        : rawPhone;
+
+      const orderPayload = {
+        ...deliveryDetails,
+        phone: formattedPhone,
+      };
+
+      const razorpayData = await createRazorpayOrder(orderPayload);
+
+      if (!razorpayData?.razorpay_order_id || !razorpayData?.key_id) {
+        throw new Error('Invalid order response received from payment server.');
+      }
+
+      // 3. Configure official Razorpay Checkout options in TEST MODE
+      const options = {
+        key: razorpayData.key_id,
+        amount: razorpayData.amount, // in paise
+        currency: razorpayData.currency || 'INR',
+        name: 'AURA Fine Jewellery',
+        description: `Order #${razorpayData.order_id} (TEST MODE)`,
+        image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=120&q=80',
+        order_id: razorpayData.razorpay_order_id,
+        handler: async function (response) {
+          try {
+            setSubmitting(true);
+            const verifyRes = await verifyRazorpayPayment({
+              order_id: razorpayData.order_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            setOrderPlaced({
+              ...verifyRes,
+              razorpay_payment_id: response.razorpay_payment_id,
+            });
+            onCartChange?.();
+          } catch (verifyErr) {
+            setError(
+              verifyErr.message ||
+                'Payment signature verification failed. Please contact support if your account was charged.'
+            );
+          } finally {
+            setSubmitting(false);
+          }
+        },
+        prefill: {
+          name: razorpayData.customer?.name || deliveryDetails?.customer_name || '',
+          email: razorpayData.customer?.email || deliveryDetails?.email || '',
+          contact: razorpayData.customer?.phone || deliveryDetails?.phone || '',
+        },
+        notes: {
+          order_id: String(razorpayData.order_id),
+          environment: 'test_mode',
+        },
+        theme: {
+          color: '#C9A45C', // AURA Gold
+          backdrop_color: 'rgba(11, 10, 9, 0.85)',
+        },
+        modal: {
+          ondismiss: async function () {
+            setSubmitting(false);
+            try {
+              await reportPaymentFailure({
+                order_id: razorpayData.order_id,
+                razorpay_order_id: razorpayData.razorpay_order_id,
+                error_code: 'PAYMENT_CANCELLED_BY_USER',
+                error_description: 'Checkout window closed before payment was completed.',
+              });
+            } catch {
+              // Ignore dismiss report error
+            }
+            setError('Payment cancelled. You can retry with Razorpay TEST MODE when you are ready.');
+          },
+        },
+      };
+
+      const rzpInstance = new window.Razorpay(options);
+
+      rzpInstance.on('payment.failed', async function (response) {
+        setSubmitting(false);
+        const errObj = response.error || {};
+        try {
+          await reportPaymentFailure({
+            order_id: razorpayData.order_id,
+            razorpay_order_id: razorpayData.razorpay_order_id,
+            error_code: errObj.code,
+            error_description: errObj.description,
+            razorpay_payment_id: errObj.metadata?.payment_id,
+          });
+        } catch {
+          // Ignore failure recording error
+        }
+        setError(`Payment failed: ${errObj.description || 'Transaction declined. Please try again.'}`);
+      });
+
+      rzpInstance.open();
     } catch (err) {
-      setError(err.message || 'Payment processing failed. Please try again.');
-    } finally {
       setSubmitting(false);
+      setError(err.message || 'Failed to initiate Razorpay checkout.');
     }
   }
 
@@ -239,14 +307,21 @@ export default function Payment({ onCartChange }) {
       <div className="checkout-page container checkout-success" style={{ minHeight: '60vh', paddingTop: '4rem', paddingBottom: '5rem' }}>
         <p className="eyebrow">Order Confirmed</p>
         <h1>Thank you, {deliveryDetails.customer_name.split(' ')[0]}.</h1>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 14px', background: 'rgba(201, 164, 92, 0.15)', border: '1px solid var(--gold)', borderRadius: '20px', color: 'var(--gold-bright)', fontSize: '0.8rem', fontWeight: 600, margin: '1rem 0' }}>
+          <span>✓ Payment Verified (Razorpay Test Mode)</span>
+          {orderPlaced.razorpay_payment_id && <span>• ID: {orderPlaced.razorpay_payment_id}</span>}
+        </div>
         <p className="checkout-success-text">
-          Your order <strong>#{orderPlaced.order_id}</strong> has been placed for{' '}
+          Your order <strong>#{orderPlaced.order_id}</strong> has been successfully placed and confirmed for{' '}
           <strong>{formatCurrency(orderPlaced.total)}</strong>. We'll reach out on{' '}
           <strong>{deliveryDetails.phone}</strong> with delivery updates{deliveryDetails?.email ? (
             <> and a confirmation receipt has been sent to <strong>{deliveryDetails.email}</strong></>
           ) : null}.
         </p>
-        <Link to="/shop" className="btn btn-gold">Continue Shopping</Link>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+          <Link to="/my-orders" className="btn btn-gold">View Your Orders</Link>
+          <Link to="/shop" className="btn btn-outline">Continue Shopping</Link>
+        </div>
       </div>
     );
   }
@@ -691,6 +766,25 @@ export default function Payment({ onCartChange }) {
               </div>
             </div>
 
+            {/* Test Mode Notice Banner */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              padding: '0.65rem 1rem',
+              background: '#fffbeb',
+              border: '1px solid #fcd34d',
+              borderRadius: '8px',
+              color: '#92400e',
+              fontSize: '0.78rem',
+              fontWeight: 500,
+              marginBottom: '1.25rem',
+              textAlign: 'center',
+            }}>
+              <span>⚡ <strong>Razorpay TEST MODE:</strong> Supports simulated UPI, Netbanking, & Test Cards (e.g. <code>4111 2222 3333 4444</code>)</span>
+            </div>
+
             {/* Pay / Continue CTA */}
             <div className="rzp-pay-action-wrap">
               <button
@@ -701,7 +795,7 @@ export default function Payment({ onCartChange }) {
               >
                 <Lock size={15} />
                 <span>
-                  {submitting ? 'Processing Payment…' : `Pay ${formatCurrency(cart.total)}`}
+                  {submitting ? 'Connecting to Razorpay…' : `Pay ${formatCurrency(cart.total)} with Razorpay`}
                 </span>
               </button>
 
@@ -709,7 +803,7 @@ export default function Payment({ onCartChange }) {
                 <span className="rzp-secured-text">Secured by</span>
                 <span className="rzp-brand-logo">Razorpay</span>
                 <span className="rzp-secured-divider">•</span>
-                <span className="rzp-secured-sub">100% Safe & Secure</span>
+                <span className="rzp-secured-sub">TEST MODE • 100% Secure</span>
               </div>
             </div>
           </div>

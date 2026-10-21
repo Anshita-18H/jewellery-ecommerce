@@ -73,7 +73,14 @@ export const removeFromWishlistApi = (productId) =>
 export const clearWishlistApi = () =>
   request('/wishlist', { method: 'DELETE' });
 
-// ---- Orders ----
+// ---- Orders & Razorpay Payments ----
+export const getPaymentConfig = () => request('/orders/config');
+export const createRazorpayOrder = (data) =>
+  request('/orders/create-razorpay-order', { method: 'POST', body: JSON.stringify(data) });
+export const verifyRazorpayPayment = (data) =>
+  request('/orders/verify-payment', { method: 'POST', body: JSON.stringify(data) });
+export const reportPaymentFailure = (data) =>
+  request('/orders/payment-failed', { method: 'POST', body: JSON.stringify(data) });
 export const placeOrder = (data) => request('/orders', { method: 'POST', body: JSON.stringify(data) });
 export const getMyOrders = () => request('/orders/mine');
 export const getOrders = () => request('/orders');

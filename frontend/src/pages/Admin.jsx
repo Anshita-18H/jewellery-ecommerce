@@ -1357,6 +1357,7 @@ function AdminOrders() {
                   <th>Phone Number</th>
                   <th>Shipping City</th>
                   <th>Total Amount</th>
+                  <th>Payment</th>
                   <th>Order Status</th>
                   <th>Placed Date</th>
                 </tr>
@@ -1369,6 +1370,28 @@ function AdminOrders() {
                     <td>{o.phone}</td>
                     <td>{o.city || '—'}</td>
                     <td>{formatCurrency(o.total_amount)}</td>
+                    <td>
+                      {o.payment_status === 'paid' ? (
+                        <div>
+                          <span className="admin-stock-badge active-status" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>
+                            Paid (Razorpay)
+                          </span>
+                          {o.razorpay_payment_id && (
+                            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px', fontFamily: 'monospace' }}>
+                              {o.razorpay_payment_id}
+                            </div>
+                          )}
+                        </div>
+                      ) : o.payment_status === 'failed' ? (
+                        <span className="admin-stock-badge deactive" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>
+                          Failed
+                        </span>
+                      ) : (
+                        <span className="admin-stock-badge" style={{ fontSize: '0.72rem', padding: '2px 8px', background: 'rgba(255, 255, 255, 0.08)', color: 'var(--text-muted)' }}>
+                          Pending
+                        </span>
+                      )}
+                    </td>
                     <td>
                       <select
                         value={o.status}

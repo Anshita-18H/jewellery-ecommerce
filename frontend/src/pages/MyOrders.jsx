@@ -189,6 +189,15 @@ export default function MyOrders() {
                   </div>
 
                   <div className="myorders-status-group">
+                    {order.payment_status === 'paid' ? (
+                      <span className="myorders-status-badge status-confirmed" style={{ background: 'rgba(201, 164, 92, 0.15)', color: 'var(--gold-bright)', borderColor: 'var(--gold-dim)' }}>
+                        <CheckCircle size={13} /> Paid (Razorpay)
+                      </span>
+                    ) : order.payment_status === 'failed' ? (
+                      <span className="myorders-status-badge status-cancelled">
+                        <XCircle size={13} /> Payment Failed
+                      </span>
+                    ) : null}
                     {renderStatusBadge(order.status)}
                   </div>
                 </div>

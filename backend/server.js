@@ -266,6 +266,26 @@ async function initDatabase() {
       console.warn('Could not verify is_active column on products:', err.message);
     }
 
+    // Razorpay columns verification on orders table
+    try {
+      const razorpayCols = [
+        ['razorpay_order_id', 'VARCHAR(100) DEFAULT NULL'],
+        ['razorpay_payment_id', 'VARCHAR(100) DEFAULT NULL'],
+        ['razorpay_signature', 'VARCHAR(255) DEFAULT NULL'],
+        ['payment_status', "VARCHAR(50) DEFAULT 'pending'"],
+        ['payment_method', "VARCHAR(50) DEFAULT 'razorpay'"],
+      ];
+      for (const [col, colDef] of razorpayCols) {
+        const [chk] = await pool.query(`SHOW COLUMNS FROM orders LIKE ?`, [col]);
+        if (chk.length === 0) {
+          await pool.query(`ALTER TABLE orders ADD COLUMN ${col} ${colDef}`);
+          console.log(`Added ${col} column to orders table`);
+        }
+      }
+    } catch (err) {
+      console.warn('Could not verify Razorpay columns on orders table:', err.message);
+    }
+
     console.log('Database tables verified successfully');
   } catch (err) {
     console.warn('Database table verification notice:', err.message);
