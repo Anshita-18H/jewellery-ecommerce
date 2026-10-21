@@ -91,7 +91,8 @@ async function initDatabase() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(150) NOT NULL,
         email VARCHAR(150) NOT NULL UNIQUE,
-        password_hash VARCHAR(255) NOT NULL,
+        password_hash VARCHAR(255) NULL,
+        google_id VARCHAR(255) NULL UNIQUE,
         phone VARCHAR(30) DEFAULT NULL,
         role VARCHAR(20) NOT NULL DEFAULT 'customer',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -284,6 +285,24 @@ async function initDatabase() {
       }
     } catch (err) {
       console.warn('Could not verify Razorpay columns on orders table:', err.message);
+    }
+
+    // Google authentication columns and password_hash nullability on users table
+    try {
+      await pool.query("ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(255) NULL");
+      console.log('Verified password_hash column is nullable on users table');
+    } catch (err) {
+      console.warn('Could not verify password_hash nullability on users table:', err.message);
+    }
+
+    try {
+      const [googleCols] = await pool.query("SHOW COLUMNS FROM users LIKE 'google_id'");
+      if (googleCols.length === 0) {
+        await pool.query("ALTER TABLE users ADD COLUMN google_id VARCHAR(255) NULL UNIQUE AFTER role");
+        console.log('Added google_id column to users table');
+      }
+    } catch (err) {
+      console.warn('Could not verify google_id column on users table:', err.message);
     }
 
     console.log('Database tables verified successfully');

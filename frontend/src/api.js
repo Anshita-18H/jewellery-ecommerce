@@ -97,6 +97,11 @@ export const loginUser = (data) =>
   request('/auth/login', { method: 'POST', body: JSON.stringify(data) });
 export const getMe = () => request('/auth/me');
 export const logoutUser = () => request('/auth/logout', { method: 'POST' });
+export const googleLoginApi = (credential) =>
+  request('/auth/google', {
+    method: 'POST',
+    body: JSON.stringify(typeof credential === 'string' ? { credential } : credential),
+  });
 export const requestPasswordReset = (email) =>
   request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
 export const verifyResetToken = (token) =>

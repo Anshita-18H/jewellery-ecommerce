@@ -4,6 +4,8 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const { sendPasswordResetEmail } = require('../services/email');
+const { OAuth2Client } = require('google-auth-library');
+const googleOAuthClient = new OAuth2Client();
 
 // Cryptographically secure password hashing with bcryptjs
 function hashPassword(password) {
@@ -115,6 +117,11 @@ router.post('/login', async (req, res) => {
     }
 
     const user = rows[0];
+
+    if (!user.password_hash) {
+      return res.status(400).json({ error: 'This account uses Google sign-in' });
+    }
+
     const valid = verifyPassword(password, user.password_hash);
 
     if (!valid) {
@@ -188,6 +195,106 @@ router.post('/logout', (req, res) => {
     res.clearCookie('connect.sid');
     res.json({ message: 'Logged out successfully' });
   });
+});
+
+/* ========================================================
+   GOOGLE AUTHENTICATION (Google Identity Services ID Token)
+   ======================================================== */
+
+// POST /api/auth/google — authenticate customer via Google ID Token
+router.post('/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ error: 'Google credential is required' });
+    }
+
+    const audience = process.env.GOOGLE_CLIENT_ID;
+    if (!audience) {
+      console.error('GOOGLE_CLIENT_ID is not configured in backend environment variables');
+      return res.status(500).json({ error: 'Google authentication is not configured on the server' });
+    }
+
+    let payload;
+    try {
+      const ticket = await googleOAuthClient.verifyIdToken({
+        idToken: credential,
+        audience: audience,
+      });
+      payload = ticket.getPayload();
+    } catch (verifyErr) {
+      console.error('Google ID token verification failed:', verifyErr.message);
+      return res.status(401).json({ error: 'Invalid Google authentication token' });
+    }
+
+    if (!payload || !payload.sub || !payload.email) {
+      return res.status(401).json({ error: 'Invalid Google authentication token payload' });
+    }
+
+    const isEmailVerified = payload.email_verified === true || payload.email_verified === 'true';
+    if (!isEmailVerified) {
+      return res.status(401).json({ error: 'Google email address is not verified' });
+    }
+
+    const googleId = payload.sub;
+    const cleanEmail = payload.email.trim().toLowerCase();
+    const tokenName = (payload.name || payload.given_name || '').trim();
+    const displayName = tokenName || cleanEmail.split('@')[0] || 'Customer';
+
+    // 1. Look up user by google_id
+    const [rowsByGoogleId] = await pool.query('SELECT * FROM users WHERE google_id = ? LIMIT 1', [googleId]);
+    let user = rowsByGoogleId[0] || null;
+
+    if (!user) {
+      // 2. Look up by email
+      const [rowsByEmail] = await pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [cleanEmail]);
+      if (rowsByEmail.length > 0) {
+        user = rowsByEmail[0];
+        // Link by setting google_id on that existing row (preserves existing role & data)
+        await pool.query('UPDATE users SET google_id = ? WHERE id = ?', [googleId, user.id]);
+        user.google_id = googleId;
+      } else {
+        // 3. Create a new user: role strictly 'customer', password_hash NULL, phone NULL
+        const [insertResult] = await pool.query(
+          'INSERT INTO users (name, email, password_hash, phone, role, google_id) VALUES (?, ?, NULL, NULL, ?, ?)',
+          [displayName, cleanEmail, 'customer', googleId]
+        );
+        user = {
+          id: insertResult.insertId,
+          name: displayName,
+          email: cleanEmail,
+          phone: null,
+          role: 'customer',
+          google_id: googleId,
+        };
+      }
+    }
+
+    // Bind authenticated user to server-side session (maintains guest cart)
+    req.session.userId = user.id;
+    req.session.role = user.role || 'customer';
+    req.session.userRole = user.role || 'customer';
+
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error on Google login:', err);
+      }
+      res.json({
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone || null,
+          role: user.role || 'customer',
+        },
+        message: 'Signed in successfully',
+      });
+    });
+  } catch (err) {
+    console.error('Google auth processing error:', err);
+    res.status(500).json({ error: 'Unable to process Google authentication. Please try again.' });
+  }
 });
 
 /* ========================================================
@@ -446,6 +553,11 @@ router.post('/admin/login', async (req, res) => {
     }
 
     const user = rows[0];
+
+    if (!user.password_hash) {
+      return res.status(400).json({ error: 'This account uses Google sign-in' });
+    }
+
     const valid = verifyPassword(password, user.password_hash);
 
     if (!valid) {

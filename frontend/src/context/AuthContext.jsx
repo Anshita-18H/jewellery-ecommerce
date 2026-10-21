@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getMe, loginUser, signupUser, registerUser, logoutUser } from '../api';
+import { getMe, loginUser, signupUser, registerUser, logoutUser, googleLoginApi } from '../api';
 
 const AuthContext = createContext(null);
 
@@ -90,6 +90,21 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const loginWithGoogle = async (credential) => {
+    const data = await googleLoginApi(credential);
+    if (data && data.user) {
+      setUser(data.user);
+      if (authModal.onSuccess) {
+        try {
+          authModal.onSuccess(data.user);
+        } catch (e) {
+          console.error('onSuccess callback error:', e);
+        }
+      }
+    }
+    return data;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -99,6 +114,7 @@ export function AuthProvider({ children }) {
         signup,
         register,
         logout,
+        loginWithGoogle,
         refreshUser: checkAuth,
         authModal,
         openAuthModal,
