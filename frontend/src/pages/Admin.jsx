@@ -27,6 +27,8 @@ import {
   MapPin,
   Package,
   User,
+  Edit2,
+  Check,
 } from 'lucide-react';
 import {
   getProducts,
@@ -43,6 +45,7 @@ import {
   deleteAdminReview,
   getAdminCustomers,
   getAdminCustomerDetails,
+  updateAdminCustomerPhone,
 } from '../api';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute';
@@ -1314,6 +1317,12 @@ function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
 
+  // Selected customer for dossier modal
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [selectedCustomerData, setSelectedCustomerData] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState(null);
+
   function loadOrders() {
     setLoading(true);
     getOrders()
@@ -1332,6 +1341,25 @@ function AdminOrders() {
     } catch (err) {
       setMessage(err.message || 'Failed to update order status');
     }
+  }
+
+  function openCustomerDetails(idOrEmail) {
+    if (!idOrEmail) return;
+    setSelectedCustomerId(idOrEmail);
+    setSelectedCustomerData(null);
+    setLoadingDetails(true);
+    setDetailsError(null);
+
+    getAdminCustomerDetails(idOrEmail)
+      .then((data) => setSelectedCustomerData(data))
+      .catch((err) => setDetailsError(err.message || 'Failed to load customer profile'))
+      .finally(() => setLoadingDetails(false));
+  }
+
+  function closeCustomerDetails() {
+    setSelectedCustomerId(null);
+    setSelectedCustomerData(null);
+    setDetailsError(null);
   }
 
   if (loading) return <p className="admin-status">Loading store orders…</p>;
@@ -1360,28 +1388,55 @@ function AdminOrders() {
               <thead>
                 <tr>
                   <th>Order #</th>
-                  <th>Customer Name</th>
-                  <th>Phone Number</th>
+                  <th>Customer (Click for Dossier)</th>
+                  <th>Delivery Phone</th>
                   <th>Shipping City</th>
                   <th>Total Amount</th>
                   <th>Payment</th>
                   <th>Order Status</th>
                   <th>Placed Date</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((o) => (
                   <tr key={o.id}>
                     <td><strong>#{o.id}</strong></td>
-                    <td>{o.customer_name}</td>
-                    <td>{o.phone}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="admin-customer-link-btn"
+                        onClick={() => openCustomerDetails(o.user_id || o.customer_email)}
+                        title="Click to view customer dossier, profile and all order history"
+                      >
+                        <strong>{o.customer_name}</strong>
+                      </button>
+                      {o.customer_email && (
+                        <div style={{ marginTop: '2px' }}>
+                          <button
+                            type="button"
+                            className="admin-customer-link-btn email-link"
+                            onClick={() => openCustomerDetails(o.user_id || o.customer_email)}
+                            title="Click to view customer dossier"
+                          >
+                            {o.customer_email}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                        <Phone size={12} className="icon-gold" />
+                        {o.phone || '—'}
+                      </span>
+                    </td>
                     <td>{o.city || '—'}</td>
                     <td>{formatCurrency(o.total_amount)}</td>
                     <td>
                       {o.payment_status === 'paid' ? (
                         <div>
                           <span className="admin-stock-badge active-status" style={{ fontSize: '0.72rem', padding: '2px 8px' }}>
-                            Paid (Razorpay)
+                            Paid ({o.payment_method || 'Razorpay'})
                           </span>
                           {o.razorpay_payment_id && (
                             <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px', fontFamily: 'monospace' }}>
@@ -1416,12 +1471,46 @@ function AdminOrders() {
                       </select>
                     </td>
                     <td>{new Date(o.created_at).toLocaleDateString()}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="admin-btn-secondary"
+                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        onClick={() => openCustomerDetails(o.user_id || o.customer_email)}
+                        title="Open customer information dossier"
+                      >
+                        <Eye size={13} /> Dossier
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
+      )}
+
+      {/* Customer Information & Orders Modal */}
+      {selectedCustomerId !== null && (
+        <AdminCustomerModal
+          customerId={selectedCustomerId}
+          customerData={selectedCustomerData}
+          loading={loadingDetails}
+          error={detailsError}
+          onClose={closeCustomerDetails}
+          onCustomerUpdated={(id, newPhone) => {
+            if (selectedCustomerData?.customer) {
+              setSelectedCustomerData((prev) => ({
+                ...prev,
+                customer: {
+                  ...prev.customer,
+                  phone: newPhone,
+                  permanent_phone: newPhone,
+                },
+              }));
+            }
+          }}
+        />
       )}
     </div>
   );
@@ -1430,7 +1519,7 @@ function AdminOrders() {
 /* ========================================================
    5. CUSTOMERS VIEW & DOSSIER MODAL
    ======================================================== */
-function AdminCustomerModal({ customerId, customerData, loading, error, onClose }) {
+function AdminCustomerModal({ customerId, customerData, loading, error, onClose, onCustomerUpdated }) {
   useEffect(() => {
     function handleKeyDown(e) {
       if (e.key === 'Escape') onClose();
@@ -1443,6 +1532,38 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose 
   const stats = customerData?.stats;
   const orders = customerData?.orders || [];
   const latestAddress = customerData?.latest_shipping_address;
+
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [phoneInput, setPhoneInput] = useState('');
+  const [savingPhone, setSavingPhone] = useState(false);
+  const [phoneMessage, setPhoneMessage] = useState(null);
+
+  useEffect(() => {
+    if (customer) {
+      setPhoneInput(customer.permanent_phone || customer.phone || '');
+      setIsEditingPhone(false);
+      setPhoneMessage(null);
+    }
+  }, [customer]);
+
+  async function handleSavePhone(e) {
+    e.preventDefault();
+    if (!customer?.id) return;
+    setSavingPhone(true);
+    setPhoneMessage(null);
+    try {
+      await updateAdminCustomerPhone(customer.id, phoneInput.trim());
+      setPhoneMessage({ type: 'success', text: 'Permanent contact number saved successfully.' });
+      setIsEditingPhone(false);
+      if (onCustomerUpdated) {
+        onCustomerUpdated(customer.id, phoneInput.trim());
+      }
+    } catch (err) {
+      setPhoneMessage({ type: 'error', text: err.message || 'Failed to update permanent phone' });
+    } finally {
+      setSavingPhone(false);
+    }
+  }
 
   return (
     <div
@@ -1514,19 +1635,92 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose 
                         {customer.email}
                       </a>
                     </div>
+
+                    {/* Permanent Account Contact */}
                     <div className="admin-info-item">
-                      <span className="admin-info-label">Contact Phone</span>
-                      <span className="admin-info-value">
-                        {customer.display_phone ? (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                            <Phone size={13} className="icon-gold" />
-                            {customer.display_phone}
+                      <div className="admin-info-label-row">
+                        <span className="admin-info-label">Permanent Account Contact</span>
+                        <span className="admin-phone-permanent-tag">Permanent</span>
+                      </div>
+                      {isEditingPhone ? (
+                        <form onSubmit={handleSavePhone} className="admin-inline-phone-edit-form">
+                          <input
+                            type="tel"
+                            className="admin-inline-phone-input"
+                            value={phoneInput}
+                            onChange={(e) => setPhoneInput(e.target.value)}
+                            placeholder="e.g. +91 98765 43210"
+                            autoFocus
+                          />
+                          <button type="submit" className="admin-mini-btn-save" disabled={savingPhone}>
+                            <Check size={12} /> {savingPhone ? 'Saving…' : 'Save'}
+                          </button>
+                          <button
+                            type="button"
+                            className="admin-mini-btn-cancel"
+                            onClick={() => {
+                              setIsEditingPhone(false);
+                              setPhoneInput(customer.permanent_phone || customer.phone || '');
+                            }}
+                          >
+                            <X size={12} />
+                          </button>
+                        </form>
+                      ) : (
+                        <div className="admin-phone-display-row">
+                          <span className="admin-info-value">
+                            {customer.permanent_phone || customer.phone ? (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                <Phone size={13} className="icon-gold" />
+                                <strong>{customer.permanent_phone || customer.phone}</strong>
+                              </span>
+                            ) : (
+                              <span className="text-muted">Not specified on account</span>
+                            )}
                           </span>
-                        ) : (
-                          <span className="text-muted">No phone provided</span>
-                        )}
+                          {customer.id && (
+                            <button
+                              type="button"
+                              className="admin-phone-edit-btn"
+                              onClick={() => setIsEditingPhone(true)}
+                              title="Update permanent contact number"
+                            >
+                              <Edit2 size={11} /> Edit
+                            </button>
+                          )}
+                        </div>
+                      )}
+                      {phoneMessage && (
+                        <span className={`admin-inline-msg ${phoneMessage.type}`}>
+                          {phoneMessage.text}
+                        </span>
+                      )}
+                      <span className="admin-info-subtext">
+                        Customer permanent contact number recorded on account profile.
                       </span>
                     </div>
+
+                    {/* Delivery Contact (Per Order) */}
+                    <div className="admin-info-item">
+                      <div className="admin-info-label-row">
+                        <span className="admin-info-label">Delivery Contact</span>
+                        <span className="admin-phone-delivery-tag">Per-Order Delivery</span>
+                      </div>
+                      <span className="admin-info-value">
+                        {customer.delivery_phone ? (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                            <Phone size={13} style={{ color: '#64b5f6' }} />
+                            <span>{customer.delivery_phone}</span>
+                          </span>
+                        ) : (
+                          <span className="text-muted">No delivery orders yet</span>
+                        )}
+                      </span>
+                      <span className="admin-info-subtext">
+                        Provided during order checkout; can be changed with each order delivery.
+                      </span>
+                    </div>
+
                     <div className="admin-info-item">
                       <span className="admin-info-label">Account Sign-in Type</span>
                       <span className="admin-info-value">{customer.auth_type}</span>
@@ -1765,7 +1959,9 @@ function AdminCustomers() {
     return (
       (c.name && c.name.toLowerCase().includes(q)) ||
       (c.email && c.email.toLowerCase().includes(q)) ||
-      (c.phone && c.phone.toLowerCase().includes(q))
+      (c.phone && c.phone.toLowerCase().includes(q)) ||
+      (c.permanent_phone && c.permanent_phone.toLowerCase().includes(q)) ||
+      (c.delivery_phone && c.delivery_phone.toLowerCase().includes(q))
     );
   });
 
@@ -1824,7 +2020,7 @@ function AdminCustomers() {
                   <th>Client ID</th>
                   <th>Full Name</th>
                   <th>Email Address</th>
-                  <th>Phone</th>
+                  <th>Contact Phone</th>
                   <th>Orders</th>
                   <th>Total Spent</th>
                   <th>Role</th>
@@ -1856,7 +2052,21 @@ function AdminCustomers() {
                         {c.email}
                       </button>
                     </td>
-                    <td>{c.phone || '—'}</td>
+                    <td>
+                      {c.permanent_phone ? (
+                        <div className="admin-phone-cell">
+                          <span className="admin-phone-val">{c.permanent_phone}</span>
+                          <span className="admin-phone-tag-tiny permanent">Permanent</span>
+                        </div>
+                      ) : c.delivery_phone ? (
+                        <div className="admin-phone-cell">
+                          <span className="admin-phone-val">{c.delivery_phone}</span>
+                          <span className="admin-phone-tag-tiny delivery">Delivery</span>
+                        </div>
+                      ) : (
+                        <span className="text-muted">—</span>
+                      )}
+                    </td>
                     <td>
                       <button
                         type="button"
@@ -1907,6 +2117,21 @@ function AdminCustomers() {
           loading={loadingDetails}
           error={detailsError}
           onClose={closeCustomerDetails}
+          onCustomerUpdated={(id, newPhone) => {
+            setCustomers((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, phone: newPhone, permanent_phone: newPhone } : c))
+            );
+            if (selectedCustomerData?.customer) {
+              setSelectedCustomerData((prev) => ({
+                ...prev,
+                customer: {
+                  ...prev.customer,
+                  phone: newPhone,
+                  permanent_phone: newPhone,
+                },
+              }));
+            }
+          }}
         />
       )}
     </div>

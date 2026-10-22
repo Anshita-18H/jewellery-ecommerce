@@ -110,12 +110,14 @@ router.get('/customers', async (req, res) => {
         u.id, 
         u.name, 
         u.email, 
+        u.phone AS permanent_phone,
         u.phone, 
         u.role, 
         u.google_id,
         u.created_at,
         COUNT(DISTINCT o.id) AS orders_count,
-        COALESCE(SUM(o.total_amount), 0) AS total_spent
+        COALESCE(SUM(o.total_amount), 0) AS total_spent,
+        (SELECT phone FROM orders WHERE user_id = u.id OR (customer_email IS NOT NULL AND LOWER(customer_email) = LOWER(u.email)) ORDER BY created_at DESC LIMIT 1) AS delivery_phone
       FROM users u
       LEFT JOIN orders o ON (o.user_id = u.id OR (o.customer_email IS NOT NULL AND o.customer_email != '' AND LOWER(o.customer_email) = LOWER(u.email)))
       GROUP BY u.id
@@ -132,25 +134,51 @@ router.get('/customers', async (req, res) => {
 router.get('/customers/:id', async (req, res) => {
   try {
     const customerId = req.params.id;
-    const [userRows] = await pool.query(
-      'SELECT id, name, email, phone, role, google_id, created_at, updated_at FROM users WHERE id = ?',
-      [customerId]
-    );
-
-    if (userRows.length === 0) {
-      return res.status(404).json({ error: 'Customer not found' });
+    let userRows;
+    if (/^\d+$/.test(customerId)) {
+      [userRows] = await pool.query(
+        'SELECT id, name, email, phone, role, google_id, created_at, updated_at FROM users WHERE id = ?',
+        [customerId]
+      );
+    } else {
+      [userRows] = await pool.query(
+        'SELECT id, name, email, phone, role, google_id, created_at, updated_at FROM users WHERE LOWER(email) = LOWER(?)',
+        [customerId]
+      );
     }
 
-    const customer = userRows[0];
+    let customer;
+    if (userRows.length === 0) {
+      // Check if there are orders with this customer ID (as email or identifier)
+      const [orderSample] = await pool.query(
+        'SELECT customer_name, customer_email, phone, created_at FROM orders WHERE LOWER(customer_email) = LOWER(?) ORDER BY created_at DESC LIMIT 1',
+        [customerId]
+      );
+      if (orderSample.length === 0) {
+        return res.status(404).json({ error: 'Customer not found' });
+      }
+      customer = {
+        id: null,
+        name: orderSample[0].customer_name,
+        email: orderSample[0].customer_email,
+        phone: null,
+        role: 'customer',
+        google_id: null,
+        created_at: orderSample[0].created_at,
+        is_guest: true,
+      };
+    } else {
+      customer = userRows[0];
+    }
 
     // Find all orders placed by this user (by user_id OR email)
     const [orders] = await pool.query(
       `SELECT id, session_id, user_id, customer_name, customer_email, phone, address, city, pincode,
               total_amount, status, payment_status, payment_method, razorpay_order_id, razorpay_payment_id, created_at
        FROM orders
-       WHERE user_id = ? OR (customer_email IS NOT NULL AND customer_email != '' AND LOWER(customer_email) = LOWER(?))
+       WHERE (user_id IS NOT NULL AND user_id = ?) OR (customer_email IS NOT NULL AND customer_email != '' AND LOWER(customer_email) = LOWER(?))
        ORDER BY created_at DESC`,
-      [customer.id, customer.email]
+      [customer.id || 0, customer.email]
     );
 
     // Attach items to each order
@@ -183,7 +211,7 @@ router.get('/customers/:id', async (req, res) => {
 
     // Determine latest delivery phone & shipping destination from actual orders
     const latestOrderWithPhone = orders.find((o) => o.phone && o.phone.trim());
-    const displayPhone = customer.phone || latestOrderWithPhone?.phone || null;
+    const deliveryPhone = latestOrderWithPhone?.phone || null;
 
     const latestShippingAddress = orders.length > 0 ? {
       recipient_name: orders[0].customer_name,
@@ -196,8 +224,9 @@ router.get('/customers/:id', async (req, res) => {
     res.json({
       customer: {
         ...customer,
-        display_phone: displayPhone,
-        auth_type: customer.google_id ? 'Google Account' : 'Email & Password',
+        permanent_phone: customer.phone || null,
+        delivery_phone: deliveryPhone,
+        auth_type: customer.is_guest ? 'Guest Checkout' : customer.google_id ? 'Google Account' : 'Email & Password',
       },
       stats: {
         total_orders: totalOrders,
@@ -209,6 +238,26 @@ router.get('/customers/:id', async (req, res) => {
   } catch (err) {
     console.error('Admin customer details fetch error:', err);
     res.status(500).json({ error: 'Failed to fetch customer profile and order history' });
+  }
+});
+
+// PUT /api/admin/customers/:id/phone — Update customer permanent contact number
+router.put('/customers/:id/phone', async (req, res) => {
+  try {
+    const customerId = req.params.id;
+    const { phone } = req.body;
+    const cleanPhone = (phone || '').trim();
+
+    if (/^\d+$/.test(customerId)) {
+      await pool.query('UPDATE users SET phone = ? WHERE id = ?', [cleanPhone || null, customerId]);
+    } else {
+      await pool.query('UPDATE users SET phone = ? WHERE LOWER(email) = LOWER(?)', [cleanPhone || null, customerId]);
+    }
+
+    res.json({ message: 'Permanent contact number updated successfully', phone: cleanPhone || null });
+  } catch (err) {
+    console.error('Update customer phone error:', err);
+    res.status(500).json({ error: 'Failed to update permanent contact number' });
   }
 });
 

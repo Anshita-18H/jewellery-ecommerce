@@ -2024,3 +2024,180 @@
   color: #e57373;
   border: 1px solid rgba(244, 67, 54, 0.35);
 }
+
+
+/* --- PERMANENT VS DELIVERY CONTACT LABELS & CONTROLS --- */
+.admin-info-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 2px;
+}
+
+.admin-phone-permanent-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: rgba(201, 164, 92, 0.16);
+  color: var(--gold-light, #d4af37);
+  border: 1px solid rgba(201, 164, 92, 0.4);
+}
+
+.admin-phone-delivery-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: rgba(33, 150, 243, 0.14);
+  color: #64b5f6;
+  border: 1px solid rgba(33, 150, 243, 0.35);
+}
+
+.admin-info-subtext {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--text-muted, #888);
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+.admin-phone-display-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.admin-phone-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  font-size: 0.7rem;
+  background: rgba(201, 164, 92, 0.1);
+  color: var(--gold-light, #d4af37);
+  border: 1px solid rgba(201, 164, 92, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-phone-edit-btn:hover {
+  background: rgba(201, 164, 92, 0.22);
+  border-color: var(--gold, #d4af37);
+}
+
+.admin-inline-phone-edit-form {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.admin-inline-phone-input {
+  flex: 1;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-gold, rgba(201, 164, 92, 0.4));
+  color: var(--text-light, #fff);
+  border-radius: 2px;
+  outline: none;
+}
+
+.admin-inline-phone-input:focus {
+  border-color: var(--gold, #d4af37);
+}
+
+.admin-mini-btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0.32rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: var(--gold, #c9a45c);
+  color: #111;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.admin-mini-btn-save:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.admin-mini-btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.32rem 0.45rem;
+  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted, #aaa);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.admin-inline-msg {
+  display: block;
+  font-size: 0.72rem;
+  margin-top: 3px;
+}
+
+.admin-inline-msg.success {
+  color: #81c784;
+}
+
+.admin-inline-msg.error {
+  color: #e57373;
+}
+
+.admin-phone-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-phone-val {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-primary, #f5f5f5);
+}
+
+.admin-phone-tag-tiny {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 0px 4px;
+  border-radius: 2px;
+}
+
+.admin-phone-tag-tiny.permanent {
+  background: rgba(201, 164, 92, 0.15);
+  color: var(--gold-light, #d4af37);
+  border: 1px solid rgba(201, 164, 92, 0.35);
+}
+
+.admin-phone-tag-tiny.delivery {
+  background: rgba(33, 150, 243, 0.12);
+  color: #64b5f6;
+  border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.admin-order-delivery-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #90caf9;
+}

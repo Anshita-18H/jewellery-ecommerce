@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Mail, Lock, User, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { X, Mail, Lock, User, Phone, AlertCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import GoogleSignInButton from './GoogleSignInButton';
 import './AuthModal.css';
@@ -15,6 +15,7 @@ export default function AuthModal() {
   // Form states
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,6 +27,7 @@ export default function AuthModal() {
       setError(null);
       setName('');
       setEmail('');
+      setPhone('');
       setPassword('');
       setShowPassword(false);
     }
@@ -61,7 +63,7 @@ export default function AuthModal() {
     setLoading(true);
     try {
       if (mode === 'signup') {
-        await signup({ name: name.trim(), email: cleanEmail, password });
+        await signup({ name: name.trim(), email: cleanEmail, phone: phone.trim(), password });
       } else {
         await login({ email: cleanEmail, password });
       }
@@ -129,24 +131,45 @@ export default function AuthModal() {
 
         <form className="auth-modal-form" onSubmit={handleSubmit} noValidate>
           {mode === 'signup' && (
-            <div className="auth-modal-field">
-              <label className="auth-modal-label" htmlFor="modal-name">
-                Full Name
-              </label>
-              <div className="auth-modal-input-wrap">
-                <User size={16} className="auth-modal-input-icon" />
-                <input
-                  id="modal-name"
-                  type="text"
-                  className="auth-modal-input"
-                  placeholder="Enter your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={loading}
-                  required
-                />
+            <>
+              <div className="auth-modal-field">
+                <label className="auth-modal-label" htmlFor="modal-name">
+                  Full Name
+                </label>
+                <div className="auth-modal-input-wrap">
+                  <User size={16} className="auth-modal-input-icon" />
+                  <input
+                    id="modal-name"
+                    type="text"
+                    className="auth-modal-input"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                </div>
               </div>
-            </div>
+
+              <div className="auth-modal-field">
+                <label className="auth-modal-label" htmlFor="modal-phone">
+                  Contact Number (Permanent)
+                </label>
+                <div className="auth-modal-input-wrap">
+                  <Phone size={16} className="auth-modal-input-icon" />
+                  <input
+                    id="modal-phone"
+                    type="tel"
+                    className="auth-modal-input"
+                    placeholder="e.g. +91 98765 43210"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           <div className="auth-modal-field">

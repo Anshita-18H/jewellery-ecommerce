@@ -131,3 +131,5 @@ export const getAdminReviews = () => request('/admin/reviews');
 export const deleteAdminReview = (id) => request(`/admin/reviews/${id}`, { method: 'DELETE' });
 export const getAdminCustomers = () => request('/admin/customers');
 export const getAdminCustomerDetails = (id) => request(`/admin/customers/${id}`);
+export const updateAdminCustomerPhone = (id, phone) =>
+  request(`/admin/customers/${id}/phone`, { method: 'PUT', body: JSON.stringify({ phone }) });

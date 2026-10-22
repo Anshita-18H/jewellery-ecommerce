@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   User,
+  Phone,
   CheckCircle2,
   Lock,
   Mail,
@@ -36,6 +37,7 @@ export default function Checkout({ onCartChange }) {
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
   const [authName, setAuthName] = useState('');
   const [authEmail, setAuthEmail] = useState('');
+  const [authPhone, setAuthPhone] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [showAuthPassword, setShowAuthPassword] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
@@ -100,7 +102,12 @@ export default function Checkout({ onCartChange }) {
     try {
       let res;
       if (authMode === 'signup') {
-        res = await signup({ name: authName.trim(), email: cleanEmail, password: authPassword });
+        res = await signup({
+          name: authName.trim(),
+          email: cleanEmail,
+          phone: authPhone.trim(),
+          password: authPassword,
+        });
       } else {
         res = await login({ email: cleanEmail, password: authPassword });
       }
@@ -319,24 +326,45 @@ export default function Checkout({ onCartChange }) {
 
               <form className="checkout-auth-form" onSubmit={handleAuthSubmit} noValidate>
                 {authMode === 'signup' && (
-                  <div className="checkout-auth-field">
-                    <label className="checkout-auth-label" htmlFor="checkout-auth-name">
-                      Full Name
-                    </label>
-                    <div className="checkout-auth-input-wrap">
-                      <User size={16} className="checkout-auth-input-icon" />
-                      <input
-                        id="checkout-auth-name"
-                        type="text"
-                        className="checkout-auth-input"
-                        placeholder="Enter your full name"
-                        value={authName}
-                        onChange={(e) => setAuthName(e.target.value)}
-                        disabled={authLoading}
-                        required
-                      />
+                  <>
+                    <div className="checkout-auth-field">
+                      <label className="checkout-auth-label" htmlFor="checkout-auth-name">
+                        Full Name
+                      </label>
+                      <div className="checkout-auth-input-wrap">
+                        <User size={16} className="checkout-auth-input-icon" />
+                        <input
+                          id="checkout-auth-name"
+                          type="text"
+                          className="checkout-auth-input"
+                          placeholder="Enter your full name"
+                          value={authName}
+                          onChange={(e) => setAuthName(e.target.value)}
+                          disabled={authLoading}
+                          required
+                        />
+                      </div>
                     </div>
-                  </div>
+
+                    <div className="checkout-auth-field">
+                      <label className="checkout-auth-label" htmlFor="checkout-auth-phone">
+                        Contact Number (Permanent)
+                      </label>
+                      <div className="checkout-auth-input-wrap">
+                        <Phone size={16} className="checkout-auth-input-icon" />
+                        <input
+                          id="checkout-auth-phone"
+                          type="tel"
+                          className="checkout-auth-input"
+                          placeholder="e.g. +91 98765 43210"
+                          value={authPhone}
+                          onChange={(e) => setAuthPhone(e.target.value)}
+                          disabled={authLoading}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 <div className="checkout-auth-field">
