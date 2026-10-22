@@ -21,6 +21,12 @@ import {
   RefreshCw,
   Clock,
   ArrowRight,
+  Eye,
+  Mail,
+  Phone,
+  MapPin,
+  Package,
+  User,
 } from 'lucide-react';
 import {
   getProducts,
@@ -36,6 +42,7 @@ import {
   getAdminReviews,
   deleteAdminReview,
   getAdminCustomers,
+  getAdminCustomerDetails,
 } from '../api';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute';
@@ -1421,12 +1428,311 @@ function AdminOrders() {
 }
 
 /* ========================================================
-   5. CUSTOMERS VIEW
+   5. CUSTOMERS VIEW & DOSSIER MODAL
    ======================================================== */
+function AdminCustomerModal({ customerId, customerData, loading, error, onClose }) {
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  const customer = customerData?.customer;
+  const stats = customerData?.stats;
+  const orders = customerData?.orders || [];
+  const latestAddress = customerData?.latest_shipping_address;
+
+  return (
+    <div
+      className="admin-modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="admin-modal-card admin-customer-modal-card">
+        {/* Modal Header */}
+        <div className="admin-modal-header">
+          <div className="admin-customer-modal-title-wrap">
+            <div className="admin-customer-avatar">
+              {customer?.name ? customer.name.charAt(0).toUpperCase() : 'C'}
+            </div>
+            <div>
+              <p className="eyebrow">Customer Dossier</p>
+              <h3>{customer ? customer.name : `Customer #${customerId}`}</h3>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="admin-modal-close-btn"
+            onClick={onClose}
+            aria-label="Close modal"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="admin-modal-body admin-customer-modal-body">
+          {loading && (
+            <div className="admin-customer-loading">
+              <span className="admin-spinner" />
+              <p>Fetching full customer profile and order history…</p>
+            </div>
+          )}
+
+          {error && (
+            <div className="admin-message error" style={{ margin: '1rem 0' }}>
+              <AlertTriangle size={18} />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {!loading && customer && (
+            <>
+              {/* Top Overview Cards Grid */}
+              <div className="admin-customer-grid">
+                {/* Contact Card */}
+                <div className="admin-customer-card">
+                  <div className="admin-customer-card-header">
+                    <User size={16} className="icon-gold" />
+                    <h4>Client Profile</h4>
+                    <span className={`admin-role-badge role-${customer.role}`}>
+                      {customer.role}
+                    </span>
+                  </div>
+                  <div className="admin-customer-card-content">
+                    <div className="admin-info-item">
+                      <span className="admin-info-label">Full Name</span>
+                      <strong className="admin-info-value">{customer.name}</strong>
+                    </div>
+                    <div className="admin-info-item">
+                      <span className="admin-info-label">Email Address</span>
+                      <a href={`mailto:${customer.email}`} className="admin-info-value admin-link-gold">
+                        <Mail size={13} />
+                        {customer.email}
+                      </a>
+                    </div>
+                    <div className="admin-info-item">
+                      <span className="admin-info-label">Contact Phone</span>
+                      <span className="admin-info-value">
+                        {customer.display_phone ? (
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            <Phone size={13} className="icon-gold" />
+                            {customer.display_phone}
+                          </span>
+                        ) : (
+                          <span className="text-muted">No phone provided</span>
+                        )}
+                      </span>
+                    </div>
+                    <div className="admin-info-item">
+                      <span className="admin-info-label">Account Sign-in Type</span>
+                      <span className="admin-info-value">{customer.auth_type}</span>
+                    </div>
+                    <div className="admin-info-item">
+                      <span className="admin-info-label">Member Since</span>
+                      <span className="admin-info-value">
+                        {new Date(customer.created_at).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Purchase Stats Card */}
+                <div className="admin-customer-card">
+                  <div className="admin-customer-card-header">
+                    <ShoppingBag size={16} className="icon-gold" />
+                    <h4>Purchase Activity</h4>
+                  </div>
+                  <div className="admin-customer-card-content">
+                    <div className="admin-stat-highlight">
+                      <div className="admin-stat-number">{stats?.total_orders || 0}</div>
+                      <div className="admin-stat-desc">Lifetime Orders</div>
+                    </div>
+                    <div className="admin-info-item" style={{ marginTop: '0.75rem' }}>
+                      <span className="admin-info-label">Total Spent</span>
+                      <strong className="admin-info-value gold-amount">
+                        {formatCurrency(stats?.total_spent || 0)}
+                      </strong>
+                    </div>
+                    <div className="admin-info-item">
+                      <span className="admin-info-label">Average Order Value</span>
+                      <span className="admin-info-value">
+                        {stats?.total_orders > 0
+                          ? formatCurrency(stats.total_spent / stats.total_orders)
+                          : '₹0'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shipping Destination Card */}
+                <div className="admin-customer-card">
+                  <div className="admin-customer-card-header">
+                    <MapPin size={16} className="icon-gold" />
+                    <h4>Delivery Address</h4>
+                  </div>
+                  <div className="admin-customer-card-content">
+                    {latestAddress ? (
+                      <div className="admin-address-box">
+                        <div className="admin-address-name">{latestAddress.recipient_name}</div>
+                        <div className="admin-address-line">{latestAddress.address}</div>
+                        <div className="admin-address-line">
+                          {latestAddress.city} — {latestAddress.pincode}
+                        </div>
+                        {latestAddress.phone && (
+                          <div className="admin-address-phone">
+                            <Phone size={12} /> {latestAddress.phone}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-muted" style={{ fontSize: '0.82rem', margin: '0.5rem 0' }}>
+                        No shipping address recorded yet.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Order History Section */}
+              <div className="admin-customer-orders-section">
+                <div className="admin-customer-section-header">
+                  <div>
+                    <h4>Order History &amp; Pieces Ordered</h4>
+                    <p className="admin-customer-section-sub">
+                      Showing all {orders.length} order{orders.length === 1 ? '' : 's'} placed by this customer
+                    </p>
+                  </div>
+                  <span className="admin-order-count-pill">{orders.length} Orders</span>
+                </div>
+
+                {orders.length === 0 ? (
+                  <div className="admin-empty-state" style={{ padding: '2rem 1rem' }}>
+                    <ShoppingBag size={28} className="icon-muted" />
+                    <p><strong>No orders placed yet.</strong></p>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      When this client purchases items from AURA, their orders and pieces will be detailed here.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="admin-customer-orders-list">
+                    {orders.map((o) => (
+                      <div key={o.id} className="admin-customer-order-card">
+                        <div className="admin-customer-order-top">
+                          <div className="admin-customer-order-id-wrap">
+                            <span className="admin-order-tag">Order #{o.id}</span>
+                            <span className="admin-order-date">
+                              {new Date(o.created_at).toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                          </div>
+
+                          <div className="admin-customer-order-badges">
+                            {/* Payment Status */}
+                            <span
+                              className={`admin-stock-badge ${
+                                o.payment_status === 'paid' ? 'active-status' : 'pending-status'
+                              }`}
+                            >
+                              {o.payment_status === 'paid' ? 'Paid' : 'Unpaid'} ({o.payment_method || 'Razorpay'})
+                            </span>
+
+                            {/* Order Status */}
+                            <span className={`admin-order-status-badge status-${o.status}`}>
+                              {o.status}
+                            </span>
+
+                            {/* Total Amount */}
+                            <strong className="admin-order-total-highlight">
+                              {formatCurrency(o.total_amount)}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {/* Delivery snapshot for this order */}
+                        <div className="admin-customer-order-shipping-bar">
+                          <span>
+                            <strong>Ship to:</strong> {o.customer_name} • {o.address}, {o.city} ({o.pincode}) • Phone: {o.phone}
+                          </span>
+                          {o.razorpay_payment_id && (
+                            <span className="admin-order-rzp-id">
+                              Payment ID: <code>{o.razorpay_payment_id}</code>
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Items Ordered Table */}
+                        <div className="admin-order-items-wrap">
+                          <h5 className="admin-order-items-title">
+                            <Package size={14} className="icon-gold" /> Pieces Ordered ({o.items?.length || 0}):
+                          </h5>
+                          <div className="admin-order-items-grid">
+                            {(o.items || []).map((item, idx) => (
+                              <div key={item.id || idx} className="admin-order-item-row">
+                                {item.image_url ? (
+                                  <img
+                                    src={item.image_url}
+                                    alt={item.product_name}
+                                    className="admin-order-item-thumb"
+                                  />
+                                ) : (
+                                  <div className="admin-order-item-thumb-placeholder">♦</div>
+                                )}
+                                <div className="admin-order-item-details">
+                                  <div className="admin-order-item-name">{item.product_name}</div>
+                                  <div className="admin-order-item-meta">
+                                    <span>Quantity: <strong>{item.quantity}</strong></span>
+                                    <span>Price: <strong>{formatCurrency(item.price)}</strong></span>
+                                    <span>Subtotal: <strong className="gold-amount">{formatCurrency(item.price * item.quantity)}</strong></span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="admin-modal-footer">
+          <button type="button" className="btn btn-outline" onClick={onClose}>
+            Close Dossier
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AdminCustomers() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Selected customer for full detail modal
+  const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+  const [selectedCustomerData, setSelectedCustomerData] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState(null);
 
   useEffect(() => {
     getAdminCustomers()
@@ -1434,6 +1740,34 @@ function AdminCustomers() {
       .catch((err) => setError(err.message || 'Could not load customer accounts'))
       .finally(() => setLoading(false));
   }, []);
+
+  function openCustomerDetails(id) {
+    setSelectedCustomerId(id);
+    setSelectedCustomerData(null);
+    setLoadingDetails(true);
+    setDetailsError(null);
+
+    getAdminCustomerDetails(id)
+      .then((data) => setSelectedCustomerData(data))
+      .catch((err) => setDetailsError(err.message || 'Failed to load customer profile'))
+      .finally(() => setLoadingDetails(false));
+  }
+
+  function closeCustomerDetails() {
+    setSelectedCustomerId(null);
+    setSelectedCustomerData(null);
+    setDetailsError(null);
+  }
+
+  const filteredCustomers = customers.filter((c) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      (c.email && c.email.toLowerCase().includes(q)) ||
+      (c.phone && c.phone.toLowerCase().includes(q))
+    );
+  });
 
   if (loading) return <p className="admin-status">Loading registered customers…</p>;
 
@@ -1444,6 +1778,26 @@ function AdminCustomers() {
           <p className="eyebrow">Client Directory</p>
           <h1 className="admin-page-title">Registered Customers ({customers.length})</h1>
         </div>
+        <div className="admin-search-wrap" style={{ maxWidth: '320px' }}>
+          <Search size={16} className="admin-search-icon" />
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="Search by name, email, phone…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="admin-search-clear"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
       {error && <p className="admin-message" style={{ color: '#ff9b9b', marginBottom: '1rem' }}>{error}</p>}
@@ -1452,6 +1806,14 @@ function AdminCustomers() {
         <div className="admin-empty-state">
           <Users size={32} className="icon-muted" />
           <p><strong>No customer accounts registered yet.</strong></p>
+        </div>
+      ) : filteredCustomers.length === 0 ? (
+        <div className="admin-empty-state">
+          <Search size={32} className="icon-muted" />
+          <p><strong>No clients match &ldquo;{searchQuery}&rdquo;.</strong></p>
+          <button type="button" className="btn btn-outline" onClick={() => setSearchQuery('')} style={{ marginTop: '0.75rem' }}>
+            Clear Search Filter
+          </button>
         </div>
       ) : (
         <div className="admin-list-card">
@@ -1463,31 +1825,89 @@ function AdminCustomers() {
                   <th>Full Name</th>
                   <th>Email Address</th>
                   <th>Phone</th>
+                  <th>Orders</th>
+                  <th>Total Spent</th>
                   <th>Role</th>
                   <th>Member Since</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {customers.map((c) => (
+                {filteredCustomers.map((c) => (
                   <tr key={c.id}>
                     <td>#{c.id}</td>
                     <td>
-                      <strong>{c.name}</strong>
+                      <button
+                        type="button"
+                        className="admin-customer-link-btn"
+                        onClick={() => openCustomerDetails(c.id)}
+                        title="Click to view full customer dossier & order history"
+                      >
+                        <strong>{c.name}</strong>
+                      </button>
                     </td>
-                    <td>{c.email}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="admin-customer-link-btn email-link"
+                        onClick={() => openCustomerDetails(c.id)}
+                        title="Click to view full customer dossier & order history"
+                      >
+                        {c.email}
+                      </button>
+                    </td>
                     <td>{c.phone || '—'}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className={`admin-order-count-badge ${Number(c.orders_count) > 0 ? 'has-orders' : 'zero-orders'}`}
+                        onClick={() => openCustomerDetails(c.id)}
+                        style={{ border: 'none', cursor: 'pointer' }}
+                        title="Click to view orders"
+                      >
+                        {c.orders_count || 0} {Number(c.orders_count) === 1 ? 'order' : 'orders'}
+                      </button>
+                    </td>
+                    <td>
+                      <strong style={{ color: Number(c.total_spent) > 0 ? 'var(--gold-bright)' : 'var(--text-muted)' }}>
+                        {formatCurrency(c.total_spent || 0)}
+                      </strong>
+                    </td>
                     <td>
                       <span className={`admin-role-badge role-${c.role}`}>
                         {c.role}
                       </span>
                     </td>
                     <td>{new Date(c.created_at).toLocaleDateString()}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="admin-btn-secondary"
+                        style={{ padding: '0.4rem 0.75rem', fontSize: '0.76rem', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                        onClick={() => openCustomerDetails(c.id)}
+                        title="View complete customer information and order details"
+                      >
+                        <Eye size={13} />
+                        <span>View Info</span>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
+      )}
+
+      {/* Customer Information & Orders Modal */}
+      {selectedCustomerId !== null && (
+        <AdminCustomerModal
+          customerId={selectedCustomerId}
+          customerData={selectedCustomerData}
+          loading={loadingDetails}
+          error={detailsError}
+          onClose={closeCustomerDetails}
+        />
       )}
     </div>
   );

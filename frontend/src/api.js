@@ -130,3 +130,4 @@ export const getAdminDashboard = () => request('/admin/dashboard');
 export const getAdminReviews = () => request('/admin/reviews');
 export const deleteAdminReview = (id) => request(`/admin/reviews/${id}`, { method: 'DELETE' });
 export const getAdminCustomers = () => request('/admin/customers');
+export const getAdminCustomerDetails = (id) => request(`/admin/customers/${id}`);

@@ -102,16 +102,113 @@ router.delete('/reviews/:id', async (req, res) => {
   }
 });
 
-// GET /api/admin/customers — List registered customers
+// GET /api/admin/customers — List registered customers with order stats
 router.get('/customers', async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      'SELECT id, name, email, phone, role, created_at FROM users ORDER BY created_at DESC'
-    );
+    const [rows] = await pool.query(`
+      SELECT 
+        u.id, 
+        u.name, 
+        u.email, 
+        u.phone, 
+        u.role, 
+        u.google_id,
+        u.created_at,
+        COUNT(DISTINCT o.id) AS orders_count,
+        COALESCE(SUM(o.total_amount), 0) AS total_spent
+      FROM users u
+      LEFT JOIN orders o ON (o.user_id = u.id OR (o.customer_email IS NOT NULL AND o.customer_email != '' AND LOWER(o.customer_email) = LOWER(u.email)))
+      GROUP BY u.id
+      ORDER BY u.created_at DESC
+    `);
     res.json(rows);
   } catch (err) {
     console.error('Admin customers fetch error:', err);
     res.status(500).json({ error: 'Failed to fetch customer accounts' });
+  }
+});
+
+// GET /api/admin/customers/:id — Detailed customer dossier with full order history & line items
+router.get('/customers/:id', async (req, res) => {
+  try {
+    const customerId = req.params.id;
+    const [userRows] = await pool.query(
+      'SELECT id, name, email, phone, role, google_id, created_at, updated_at FROM users WHERE id = ?',
+      [customerId]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: 'Customer not found' });
+    }
+
+    const customer = userRows[0];
+
+    // Find all orders placed by this user (by user_id OR email)
+    const [orders] = await pool.query(
+      `SELECT id, session_id, user_id, customer_name, customer_email, phone, address, city, pincode,
+              total_amount, status, payment_status, payment_method, razorpay_order_id, razorpay_payment_id, created_at
+       FROM orders
+       WHERE user_id = ? OR (customer_email IS NOT NULL AND customer_email != '' AND LOWER(customer_email) = LOWER(?))
+       ORDER BY created_at DESC`,
+      [customer.id, customer.email]
+    );
+
+    // Attach items to each order
+    if (orders.length > 0) {
+      const orderIds = orders.map((o) => o.id);
+      const [items] = await pool.query(
+        `SELECT oi.id, oi.order_id, oi.product_id, oi.product_name, oi.price, oi.quantity,
+                p.image_url, p.slug
+         FROM order_items oi
+         LEFT JOIN products p ON oi.product_id = p.id
+         WHERE oi.order_id IN (?)`,
+        [orderIds]
+      );
+
+      const itemsByOrderId = {};
+      for (const item of items) {
+        if (!itemsByOrderId[item.order_id]) {
+          itemsByOrderId[item.order_id] = [];
+        }
+        itemsByOrderId[item.order_id].push(item);
+      }
+
+      for (const order of orders) {
+        order.items = itemsByOrderId[order.id] || [];
+      }
+    }
+
+    const totalOrders = orders.length;
+    const totalSpent = orders.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+
+    // Determine latest delivery phone & shipping destination from actual orders
+    const latestOrderWithPhone = orders.find((o) => o.phone && o.phone.trim());
+    const displayPhone = customer.phone || latestOrderWithPhone?.phone || null;
+
+    const latestShippingAddress = orders.length > 0 ? {
+      recipient_name: orders[0].customer_name,
+      address: orders[0].address,
+      city: orders[0].city,
+      pincode: orders[0].pincode,
+      phone: orders[0].phone,
+    } : null;
+
+    res.json({
+      customer: {
+        ...customer,
+        display_phone: displayPhone,
+        auth_type: customer.google_id ? 'Google Account' : 'Email & Password',
+      },
+      stats: {
+        total_orders: totalOrders,
+        total_spent: totalSpent,
+      },
+      latest_shipping_address: latestShippingAddress,
+      orders,
+    });
+  } catch (err) {
+    console.error('Admin customer details fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch customer profile and order history' });
   }
 });
 
