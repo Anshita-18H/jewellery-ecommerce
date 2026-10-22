@@ -348,7 +348,7 @@ export default function Checkout({ onCartChange }) {
 
                     <div className="checkout-auth-field">
                       <label className="checkout-auth-label" htmlFor="checkout-auth-phone">
-                        Contact Number (Permanent)
+                        Contact Number
                       </label>
                       <div className="checkout-auth-input-wrap">
                         <Phone size={16} className="checkout-auth-input-icon" />

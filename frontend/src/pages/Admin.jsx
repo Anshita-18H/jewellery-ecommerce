@@ -1540,7 +1540,7 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose,
 
   useEffect(() => {
     if (customer) {
-      setPhoneInput(customer.permanent_phone || customer.phone || '');
+      setPhoneInput(customer.phone || customer.permanent_phone || customer.delivery_phone || '');
       setIsEditingPhone(false);
       setPhoneMessage(null);
     }
@@ -1553,13 +1553,15 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose,
     setPhoneMessage(null);
     try {
       await updateAdminCustomerPhone(customer.id, phoneInput.trim());
-      setPhoneMessage({ type: 'success', text: 'Permanent contact number saved successfully.' });
+      setPhoneMessage({ type: 'success', text: 'Contact number saved.' });
       setIsEditingPhone(false);
+      customer.phone = phoneInput.trim();
+      customer.permanent_phone = phoneInput.trim();
       if (onCustomerUpdated) {
         onCustomerUpdated(customer.id, phoneInput.trim());
       }
     } catch (err) {
-      setPhoneMessage({ type: 'error', text: err.message || 'Failed to update permanent phone' });
+      setPhoneMessage({ type: 'error', text: err.message || 'Failed to update phone' });
     } finally {
       setSavingPhone(false);
     }
@@ -1636,12 +1638,9 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose,
                       </a>
                     </div>
 
-                    {/* Permanent Account Contact */}
+                    {/* Contact Number */}
                     <div className="admin-info-item">
-                      <div className="admin-info-label-row">
-                        <span className="admin-info-label">Permanent Account Contact</span>
-                        <span className="admin-phone-permanent-tag">Permanent</span>
-                      </div>
+                      <span className="admin-info-label">Contact Number</span>
                       {isEditingPhone ? (
                         <form onSubmit={handleSavePhone} className="admin-inline-phone-edit-form">
                           <input
@@ -1660,7 +1659,7 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose,
                             className="admin-mini-btn-cancel"
                             onClick={() => {
                               setIsEditingPhone(false);
-                              setPhoneInput(customer.permanent_phone || customer.phone || '');
+                              setPhoneInput(customer.phone || customer.permanent_phone || customer.delivery_phone || '');
                             }}
                           >
                             <X size={12} />
@@ -1669,13 +1668,13 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose,
                       ) : (
                         <div className="admin-phone-display-row">
                           <span className="admin-info-value">
-                            {customer.permanent_phone || customer.phone ? (
+                            {customer.phone || customer.permanent_phone || customer.delivery_phone ? (
                               <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                                 <Phone size={13} className="icon-gold" />
-                                <strong>{customer.permanent_phone || customer.phone}</strong>
+                                <strong>{customer.phone || customer.permanent_phone || customer.delivery_phone}</strong>
                               </span>
                             ) : (
-                              <span className="text-muted">Not specified on account</span>
+                              <span className="text-muted">No phone provided</span>
                             )}
                           </span>
                           {customer.id && (
@@ -1683,7 +1682,7 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose,
                               type="button"
                               className="admin-phone-edit-btn"
                               onClick={() => setIsEditingPhone(true)}
-                              title="Update permanent contact number"
+                              title="Edit contact number"
                             >
                               <Edit2 size={11} /> Edit
                             </button>
@@ -1695,30 +1694,6 @@ function AdminCustomerModal({ customerId, customerData, loading, error, onClose,
                           {phoneMessage.text}
                         </span>
                       )}
-                      <span className="admin-info-subtext">
-                        Customer permanent contact number recorded on account profile.
-                      </span>
-                    </div>
-
-                    {/* Delivery Contact (Per Order) */}
-                    <div className="admin-info-item">
-                      <div className="admin-info-label-row">
-                        <span className="admin-info-label">Delivery Contact</span>
-                        <span className="admin-phone-delivery-tag">Per-Order Delivery</span>
-                      </div>
-                      <span className="admin-info-value">
-                        {customer.delivery_phone ? (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                            <Phone size={13} style={{ color: '#64b5f6' }} />
-                            <span>{customer.delivery_phone}</span>
-                          </span>
-                        ) : (
-                          <span className="text-muted">No delivery orders yet</span>
-                        )}
-                      </span>
-                      <span className="admin-info-subtext">
-                        Provided during order checkout; can be changed with each order delivery.
-                      </span>
                     </div>
 
                     <div className="admin-info-item">
@@ -2052,21 +2027,7 @@ function AdminCustomers() {
                         {c.email}
                       </button>
                     </td>
-                    <td>
-                      {c.permanent_phone ? (
-                        <div className="admin-phone-cell">
-                          <span className="admin-phone-val">{c.permanent_phone}</span>
-                          <span className="admin-phone-tag-tiny permanent">Permanent</span>
-                        </div>
-                      ) : c.delivery_phone ? (
-                        <div className="admin-phone-cell">
-                          <span className="admin-phone-val">{c.delivery_phone}</span>
-                          <span className="admin-phone-tag-tiny delivery">Delivery</span>
-                        </div>
-                      ) : (
-                        <span className="text-muted">—</span>
-                      )}
-                    </td>
+                    <td>{c.phone || c.permanent_phone || c.delivery_phone || '—'}</td>
                     <td>
                       <button
                         type="button"

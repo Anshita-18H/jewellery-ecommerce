@@ -153,7 +153,7 @@ export default function AuthModal() {
 
               <div className="auth-modal-field">
                 <label className="auth-modal-label" htmlFor="modal-phone">
-                  Contact Number (Permanent)
+                  Contact Number
                 </label>
                 <div className="auth-modal-input-wrap">
                   <Phone size={16} className="auth-modal-input-icon" />
