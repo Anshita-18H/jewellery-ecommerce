@@ -3,10 +3,21 @@ const router = express.Router();
 const pool = require('../config/db');
 const { requireAdmin } = require('../middleware/auth');
 
-// GET /api/categories — used for nav links, shop filters, and admin dropdown
+// GET /api/categories — used for nav links, shop filters, and admin taxonomy
 router.get('/', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM categories ORDER BY name ASC');
+    const [rows] = await pool.query(`
+      SELECT 
+        c.id, 
+        c.name, 
+        c.slug,
+        COUNT(p.id) AS product_count,
+        COALESCE(SUM(p.stock), 0) AS total_stock
+      FROM categories c
+      LEFT JOIN products p ON p.category_id = c.id
+      GROUP BY c.id
+      ORDER BY c.name ASC
+    `);
     res.json(rows);
   } catch (err) {
     console.error(err);

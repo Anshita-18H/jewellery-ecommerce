@@ -1268,15 +1268,22 @@ function AdminProducts({
    ======================================================== */
 function AdminCategories({ onSelectCategory }) {
   const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCategories()
-      .then(setCategories)
+    Promise.all([
+      getCategories().catch(() => []),
+      getProducts({ include_hidden: 'true' }).catch(() => [])
+    ])
+      .then(([cats, prods]) => {
+        setCategories(Array.isArray(cats) ? cats : []);
+        setProducts(Array.isArray(prods) ? prods : []);
+      })
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <p className="admin-status">Loading categories…</p>;
+  if (loading) return <p className="admin-status">Loading categories and stock levels…</p>;
 
   return (
     <div className="admin-categories-view">
@@ -1288,22 +1295,67 @@ function AdminCategories({ onSelectCategory }) {
       </div>
 
       <div className="admin-categories-grid">
-        {categories.map((cat) => (
-          <div key={cat.id} className="admin-category-card">
-            <div className="admin-cat-icon">
-              <FolderTree size={22} />
-            </div>
-            <h3>{cat.name}</h3>
-            <p className="admin-cat-slug">slug: <code>{cat.slug}</code></p>
-            <button
-              type="button"
-              className="btn btn-outline admin-cat-btn"
+        {categories.map((cat) => {
+          const catProducts = products.filter(
+            (p) =>
+              p.category_id === cat.id ||
+              (p.category_slug && p.category_slug.toLowerCase() === (cat.slug || '').toLowerCase())
+          );
+          const computedStock = catProducts.reduce((sum, p) => sum + Number(p.stock || 0), 0);
+          const totalStock =
+            cat.total_stock !== undefined && cat.total_stock !== null
+              ? Number(cat.total_stock)
+              : computedStock;
+          const productCount =
+            cat.product_count !== undefined && cat.product_count !== null
+              ? Number(cat.product_count)
+              : catProducts.length;
+
+          return (
+            <div
+              key={cat.id}
+              className="admin-category-card"
               onClick={() => onSelectCategory(cat.slug)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelectCategory(cat.slug);
+                }
+              }}
+              title={`Click to open ${cat.name} category (${totalStock} in stock)`}
             >
-              Filter Products in {cat.name}
-            </button>
-          </div>
-        ))}
+              <div className="admin-cat-icon">
+                <FolderTree size={22} />
+              </div>
+              <h3>{cat.name}</h3>
+              <p className="admin-cat-slug">
+                slug: <code>{cat.slug}</code>
+              </p>
+
+              <div className="admin-cat-meta-row">
+                <span className="admin-cat-count">
+                  {productCount} {productCount === 1 ? 'Design' : 'Designs'}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-outline admin-cat-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectCategory(cat.slug);
+                }}
+                title={`Open ${cat.name} (${totalStock} in stock)`}
+              >
+                <Package size={14} className="icon-gold" />
+                <span>{totalStock} in Stock</span>
+                <ArrowRight size={13} className="admin-cat-arrow" />
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
