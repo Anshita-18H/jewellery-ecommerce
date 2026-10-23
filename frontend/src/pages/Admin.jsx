@@ -92,8 +92,7 @@ export default function Admin() {
 
   const [activeTab, setActiveTab] = useState(getTabFromPath);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('');
   const [editProduct, setEditProduct] = useState(null);
 
   // Sync tab with URL
@@ -105,19 +104,6 @@ export default function Admin() {
     setActiveTab(tab);
     setMobileNavOpen(false);
     navigate(`/admin/${tab}`);
-  };
-
-  const handleSearchChange = (query) => {
-    setSearchQuery(query);
-    // If admin enters a search query while on another tab, switch to products to display matching results
-    if (query.trim() && activeTab !== 'products') {
-      setActiveTab('products');
-      navigate('/admin/products');
-    }
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery('');
   };
 
   const handleLogout = async () => {
@@ -263,27 +249,19 @@ export default function Admin() {
               <Menu size={20} />
             </button>
 
-            {/* ADMIN SEARCH BAR */}
-            <div className="admin-search-wrapper" role="search">
-              <Search size={16} className="admin-search-icon" aria-hidden="true" />
-              <input
-                type="text"
-                className="admin-search-input"
-                placeholder="Search products by name, ID, category..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                aria-label="Search products in admin"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  className="admin-search-clear"
-                  onClick={handleClearSearch}
-                  aria-label="Clear search input"
-                >
-                  <X size={14} />
-                </button>
-              )}
+            {/* BREADCRUMB INDICATOR */}
+            <div className="admin-topbar-breadcrumb">
+              <span className="admin-breadcrumb-brand">AURA</span>
+              <span className="admin-breadcrumb-sep">/</span>
+              <span className="admin-breadcrumb-section">
+                {activeTab === 'dashboard' && 'Dashboard Overview'}
+                {activeTab === 'products' && 'Product Inventory'}
+                {activeTab === 'categories' && 'Taxonomy & Categories'}
+                {activeTab === 'orders' && 'Client Orders'}
+                {activeTab === 'customers' && 'Customer Directory'}
+                {activeTab === 'reviews' && 'Reviews & Moderation'}
+                {activeTab === 'settings' && 'Store Configuration'}
+              </span>
             </div>
           </div>
 
@@ -314,9 +292,8 @@ export default function Admin() {
 
           {activeTab === 'products' && (
             <AdminProducts
-              searchQuery={searchQuery}
-              onClearSearch={handleClearSearch}
-              onSearchingStateChange={setIsSearching}
+              initialCategory={categoryFilter}
+              onClearInitialCategory={() => setCategoryFilter('')}
               editProduct={editProduct}
               onClearEdit={() => setEditProduct(null)}
             />
@@ -324,7 +301,7 @@ export default function Admin() {
 
           {activeTab === 'categories' && (
             <AdminCategories onSelectCategory={(catSlug) => {
-              setSearchQuery(catSlug);
+              setCategoryFilter(catSlug);
               handleTabChange('products');
             }} />
           )}
@@ -653,9 +630,8 @@ function AdminDashboard({ onNavigate, onEditProduct }) {
    2. PRODUCTS MANAGEMENT WITH INTEGRATED SEARCH
    ======================================================== */
 function AdminProducts({
-  searchQuery,
-  onClearSearch,
-  onSearchingStateChange,
+  initialCategory,
+  onClearInitialCategory,
   editProduct,
   onClearEdit,
 }) {
@@ -666,6 +642,14 @@ function AdminProducts({
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [filter, setFilter] = useState('all'); // 'all' | 'instock' | 'lowstock'
+  const [searchQuery, setSearchQuery] = useState(initialCategory || '');
+
+  // Keep search query updated if initialCategory changes
+  useEffect(() => {
+    if (initialCategory) {
+      setSearchQuery(initialCategory);
+    }
+  }, [initialCategory]);
 
   // Debounced search fetcher
   const searchTimeoutRef = useRef(null);
@@ -673,7 +657,6 @@ function AdminProducts({
   const fetchProducts = useCallback(
     async (search = '') => {
       setLoading(true);
-      onSearchingStateChange?.(true);
       try {
         const params = { include_hidden: 'true' };
         if (search && search.trim()) {
@@ -686,10 +669,9 @@ function AdminProducts({
         setMessage(err.message || 'Failed to fetch products');
       } finally {
         setLoading(false);
-        onSearchingStateChange?.(false);
       }
     },
-    [onSearchingStateChange]
+    []
   );
 
   useEffect(() => {
@@ -832,16 +814,41 @@ function AdminProducts({
       <div className="admin-page-header">
         <div>
           <p className="eyebrow">Catalog Management</p>
-          <h1 className="admin-page-title">Products ({products.length})</h1>
+          <h1 className="admin-page-title">Products ({filteredProducts.length})</h1>
         </div>
-        <button
-          type="button"
-          className="btn btn-gold admin-add-product-btn"
-          onClick={openAddForm}
-        >
-          <Plus size={16} />
-          <span>Add Product</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+          <div className="admin-search-wrap" style={{ minWidth: '240px', maxWidth: '340px' }}>
+            <Search size={16} className="admin-search-icon" />
+            <input
+              type="text"
+              className="admin-search-input"
+              placeholder="Search products by name, ID, category..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="admin-search-clear"
+                onClick={() => {
+                  setSearchQuery('');
+                  onClearInitialCategory?.();
+                }}
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+          <button
+            type="button"
+            className="btn btn-gold admin-add-product-btn"
+            onClick={openAddForm}
+          >
+            <Plus size={16} />
+            <span>Add Product</span>
+          </button>
+        </div>
       </div>
 
       {/* Action / Success Message Banner */}
@@ -858,9 +865,16 @@ function AdminProducts({
       {searchQuery && (
         <div className="admin-search-status-banner">
           <span>
-            Showing results for <strong>"{searchQuery}"</strong> ({products.length} found)
+            Showing results for <strong>"{searchQuery}"</strong> ({filteredProducts.length} found)
           </span>
-          <button type="button" className="admin-clear-link" onClick={onClearSearch}>
+          <button
+            type="button"
+            className="admin-clear-link"
+            onClick={() => {
+              setSearchQuery('');
+              onClearInitialCategory?.();
+            }}
+          >
             Clear Search
           </button>
         </div>
@@ -1128,7 +1142,14 @@ function AdminProducts({
                 <p>No products exist under this filter.</p>
               )}
               {searchQuery && (
-                <button type="button" className="btn btn-outline" onClick={onClearSearch}>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => {
+                    setSearchQuery('');
+                    onClearInitialCategory?.();
+                  }}
+                >
                   Clear Search Filter
                 </button>
               )}
@@ -1270,6 +1291,7 @@ function AdminCategories({ onSelectCategory }) {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -1283,6 +1305,15 @@ function AdminCategories({ onSelectCategory }) {
       .finally(() => setLoading(false));
   }, []);
 
+  const filteredCategories = categories.filter((cat) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      (cat.name && cat.name.toLowerCase().includes(q)) ||
+      (cat.slug && cat.slug.toLowerCase().includes(q))
+    );
+  });
+
   if (loading) return <p className="admin-status">Loading categories and stock levels…</p>;
 
   return (
@@ -1290,10 +1321,44 @@ function AdminCategories({ onSelectCategory }) {
       <div className="admin-page-header">
         <div>
           <p className="eyebrow">Taxonomy</p>
-          <h1 className="admin-page-title">Categories ({categories.length})</h1>
+          <h1 className="admin-page-title">Categories ({filteredCategories.length})</h1>
+        </div>
+        <div className="admin-search-wrap" style={{ maxWidth: '320px' }}>
+          <Search size={16} className="admin-search-icon" />
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="Search categories..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="admin-search-clear"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       </div>
 
+      {filteredCategories.length === 0 ? (
+        <div className="admin-empty-state">
+          <Search size={32} className="icon-muted" />
+          <p><strong>No categories match &ldquo;{searchQuery}&rdquo;.</strong></p>
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => setSearchQuery('')}
+            style={{ marginTop: '0.75rem' }}
+          >
+            Clear Search Filter
+          </button>
+        </div>
+      ) : (
       <div className="admin-categories-grid">
         {categories.map((cat) => {
           const catProducts = products.filter(
@@ -1357,6 +1422,7 @@ function AdminCategories({ onSelectCategory }) {
           );
         })}
       </div>
+      )}
     </div>
   );
 }
@@ -1368,6 +1434,7 @@ function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Selected customer for dossier modal
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -1414,6 +1481,30 @@ function AdminOrders() {
     setDetailsError(null);
   }
 
+  const filteredOrders = orders.filter((o) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const idStr = String(o.id || '');
+    const name = (o.customer_name || '').toLowerCase();
+    const email = (o.customer_email || '').toLowerCase();
+    const phone = (o.phone || '').toLowerCase();
+    const city = (o.city || '').toLowerCase();
+    const status = (o.status || '').toLowerCase();
+    const paymentStatus = (o.payment_status || '').toLowerCase();
+    const rzpId = (o.razorpay_payment_id || '').toLowerCase();
+
+    return (
+      idStr.includes(q) ||
+      name.includes(q) ||
+      email.includes(q) ||
+      phone.includes(q) ||
+      city.includes(q) ||
+      status.includes(q) ||
+      paymentStatus.includes(q) ||
+      rzpId.includes(q)
+    );
+  });
+
   if (loading) return <p className="admin-status">Loading store orders…</p>;
 
   return (
@@ -1421,7 +1512,27 @@ function AdminOrders() {
       <div className="admin-page-header">
         <div>
           <p className="eyebrow">Fulfilment</p>
-          <h1 className="admin-page-title">Client Orders ({orders.length})</h1>
+          <h1 className="admin-page-title">Client Orders ({filteredOrders.length})</h1>
+        </div>
+        <div className="admin-search-wrap" style={{ maxWidth: '340px' }}>
+          <Search size={16} className="admin-search-icon" />
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="Search by order #, name, email, phone, city..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="admin-search-clear"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -1432,6 +1543,19 @@ function AdminOrders() {
           <ShoppingBag size={32} className="icon-muted" />
           <p><strong>No customer orders found.</strong></p>
           <p>When clients place orders on the storefront, they will appear here with contact and shipping details.</p>
+        </div>
+      ) : filteredOrders.length === 0 ? (
+        <div className="admin-empty-state">
+          <Search size={32} className="icon-muted" />
+          <p><strong>No orders match &ldquo;{searchQuery}&rdquo;.</strong></p>
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => setSearchQuery('')}
+            style={{ marginTop: '0.75rem' }}
+          >
+            Clear Search Filter
+          </button>
         </div>
       ) : (
         <div className="admin-list-card">
@@ -1451,7 +1575,7 @@ function AdminOrders() {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((o) => (
+                {filteredOrders.map((o) => (
                   <tr key={o.id}>
                     <td><strong>#{o.id}</strong></td>
                     <td>
@@ -2158,6 +2282,7 @@ function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   function loadReviews() {
     setLoading(true);
@@ -2180,6 +2305,24 @@ function AdminReviews() {
     }
   }
 
+  const filteredReviews = reviews.filter((r) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const prodName = (r.product_name || '').toLowerCase();
+    const custName = (r.customer_name || '').toLowerCase();
+    const custEmail = (r.customer_email || '').toLowerCase();
+    const text = (r.review_text || '').toLowerCase();
+    const ratingStr = String(r.rating || '');
+
+    return (
+      prodName.includes(q) ||
+      custName.includes(q) ||
+      custEmail.includes(q) ||
+      text.includes(q) ||
+      ratingStr.includes(q)
+    );
+  });
+
   if (loading) return <p className="admin-status">Loading customer reviews from database…</p>;
 
   return (
@@ -2187,7 +2330,27 @@ function AdminReviews() {
       <div className="admin-page-header">
         <div>
           <p className="eyebrow">Reputation & Feedback</p>
-          <h1 className="admin-page-title">Client Reviews ({reviews.length})</h1>
+          <h1 className="admin-page-title">Client Reviews ({filteredReviews.length})</h1>
+        </div>
+        <div className="admin-search-wrap" style={{ maxWidth: '320px' }}>
+          <Search size={16} className="admin-search-icon" />
+          <input
+            type="text"
+            className="admin-search-input"
+            placeholder="Search reviews by piece, client, comment..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="admin-search-clear"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+            >
+              <X size={14} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -2198,6 +2361,19 @@ function AdminReviews() {
           <Star size={32} className="icon-muted" />
           <p><strong>No customer reviews recorded yet.</strong></p>
           <p>When clients leave star ratings and reviews on pieces, they will be listed here for moderation.</p>
+        </div>
+      ) : filteredReviews.length === 0 ? (
+        <div className="admin-empty-state">
+          <Search size={32} className="icon-muted" />
+          <p><strong>No reviews match &ldquo;{searchQuery}&rdquo;.</strong></p>
+          <button
+            type="button"
+            className="btn btn-outline"
+            onClick={() => setSearchQuery('')}
+            style={{ marginTop: '0.75rem' }}
+          >
+            Clear Search Filter
+          </button>
         </div>
       ) : (
         <div className="admin-list-card">
@@ -2214,7 +2390,7 @@ function AdminReviews() {
                 </tr>
               </thead>
               <tbody>
-                {reviews.map((r) => (
+                {filteredReviews.map((r) => (
                   <tr key={r.id}>
                     <td>
                       <Link to={`/product/${r.product_slug}`} className="admin-prod-link" target="_blank">
