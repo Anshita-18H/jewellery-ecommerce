@@ -83,15 +83,6 @@ export default function Navbar({ cartCount = 0 }) {
               {link.label}
             </Link>
           ))}
-          {user && (
-            <Link
-              to="/my-orders"
-              className={`navbar-link ${location.pathname === '/my-orders' ? 'active' : ''}`}
-              onClick={() => setMenuOpen(false)}
-            >
-              My Orders
-            </Link>
-          )}
         </nav>
 
         {/* Right: Actions */}
@@ -197,6 +188,15 @@ export default function Navbar({ cartCount = 0 }) {
                       >
                         Create Account
                       </button>
+                      <Link
+                        to="/my-orders"
+                        className="navbar-dropdown-item"
+                        style={{ marginTop: '0.45rem', borderTop: '1px solid var(--border)' }}
+                        onClick={() => setAccountOpen(false)}
+                      >
+                        <Package size={15} />
+                        <span>Track / My Orders</span>
+                      </Link>
                     </div>
                   </>
                 )}
