@@ -19,7 +19,7 @@ function slugify(name) {
 // include_hidden=true to see everything, including soft-deleted products.
 router.get('/', async (req, res) => {
   try {
-    const { category, search, featured, gallery, occasion, gender, min_price, max_price, include_hidden } = req.query;
+    const { category, search, featured, gallery, occasion, gender, min_price, max_price, include_hidden, include_deleted, deleted_only } = req.query;
 
     let sql = `
       SELECT p.*, c.name AS category_name, c.slug AS category_slug,
@@ -34,7 +34,13 @@ router.get('/', async (req, res) => {
 
     // By default, public storefront only sees active products. Admin panel passes include_hidden=true
     if (include_hidden !== 'true') {
-      sql += ' AND COALESCE(p.is_active, 1) = 1';
+      sql += ' AND COALESCE(p.is_active, 1) = 1 AND COALESCE(p.is_deleted, 0) = 0';
+    } else {
+      if (deleted_only === 'true') {
+        sql += ' AND COALESCE(p.is_deleted, 0) = 1';
+      } else if (include_deleted !== 'true') {
+        sql += ' AND COALESCE(p.is_deleted, 0) = 0';
+      }
     }
 
     if (category) {
@@ -78,7 +84,7 @@ router.get('/', async (req, res) => {
   } catch (err) {
     console.error('Products fetch error, attempting fallback query:', err.message);
     try {
-      const { category, search, featured, gallery, occasion, gender, min_price, max_price, include_hidden } = req.query;
+      const { category, search, featured, gallery, occasion, gender, min_price, max_price, include_hidden, include_deleted, deleted_only } = req.query;
       let fallbackSql = `
         SELECT p.*, c.name AS category_name, c.slug AS category_slug,
                0 AS avg_rating,
@@ -90,7 +96,13 @@ router.get('/', async (req, res) => {
       const fallbackParams = [];
 
       if (include_hidden !== 'true') {
-        fallbackSql += ' AND COALESCE(p.is_active, 1) = 1';
+        fallbackSql += ' AND COALESCE(p.is_active, 1) = 1 AND COALESCE(p.is_deleted, 0) = 0';
+      } else {
+        if (deleted_only === 'true') {
+          fallbackSql += ' AND COALESCE(p.is_deleted, 0) = 1';
+        } else if (include_deleted !== 'true') {
+          fallbackSql += ' AND COALESCE(p.is_deleted, 0) = 0';
+        }
       }
 
       if (category) {
@@ -359,11 +371,11 @@ router.put('/:id/status', requireAdmin, async (req, res) => {
 // PUT /api/products/:id/restore — admin: activate a deactivated product
 router.put('/:id/restore', requireAdmin, async (req, res) => {
   try {
-    const [result] = await pool.query('UPDATE products SET is_active = 1 WHERE id = ?', [req.params.id]);
+    const [result] = await pool.query('UPDATE products SET is_deleted = 0, is_active = 1, deleted_at = NULL WHERE id = ?', [req.params.id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    res.json({ message: 'Product activated successfully', is_active: 1 });
+    res.json({ message: 'Product restored successfully to inventory', is_deleted: 0, is_active: 1 });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to activate product' });
@@ -373,11 +385,11 @@ router.put('/:id/restore', requireAdmin, async (req, res) => {
 // DELETE /api/products/:id — admin: soft-delete (deactivate) a product to keep database records intact
 router.delete('/:id', requireAdmin, async (req, res) => {
   try {
-    const [result] = await pool.query('UPDATE products SET is_active = 0 WHERE id = ?', [req.params.id]);
+    const [result] = await pool.query('UPDATE products SET is_deleted = 1, is_active = 0, deleted_at = NOW() WHERE id = ?', [req.params.id]);
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    res.json({ message: 'Product deactivated (soft-deleted) successfully', is_active: 0 });
+    res.json({ message: 'Product moved to Deleted Items', is_deleted: 1, is_active: 0 });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to deactivate product' });

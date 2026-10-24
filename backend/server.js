@@ -267,6 +267,21 @@ async function initDatabase() {
       console.warn('Could not verify is_active column on products:', err.message);
     }
 
+    try {
+      const [delCols] = await pool.query(`SHOW COLUMNS FROM products LIKE 'is_deleted'`);
+      if (delCols.length === 0) {
+        await pool.query(`ALTER TABLE products ADD COLUMN is_deleted TINYINT(1) DEFAULT 0 AFTER is_active`);
+        console.log('Added is_deleted column to products table');
+      }
+      const [delAtCols] = await pool.query(`SHOW COLUMNS FROM products LIKE 'deleted_at'`);
+      if (delAtCols.length === 0) {
+        await pool.query(`ALTER TABLE products ADD COLUMN deleted_at DATETIME NULL DEFAULT NULL AFTER is_deleted`);
+        console.log('Added deleted_at column to products table');
+      }
+    } catch (err) {
+      console.warn('Could not verify is_deleted column on products:', err.message);
+    }
+
     // Razorpay columns verification on orders table
     try {
       const razorpayCols = [

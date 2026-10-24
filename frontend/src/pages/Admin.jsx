@@ -29,6 +29,8 @@ import {
   User,
   Edit2,
   Check,
+  RotateCcw,
+  Trash2,
 } from 'lucide-react';
 import {
   getProducts,
@@ -38,6 +40,7 @@ import {
   deleteProduct,
   updateProductStatus,
   restoreProduct,
+  hardDeleteProduct,
   getOrders,
   updateOrderStatus,
   getAdminDashboard,
@@ -658,7 +661,7 @@ function AdminProducts({
     async (search = '') => {
       setLoading(true);
       try {
-        const params = { include_hidden: 'true' };
+        const params = { include_hidden: 'true', include_deleted: 'true' };
         if (search && search.trim()) {
           params.search = search.trim();
         }
@@ -771,7 +774,7 @@ function AdminProducts({
     const newStatus = isCurrentlyActive ? 0 : 1;
     try {
       await updateProductStatus(product.id, newStatus);
-      setMessage(newStatus === 1 ? `"${product.name}" is now Active on website.` : `"${product.name}" has been Deactivated (hidden from website, records preserved).`);
+      setMessage(newStatus === 1 ? `"${product.name}" is now Active on storefront.` : `"${product.name}" has been Deactivated (hidden from website).`);
       fetchProducts(searchQuery);
     } catch (err) {
       setMessage(err.message || 'Failed to update product status');
@@ -779,34 +782,57 @@ function AdminProducts({
   }
 
   async function handleDelete(product) {
-    const isCurrentlyActive = product.is_active !== 0 && product.is_active !== false;
-    if (isCurrentlyActive) {
-      if (!confirm(`Deactivate "${product.name}"? This soft-deletes the product by hiding it from the website storefront while keeping your database records intact.`)) return;
-      try {
-        await deleteProduct(product.id);
-        setMessage(`"${product.name}" soft-deleted (deactivated). Database record safely preserved.`);
-        fetchProducts(searchQuery);
-      } catch (err) {
-        setMessage(err.message || 'Failed to deactivate product');
-      }
-    } else {
-      if (!confirm(`"${product.name}" is currently deactivated. Would you like to reactivate it on the website?`)) return;
-      try {
-        await updateProductStatus(product.id, 1);
-        setMessage(`"${product.name}" is now Active on the website.`);
-        fetchProducts(searchQuery);
-      } catch (err) {
-        setMessage(err.message || 'Failed to activate product');
-      }
+    if (!confirm(`Move "${product.name}" to Deleted Items? It will be removed from your active inventory table and can be restored anytime.`)) return;
+    try {
+      await deleteProduct(product.id);
+      setMessage(`"${product.name}" soft-deleted (moved to Deleted Items).`);
+      fetchProducts(searchQuery);
+    } catch (err) {
+      setMessage(err.message || 'Failed to delete product');
     }
   }
 
+  async function handleRestore(product) {
+    try {
+      await restoreProduct(product.id);
+      setMessage(`"${product.name}" restored successfully back to active inventory.`);
+      fetchProducts(searchQuery);
+    } catch (err) {
+      setMessage(err.message || 'Failed to restore product');
+    }
+  }
+
+  async function handleHardDelete(product) {
+    if (!confirm(`Permanently delete "${product.name}" from database? This action is irreversible.`)) return;
+    try {
+      await hardDeleteProduct(product.id);
+      setMessage(`"${product.name}" permanently deleted from database.`);
+      fetchProducts(searchQuery);
+    } catch (err) {
+      setMessage(err.message || 'Failed to permanently delete product');
+    }
+  }
+
+  const nonDeletedProducts = products.filter((p) => p.is_deleted !== 1 && p.is_deleted !== true);
+  const deletedProducts = products.filter((p) => p.is_deleted === 1 || p.is_deleted === true);
+  const activeProducts = nonDeletedProducts.filter((p) => p.is_active !== 0 && p.is_active !== false);
+  const deactiveProducts = nonDeletedProducts.filter((p) => p.is_active === 0 || p.is_active === false);
+  const inStockProducts = nonDeletedProducts.filter((p) => Number(p.stock) > 5);
+  const lowStockProducts = nonDeletedProducts.filter((p) => Number(p.stock) <= 5);
+
   const filteredProducts = products.filter((p) => {
-    if (filter === 'instock') return p.stock > 5;
-    if (filter === 'lowstock') return p.stock <= 5;
+    const isDeleted = p.is_deleted === 1 || p.is_deleted === true;
+    if (filter === 'deleted') {
+      return isDeleted;
+    }
+    // All other filters completely exclude soft-deleted products so they are removed from the active table!
+    if (isDeleted) return false;
+
     if (filter === 'active') return p.is_active !== 0 && p.is_active !== false;
     if (filter === 'deactive') return p.is_active === 0 || p.is_active === false;
-    return true;
+    if (filter === 'instock') return Number(p.stock) > 5;
+    if (filter === 'lowstock') return Number(p.stock) <= 5;
+    return true; // 'all'
   });
 
   return (
@@ -814,7 +840,7 @@ function AdminProducts({
       <div className="admin-page-header">
         <div>
           <p className="eyebrow">Catalog Management</p>
-          <h1 className="admin-page-title">Products ({filteredProducts.length})</h1>
+          <h1 className="admin-page-title">Products ({filter === 'deleted' ? deletedProducts.length : nonDeletedProducts.length})</h1>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
           <div className="admin-search-wrap" style={{ minWidth: '240px', maxWidth: '340px' }}>
@@ -1088,42 +1114,58 @@ function AdminProducts({
         {/* PRODUCTS LIST TABLE */}
         <div className="admin-list-card">
           <div className="admin-list-header">
-            <h3>Inventory Table</h3>
+            <div>
+              <h3>{filter === 'deleted' ? 'Deleted Items' : 'Inventory Table'}</h3>
+              <p className="admin-list-sub">
+                {filter === 'deleted'
+                  ? 'Soft-deleted items removed from the live store catalog. You can restore them or permanently delete them.'
+                  : 'Manage pricing, real-time stock levels, storefront visibility, and categories.'}
+              </p>
+            </div>
             <div className="admin-filter-bar">
               <button
                 type="button"
                 className={`admin-filter-btn ${filter === 'all' ? 'active' : ''}`}
                 onClick={() => setFilter('all')}
               >
-                All ({products.length})
+                All ({nonDeletedProducts.length})
               </button>
               <button
                 type="button"
                 className={`admin-filter-btn ${filter === 'active' ? 'active' : ''}`}
                 onClick={() => setFilter('active')}
               >
-                Active ({products.filter((p) => p.is_active !== 0 && p.is_active !== false).length})
+                Active ({activeProducts.length})
               </button>
               <button
                 type="button"
                 className={`admin-filter-btn ${filter === 'deactive' ? 'active' : ''}`}
                 onClick={() => setFilter('deactive')}
               >
-                Deactive ({products.filter((p) => p.is_active === 0 || p.is_active === false).length})
+                Deactive ({deactiveProducts.length})
               </button>
               <button
                 type="button"
                 className={`admin-filter-btn ${filter === 'instock' ? 'active' : ''}`}
                 onClick={() => setFilter('instock')}
               >
-                In Stock ({products.filter((p) => p.stock > 5).length})
+                In Stock ({inStockProducts.length})
               </button>
               <button
                 type="button"
                 className={`admin-filter-btn ${filter === 'lowstock' ? 'active' : ''}`}
                 onClick={() => setFilter('lowstock')}
               >
-                Low Stock ({products.filter((p) => p.stock <= 5).length})
+                Low Stock ({lowStockProducts.length})
+              </button>
+              <button
+                type="button"
+                className={`admin-filter-btn admin-filter-btn-deleted ${filter === 'deleted' ? 'active' : ''}`}
+                onClick={() => setFilter('deleted')}
+                title="View soft-deleted products"
+              >
+                <Trash2 size={13} />
+                <span>Deleted ({deletedProducts.length})</span>
               </button>
             </div>
           </div>
@@ -1133,8 +1175,10 @@ function AdminProducts({
           ) : filteredProducts.length === 0 ? (
             <div className="admin-no-results">
               <Search size={32} className="icon-muted" />
-              <h4>No products found</h4>
-              {searchQuery ? (
+              <h4>{filter === 'deleted' ? 'No Deleted Items' : 'No products found'}</h4>
+              {filter === 'deleted' ? (
+                <p>When you delete products from your inventory, they are safely preserved here and can be restored anytime.</p>
+              ) : searchQuery ? (
                 <p>
                   No jewellery matched your search query <strong>"{searchQuery}"</strong>.
                 </p>
@@ -1159,121 +1203,162 @@ function AdminProducts({
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Image</th>
+                    <th style={{ width: '56px' }}>ID</th>
+                    <th style={{ width: '60px', textAlign: 'center' }}>Image</th>
                     <th>Name</th>
                     <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Rating</th>
-                    <th>Actions</th>
+                    <th style={{ minWidth: '130px' }}>Status</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>Price</th>
+                    <th style={{ width: '80px', textAlign: 'center' }}>Stock</th>
+                    <th style={{ width: '80px', textAlign: 'center' }}>Rating</th>
+                    <th style={{ textAlign: 'right', minWidth: '190px' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.map((p) => (
-                    <tr key={p.id}>
-                      <td style={{ color: 'var(--text-muted)' }}>#{p.id}</td>
-                      <td>
-                        <img src={p.image_url} alt={p.name} className="admin-table-img" />
-                      </td>
-                      <td>
-                        <div style={{ fontWeight: 500, color: 'var(--cream)' }}>{p.name}</div>
-                        <span className="admin-name-sub">/{p.slug}</span>
-                      </td>
-                      <td>
-                        <div>{p.category_name || '—'}</div>
-                        {p.occasion_tags && (
-                          <span className="admin-name-sub" style={{ color: 'var(--gold)' }}>
-                            Tags: {p.occasion_tags}
-                          </span>
-                        )}
-                        {p.gender_tag && (
-                          <span className="admin-name-sub" style={{ color: 'var(--cream)', textTransform: 'capitalize' }}>
-                            Gender: {p.gender_tag}
-                          </span>
-                        )}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
-                          {p.is_active === 0 || p.is_active === false ? (
-                            <span className="admin-stock-badge deactive" style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
-                              Deactivated
-                            </span>
-                          ) : (
-                            <span className="admin-stock-badge active-status" style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
-                              Active
+                  {filteredProducts.map((p) => {
+                    const isDeleted = p.is_deleted === 1 || p.is_deleted === true;
+                    const isActive = p.is_active !== 0 && p.is_active !== false;
+
+                    return (
+                      <tr key={p.id} className={isDeleted ? 'row-deleted' : ''}>
+                        <td style={{ color: 'var(--text-muted)', fontFamily: 'monospace', fontWeight: 600 }}>
+                          #{p.id}
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <img src={p.image_url || '/placeholder.jpg'} alt={p.name} className="admin-table-img" />
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 500, color: 'var(--cream)', fontSize: '0.86rem' }}>{p.name}</div>
+                          <span className="admin-name-sub">/{p.slug}</span>
+                        </td>
+                        <td>
+                          <div style={{ color: 'var(--cream)', fontWeight: 500 }}>{p.category_name || '—'}</div>
+                          {p.occasion_tags && (
+                            <span className="admin-name-sub" style={{ color: 'var(--gold-dim)' }}>
+                              Tags: {p.occasion_tags}
                             </span>
                           )}
-                          {Boolean(p.is_hero_banner) && (
-                            <span className="admin-stock-badge" style={{ background: 'rgba(212, 175, 55, 0.25)', color: 'var(--gold)', border: '1px solid var(--gold)', fontSize: '0.68rem', padding: '2px 6px' }}>
-                              ★ Hero Banner
+                          {p.gender_tag && (
+                            <span className="admin-name-sub" style={{ color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                              Gender: {p.gender_tag}
                             </span>
                           )}
-                          {Boolean(p.is_in_gallery) && (
-                            <span className="admin-stock-badge" style={{ background: 'rgba(186, 104, 200, 0.25)', color: '#ce93d8', border: '1px solid #ce93d8', fontSize: '0.68rem', padding: '2px 6px' }}>
-                              ✦ Gallery
-                            </span>
-                          )}
-                          {p.section_cover && (
-                            <span className="admin-stock-badge" style={{ background: 'rgba(129, 199, 132, 0.25)', color: '#81c784', border: '1px solid #81c784', fontSize: '0.68rem', padding: '2px 6px', textTransform: 'capitalize' }}>
-                              Cover: {p.section_cover}
-                            </span>
-                          )}
-                          {Boolean(p.is_featured) && (
-                            <span className="admin-stock-badge" style={{ background: 'rgba(255, 255, 255, 0.08)', color: 'var(--text-muted)', fontSize: '0.68rem', padding: '2px 6px' }}>
-                              Featured
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td>{formatCurrency(p.price)}</td>
-                      <td>
-                        <span className={`admin-stock-badge ${p.stock <= 5 ? 'low-stock' : 'in-stock'}`}>
-                          {p.stock}
-                        </span>
-                      </td>
-                      <td>
-                        {p.avg_rating > 0 ? (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <Star size={12} fill="var(--gold)" stroke="none" />
-                            <span>{p.avg_rating}</span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
+                            {isDeleted ? (
+                              <span className="admin-status-pill status-deleted">
+                                <span className="admin-status-dot" /> Deleted
+                              </span>
+                            ) : !isActive ? (
+                              <span className="admin-status-pill status-deactive">
+                                <span className="admin-status-dot" /> Deactivated
+                              </span>
+                            ) : (
+                              <span className="admin-status-pill status-active">
+                                <span className="admin-status-dot" /> Active
+                              </span>
+                            )}
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                              {Boolean(p.is_hero_banner) && (
+                                <span className="admin-mini-tag hero-tag">★ Hero</span>
+                              )}
+                              {Boolean(p.is_in_gallery) && (
+                                <span className="admin-mini-tag gallery-tag">✦ Gallery</span>
+                              )}
+                              {Boolean(p.is_featured) && (
+                                <span className="admin-mini-tag featured-tag">Featured</span>
+                              )}
+                            </div>
                           </div>
-                        ) : (
-                          <span style={{ color: 'var(--text-muted)' }}>—</span>
-                        )}
-                      </td>
-                      <td className="admin-table-actions">
-                        <button type="button" onClick={() => startEdit(p)}>
-                          Edit
-                        </button>
-                        {p.is_active === 0 || p.is_active === false ? (
-                          <button
-                            type="button"
-                            className="admin-active-btn"
-                            onClick={() => handleToggleActive(p)}
-                            title="Activate piece on website"
-                          >
-                            Active
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            className="admin-deactive-btn"
-                            onClick={() => handleToggleActive(p)}
-                            title="Deactivate piece (hide from website without deleting from database)"
-                          >
-                            Deactive
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          className="admin-delete-btn"
-                          onClick={() => handleDelete(p)}
-                          title="Soft delete (deactivate) product"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td style={{ whiteSpace: 'nowrap' }}>
+                          <strong style={{ color: 'var(--gold-bright)', fontSize: '0.88rem' }}>
+                            {formatCurrency(p.price)}
+                          </strong>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <span className={`admin-stock-badge ${Number(p.stock) <= 5 ? 'low-stock' : 'in-stock'}`}>
+                            {p.stock}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          {p.avg_rating > 0 ? (
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                              <Star size={11} fill="var(--gold)" stroke="none" />
+                              <span style={{ fontWeight: 500, color: 'var(--cream)', fontSize: '0.8rem' }}>{p.avg_rating}</span>
+                            </div>
+                          ) : (
+                            <span style={{ color: 'var(--text-muted)' }}>—</span>
+                          )}
+                        </td>
+                        <td className="admin-table-actions" style={{ textAlign: 'right' }}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', width: '100%' }}>
+                            {isDeleted ? (
+                              <>
+                                <button
+                                  type="button"
+                                  className="admin-restore-btn"
+                                  onClick={() => handleRestore(p)}
+                                  title="Restore piece back to live inventory"
+                                >
+                                  <RotateCcw size={12} />
+                                  <span>Restore</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  className="admin-delete-permanent-btn"
+                                  onClick={() => handleHardDelete(p)}
+                                  title="Permanently remove from database"
+                                >
+                                  <Trash2 size={12} />
+                                  <span>Delete Forever</span>
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  type="button"
+                                  className="admin-edit-btn"
+                                  onClick={() => startEdit(p)}
+                                  title="Edit piece details"
+                                >
+                                  Edit
+                                </button>
+                                {!isActive ? (
+                                  <button
+                                    type="button"
+                                    className="admin-active-btn"
+                                    onClick={() => handleToggleActive(p)}
+                                    title="Activate piece on website storefront"
+                                  >
+                                    Active
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="admin-deactive-btn"
+                                    onClick={() => handleToggleActive(p)}
+                                    title="Deactivate piece (hide from storefront)"
+                                  >
+                                    Deactive
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  className="admin-delete-btn"
+                                  onClick={() => handleDelete(p)}
+                                  title="Move piece to Deleted Items"
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

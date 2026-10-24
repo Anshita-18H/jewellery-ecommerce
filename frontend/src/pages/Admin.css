@@ -2117,3 +2117,222 @@
   transform: translateX(4px);
 }
 
+
+
+/* ========================================================
+   TABLE STYLING ENHANCEMENTS - PERFECT LINES & STATUS PILLS
+   ======================================================== */
+.admin-table-responsive {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-card) !important;
+}
+
+.admin-table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+.admin-table th {
+  background: #181512 !important;
+  color: var(--text-muted) !important;
+  font-weight: 600 !important;
+  font-size: 0.69rem !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  padding: 0.95rem 1rem !important;
+  border-bottom: 2px solid rgba(201, 164, 92, 0.35) !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+}
+
+.admin-table td {
+  padding: 0.95rem 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: var(--text-body) !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+  transition: background 0.15s ease !important;
+}
+
+.admin-table tbody tr:hover td {
+  background: rgba(201, 164, 92, 0.035) !important;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none !important;
+}
+
+.admin-table tbody tr.row-deleted td {
+  background: rgba(244, 67, 54, 0.02) !important;
+  opacity: 0.88;
+}
+
+.admin-table tbody tr.row-deleted:hover td {
+  background: rgba(244, 67, 54, 0.06) !important;
+  opacity: 1;
+}
+
+/* Status Pills */
+.admin-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.admin-status-pill .admin-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-active {
+  background: rgba(76, 175, 80, 0.15);
+  color: #81c784;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+}
+.status-active .admin-status-dot {
+  background: #81c784;
+  box-shadow: 0 0 6px rgba(129, 199, 132, 0.6);
+}
+
+.status-deactive {
+  background: rgba(255, 179, 0, 0.14);
+  color: #ffb74d;
+  border: 1px solid rgba(255, 179, 0, 0.4);
+}
+.status-deactive .admin-status-dot {
+  background: #ffb74d;
+}
+
+.status-deleted {
+  background: rgba(244, 67, 54, 0.14);
+  color: #e57373;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+}
+.status-deleted .admin-status-dot {
+  background: #e57373;
+  box-shadow: 0 0 5px rgba(229, 115, 115, 0.5);
+}
+
+/* Mini Tags */
+.admin-mini-tag {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.hero-tag {
+  background: rgba(212, 175, 55, 0.22);
+  color: var(--gold);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+}
+
+.gallery-tag {
+  background: rgba(186, 104, 200, 0.2);
+  color: #ce93d8;
+  border: 1px solid rgba(186, 104, 200, 0.45);
+}
+
+.featured-tag {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--cream);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Filter Bar Buttons */
+.admin-filter-btn-deleted {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  color: #e57373 !important;
+  border-color: rgba(229, 115, 115, 0.3) !important;
+}
+
+.admin-filter-btn-deleted:hover,
+.admin-filter-btn-deleted.active {
+  border-color: #e57373 !important;
+  background: rgba(229, 115, 115, 0.16) !important;
+  color: #ff8a80 !important;
+}
+
+/* Action Buttons */
+.admin-restore-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.73rem;
+  font-weight: 500;
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.45);
+  color: #81c784;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.admin-restore-btn:hover {
+  background: #81c784;
+  color: #111;
+}
+
+.admin-delete-permanent-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.73rem;
+  font-weight: 500;
+  background: rgba(244, 67, 54, 0.14);
+  border: 1px solid rgba(244, 67, 54, 0.45);
+  color: #e57373;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.admin-delete-permanent-btn:hover {
+  background: #e57373;
+  color: #fff;
+}
+
+.admin-active-btn {
+  border: 1px solid rgba(76, 175, 80, 0.45) !important;
+  color: #81c784 !important;
+  background: rgba(76, 175, 80, 0.1) !important;
+  font-weight: 500 !important;
+}
+.admin-active-btn:hover {
+  background: #81c784 !important;
+  color: #111 !important;
+}
+
+.admin-deactive-btn {
+  border: 1px solid rgba(255, 179, 0, 0.45) !important;
+  color: #ffb74d !important;
+  background: rgba(255, 179, 0, 0.08) !important;
+  font-weight: 500 !important;
+}
+.admin-deactive-btn:hover {
+  background: #ffb74d !important;
+  color: #111 !important;
+}
+
+.admin-delete-btn {
+  border: 1px solid rgba(244, 67, 54, 0.35) !important;
+  color: #e57373 !important;
+}
+.admin-delete-btn:hover {
+  background: rgba(244, 67, 54, 0.15) !important;
+  border-color: #e57373 !important;
+  color: #ff8a80 !important;
+}
